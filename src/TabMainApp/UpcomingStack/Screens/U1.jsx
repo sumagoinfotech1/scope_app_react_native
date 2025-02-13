@@ -90,7 +90,7 @@ const U1 = () => {
   return (
     <GradientContainer style={styles.maincontainer}>
   
-    <View style={{ margin: hp('3') }}>
+    <View style={{ marginTop: Platform.OS === 'ios' ? hp("7%") : hp("2%"), marginBottom:hp("2%")}}>
         <ScreenHeader headername={"UPCOMING EVENTS"} />
       </View>
       

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView } from 'react-native'
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView ,Platform} from 'react-native'
 import React, { memo } from 'react'
 import ScreenHeader from '../../../ReusableComponents/ScreenHeader'
 import GradientContainer from '../../../ReusableComponents/GradientContainer'
@@ -24,7 +24,7 @@ const meetupData = [
 const Home = () => {
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Image source={{ uri: item.image }} style={{ width: wp("80%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
+      <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
     </View>
   );
 
@@ -48,9 +48,9 @@ const Home = () => {
 
         {/* Location */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4') ,width: wp("40"),}]}>
+          <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4') ,width: wp("45"),}]}>
             <FontAwesome name="map-marker" size={16} color="black" />
-            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
+            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}sdsdasdadddas</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <CustomButton
@@ -108,7 +108,7 @@ const Home = () => {
   return (
     <GradientContainer style={styles.maincontainer}>
       <ScrollView>
-      <View style={{ marginTop: hp('4') }}>
+      <View style={{ marginTop: Platform.OS === 'ios' ? hp("7%") : hp("2%"), marginBottom:hp("2%")}}>
         <ScreenHeader headername={"EVENTS"} />
         </View>
         <View style={styles.bannerContainer}>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     color: Colors.black,
     fontSize: wp("3.5%"),
     padding: wp("1%"),
-
+    width: wp("40")
 
   },
 
