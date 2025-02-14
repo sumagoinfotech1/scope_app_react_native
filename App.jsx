@@ -23,7 +23,7 @@ const App = () => {
   useEffect(() => {
     setTimeout(() => {
       SplashScreen.hide(); // Hide splash screen after 2 seconds
-    }, 2000);
+    }, 3000);
   }, []);
   return (
     <NavigationContainer>

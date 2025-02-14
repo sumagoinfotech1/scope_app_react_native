@@ -427,14 +427,20 @@ import CustomButton from "../ReusableComponents/CustomButton";
 import FontAwesome from "react-native-vector-icons/Feather";
 import CarouselComponent from "../ReusableComponents/CarouselComponent";
 import HeaderName from "../ReusableComponents/HeaderName";
-
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 const Mobile = ({ navigation }) => {
   const [step, setStep] = useState("mobile"); // Tracks the current step
   const [mobile, setMobile] = useState(""); // Store mobile number
   const [otp, setOtp] = useState(["", "", "", ""]); // Store OTP
   const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
-  const [profile, setProfile] = useState(""); // Store Profile name
+  const [profileName, setProfileName] = useState("");
+  const [promocode, setPromocode] = useState("");  // Store Profile name
   const [loading, setLoading] = useState(false); // Show loader while API fetches
+  const [error, setError] = useState("");
+  const [errorOccure, setErrorOccure] = useState(false);
+const OTP=otp.join('')
+console.log('otp4',OTP);
 
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -448,30 +454,128 @@ const Mobile = ({ navigation }) => {
     { id: 3, image: 'https://i.pinimg.com/736x/51/d5/48/51d548911242e61017adcdfbed429f59.jpg' },
   ];
 
+ 
+
   const handleSendOtp = async () => {
-    setStep("otp");
+    setErrorOccure(false);
+  
+    if (!/^\d{10}$/.test(mobile)) {
+      setErrorOccure(true);
+      setError("Enter a valid 10-digit mobile number");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.post("http://16.170.83.70:3001/api/user/send-otp", {
+        mobile: mobile,
+      });
+  
+      console.log("Response:", response.data);
+  
+      if (response.data.result) {
+        setStep("otp");
+      } else {
+        alert(response.data.message || "Failed to send OTP");
+      }
+    } catch (error) {
+      alert(error.response?.data?.message || "Error sending OTP");
+    }
+  
     setLoading(false);
   };
+  
 
   const handleVerifyOtp = async () => {
-    setStep("profile");
+    setErrorOccure(false);
+  
+    // Validate OTP (Ensure 4-digit input)
+    if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => !digit.trim())) {
+      setErrorOccure(true);
+      setError("Enter 4 digits OTP");
+      return;
+    }
+  
+    setLoading(true);
+    try {
+      const response = await axios.post("http://16.170.83.70:3001/auth/verify-otp", {
+        mobile,
+        otp: OTP, // Convert array to string
+      });
+  
+      console.log("Response:", response.data);
+  
+      if (response.data.result) {
+        const { accessToken, refreshToken } = response.data.data;
+  
+        // Store tokens securely in AsyncStorage
+        await AsyncStorage.setItem("accessToken", accessToken);
+        await AsyncStorage.setItem("refreshToken", refreshToken);
+  
+        setStep("profile"); // Move to the next step after successful verification
+      } else {
+        alert(response.data.message || "OTP verification failed");
+      }
+    } catch (error) {
+      console.error("Error verifying OTP:", error);
+      alert(error.response?.data?.message || "Error verifying OTP");
+    }
+  
     setLoading(false);
   };
+  
+  
+  
+  const validateName = (name) => {
+    if (!name.trim()) {
+      return "Name cannot be empty";
+    }
+  
+    if (!/^[A-Za-z\s]+$/.test(name)) {
+      return "Name must contain only letters and spaces";
+    }
+  
+    if (name.length < 2 || name.length > 50) {
+      return "Name must be between 2 and 50 characters";
+    }
+  
+    return null; // No errors
+  };
+  
+  
 
   const handleSaveProfile = async () => {
+    setErrorOccure(false);
+  const errorMessage = validateName(profileName);
+  if (errorMessage) {
+    setErrorOccure(true);
+    setError(errorMessage);
+    return;
+  }
     navigation.navigate("SkillsScreen");
     setLoading(false);
   };
 
   const handleChangeText = (text, index) => {
-    if (text.length > 1) return;
+    if (text.length > 1 || !/^\d?$/.test(text)) return; // Allow only a single digit (0-9)
+  
     let newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
+  
+    // Move focus to the next input if text is entered
     if (text && index < 3) {
       inputRefs[index + 1].current.focus();
     }
   };
+  
+  const handleKeyPress = (e, index) => {
+    if (e.nativeEvent.key === "Backspace" && index > 0 && !otp[index]) {
+      inputRefs[index - 1].current.focus();
+    }
+  };
+  
+  
 
   if (loading) {
     return (
@@ -486,15 +590,14 @@ const Mobile = ({ navigation }) => {
       <View style={styles.container}>
         <HeaderName />
         <View style={styles.bannerContainer}>
-          <CarouselComponent data={data} renderItem={renderItem} height={hp("30%")} />
+          <CarouselComponent data={data} renderItem={renderItem} height={hp("37%")} />
         </View>
       </View>
+      
       <LinearGradient colors={["#F3B2B2", "#FFFFFF"]} style={styles.formContainer}>
         {step === "mobile" && (
-          <>
-            <View style={styles.avatarContainer}>
-              <Image source={require("../assets/icons/I1.png")} style={styles.avatar} />
-            </View>
+          <View style={{ alignItems: 'center', width: wp('90%'), marginTop: hp('4') }}>
+
             <Text style={styles.label}>Enter your mobile number</Text>
             <TextInput
               style={styles.input}
@@ -502,17 +605,22 @@ const Mobile = ({ navigation }) => {
               keyboardType="numeric"
               value={mobile}
               onChangeText={setMobile}
+              maxLength={10}
             />
+            {errorOccure ? <View style={styles.errorcontainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View> : null}
+
             <CustomButton title="Proceed" align="right" onPress={handleSendOtp} />
-          </>
+          </View>
         )}
 
         {step === "otp" && (
           <>
             <Text style={styles.label}>OTP Verification</Text>
-            
+
             <Text style={styles.extraText}>A 4 Digit CODE HAS BEEN SENT TO {"\n"}{mobile}
-              <FontAwesome name="edit-2" size={20} color={"red"} onPress={() => setStep("mobile")} />
+              <FontAwesome name="edit-2" size={18} color={"black"} onPress={() => setStep("mobile")} />
             </Text>
             <View style={styles.otpContainer}>
               {otp.map((value, index) => (
@@ -525,9 +633,14 @@ const Mobile = ({ navigation }) => {
                   maxLength={1}
                   value={value}
                   onChangeText={(text) => handleChangeText(text, index)}
+                  onKeyPress={(e) => handleKeyPress(e, index)}
                 />
               ))}
+             
             </View>
+            {errorOccure ? <View style={styles.errorcontainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View> : null}
             <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} />
           </>
         )}
@@ -535,44 +648,57 @@ const Mobile = ({ navigation }) => {
         {step === "profile" && (
           <>
             <Text style={styles.label}>Complete Profile</Text>
-            <TextInput style={styles.input} placeholder="Enter name" value={profile} onChangeText={setProfile} />
+            <TextInput style={styles.input} 
+            placeholder="Enter name" 
+            alue={profileName} 
+            onChangeText={setProfileName} />
 
             <TextInput
               style={styles.input}
               placeholder="Enter Mobile Number"
               value={mobile}
-              onChangeText={setProfile}
+             
               editable={false}
             />
             <View style={[styles.input, { flexDirection: 'row' }]}>
               <TextInput
                 placeholder="Enter Promo Code"
-                value={profile}
-                onChangeText={setProfile}
+                value={promocode}
+                onChangeText={setPromocode}
               />
               <CustomButton
                 title="Apply"
                 align="center"
-                style={{ paddingHorizontal: wp("4"), padding: wp("1.2%"), }}
+                style={{ paddingHorizontal: wp("4"), padding: wp("3%"), left: wp('3.3') }}
                 textstyle={{ fontSize: wp("3.4%") }}
 
               />
+              
             </View>
+            {errorOccure ? <View style={styles.errorcontainer}>
+              <Text style={styles.errorText}>{error}</Text>
+            </View> : null}
             <CustomButton title="Submit" align="right" onPress={handleSaveProfile} />
           </>
         )}
       </LinearGradient>
+      {step === "mobile" && (
+        <View style={styles.avatarContainer}>
+          <Image source={require("../assets/icons/I1.png")} style={styles.avatar} />
+        </View>
+      )}
     </View>
+
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 2, alignItems: "center", justifyContent: "center" },
+  container: { flex: 1.5, alignItems: "center", justifyContent: "center" },
 
   bannerContainer: { alignItems: "center", justifyContent: 'center', marginBottom: hp("5%"), width: wp("100%") },
 
   avatarContainer: {
-    position: "relative",
+    position: "absolute",
     bottom: hp("4%"),
     alignItems: "center",
     justifyContent: "center",
@@ -580,6 +706,10 @@ const styles = StyleSheet.create({
     height: hp("15%"),
     backgroundColor: Colors.secondary,
     borderRadius: hp("10%"),
+    bottom: Platform.OS === 'ios' ? hp("31") : hp("27.8%"),
+
+    alignSelf: 'center',
+    zIndex: 10,
     // Android
     elevation: 10,
 
@@ -593,16 +723,17 @@ const styles = StyleSheet.create({
   avatar: { width: hp("10%"), height: hp("9%"), position: "absolute", resizeMode: 'contain', right: hp("1%") },
 
   formContainer: {
-    flex: 2,
+    flex: 1,
     padding: wp("5%"),
     width: "100%",
     alignItems: "center",
     borderTopLeftRadius: wp("7%"),
     borderTopRightRadius: wp("7%"),
     justifyContent: "center",
+
   },
 
-  label: { fontSize: wp("4.5%"), fontWeight: "bold", marginBottom: hp("1.5%"), color: Colors.black },
+  label: { fontSize: wp("4.9%"), fontWeight: "bold", marginBottom: hp("1.5%"), color: Colors.black },
 
   input: {
     width: "100%",
@@ -614,12 +745,13 @@ const styles = StyleSheet.create({
     marginBottom: hp("1.2%"),
     backgroundColor: Colors.white,
     elevation: 10,
-    fontSize:wp("3.6%"),
+    fontSize: wp("3.8%"),
     // iOS
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
+    marginVertical: hp('1')
   },
 
   otpContainer: { flexDirection: "row", justifyContent: "center", marginBottom: hp("2%") },
@@ -638,22 +770,30 @@ const styles = StyleSheet.create({
 
   carouselImage: {
     width: wp("95%"),
-    height: hp("25%"),
+    height: hp("33%"),
     borderRadius: 20,
     backgroundColor: "black",
     resizeMode: "cover",
     borderWidth: 2,
     borderColor: Colors.white,
   },
-    extraText: {
+  extraText: {
     fontSize: wp("3%"),
     fontWeight: "400",
     marginBottom: hp("1.5%"),
     color: Colors.black,
     alignSelf: "center",
     textAlign: 'center',
-
+    margin: wp("1%"),
   },
+  errorcontainer: {
+    alignItems: "center",
+    justifyContent: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: wp('4')
+  }
 });
 
 export default Mobile;

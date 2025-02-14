@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    top: hp("6")
+    top: hp("3")
   },
 
   bannerContainer: {

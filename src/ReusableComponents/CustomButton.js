@@ -15,7 +15,7 @@ const CustomButton = ({ title, onPress, style, align = 'center',textstyle }) => 
 const styles = StyleSheet.create({
   container: {
     width: '100%',  
-    marginVertical: wp("2%"), 
+    marginVertical: wp("1%"), 
   },
   button: {
     backgroundColor: Colors.background,
