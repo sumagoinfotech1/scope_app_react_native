@@ -418,7 +418,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator ,alert} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -429,6 +429,8 @@ import CarouselComponent from "../ReusableComponents/CarouselComponent";
 import HeaderName from "../ReusableComponents/HeaderName";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loader from "../ReusableComponents/Loader";
+import { API_URL } from '@env';
 const Mobile = ({ navigation }) => {
   const [step, setStep] = useState("mobile"); // Tracks the current step
   const [mobile, setMobile] = useState(""); // Store mobile number
@@ -440,7 +442,7 @@ const Mobile = ({ navigation }) => {
   const [error, setError] = useState("");
   const [errorOccure, setErrorOccure] = useState(false);
 const OTP=otp.join('')
-console.log('otp4',OTP);
+
 
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -467,7 +469,7 @@ console.log('otp4',OTP);
   
     setLoading(true);
     try {
-      const response = await axios.post("http://16.170.83.70:3001/api/user/send-otp", {
+      const response = await axios.post(`${API_URL}api/user/send-otp`, {
         mobile: mobile,
       });
   
@@ -498,12 +500,12 @@ console.log('otp4',OTP);
   
     setLoading(true);
     try {
-      const response = await axios.post("http://16.170.83.70:3001/auth/verify-otp", {
+      const response = await axios.post(`${API_URL}auth/verify-otp`, {
         mobile,
         otp: OTP, // Convert array to string
       });
   
-      console.log("Response:", response.data);
+      // console.log("Response:", response.data);
   
       if (response.data.result) {
         const { accessToken, refreshToken } = response.data.data;
@@ -544,17 +546,64 @@ console.log('otp4',OTP);
   
   
 
-  const handleSaveProfile = async () => {
+  const handleCompleteProfile = async () => {
+    setLoading(true);
     setErrorOccure(false);
-  const errorMessage = validateName(profileName);
-  if (errorMessage) {
-    setErrorOccure(true);
-    setError(errorMessage);
-    return;
-  }
-    navigation.navigate("SkillsScreen");
-    setLoading(false);
+  
+    // Validate Profile Name
+    const errorMessage = validateName(profileName);
+    if (errorMessage) {
+      setErrorOccure(true);
+      setError(errorMessage);
+      setLoading(false);
+      return;
+    }
+  
+    try {
+      // Retrieve Access Token
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) {
+        throw new Error('Authentication token not found');
+      }
+  
+      console.log('Request Payload:', { mobile, name: profileName });
+  
+      // Make API Request
+      const response = await axios.post(
+        `${API_URL}auth/complete-profile`,
+        { mobile, name: profileName },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+  
+      // console.log('API Response:', response);
+  
+      if (response.status === 200 && response.data?.result) {
+        navigation.navigate('SkillsScreen');
+      } else {
+        throw new Error(response.data?.message || 'Profile update failed');
+      }
+    } catch (error) {
+      console.error('Error in handleCompleteProfile:', error);
+  
+      let errorMsg = 'Something went wrong. Please try again.';
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+  
+      setErrorOccure(true);
+      setError(errorMsg);
+      alert(errorMsg);
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   const handleChangeText = (text, index) => {
     if (text.length > 1 || !/^\d?$/.test(text)) return; // Allow only a single digit (0-9)
@@ -575,15 +624,6 @@ console.log('otp4',OTP);
     }
   };
   
-  
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#F66" />
-      </View>
-    );
-  }
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -678,7 +718,7 @@ console.log('otp4',OTP);
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
-            <CustomButton title="Submit" align="right" onPress={handleSaveProfile} />
+            <CustomButton title="Submit" align="right" onPress={handleCompleteProfile} />
           </>
         )}
       </LinearGradient>
@@ -687,6 +727,7 @@ console.log('otp4',OTP);
           <Image source={require("../assets/icons/I1.png")} style={styles.avatar} />
         </View>
       )}
+      <Loader visible={loading}/>
     </View>
 
   );
