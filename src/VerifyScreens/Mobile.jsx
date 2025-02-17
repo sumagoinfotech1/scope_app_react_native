@@ -418,7 +418,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator ,alert} from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator, alert, Alert } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -441,7 +441,8 @@ const Mobile = ({ navigation }) => {
   const [loading, setLoading] = useState(false); // Show loader while API fetches
   const [error, setError] = useState("");
   const [errorOccure, setErrorOccure] = useState(false);
-const OTP=otp.join('')
+  const [verifiedcode, setVerifyCode] = useState(false);
+  const OTP = otp.join('')
 
 
   const renderItem = ({ item }) => (
@@ -456,64 +457,67 @@ const OTP=otp.join('')
     { id: 3, image: 'https://i.pinimg.com/736x/51/d5/48/51d548911242e61017adcdfbed429f59.jpg' },
   ];
 
- 
+
 
   const handleSendOtp = async () => {
     setErrorOccure(false);
-  
+
     if (!/^\d{10}$/.test(mobile)) {
       setErrorOccure(true);
       setError("Enter a valid 10-digit mobile number");
       return;
     }
-  
+
     setLoading(true);
     try {
       const response = await axios.post(`${API_URL}api/user/send-otp`, {
         mobile: mobile,
       });
-  
+
       console.log("Response:", response.data);
-  
-      if (response.data.result) {
+
+      if (response.data.result===true) {
         setStep("otp");
+        setLoading(false);
       } else {
-        alert(response.data.message || "Failed to send OTP");
+        setErrorOccure(true);
+        setError(response.data.message || "Failed to send OTP");
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Error sending OTP");
+      setErrorOccure(true);
+      setError(error.response?.data?.message || "Error sending OTP");
     }
-  
+    // setErrorOccure(false);
     setLoading(false);
   };
-  
+
 
   const handleVerifyOtp = async () => {
     setErrorOccure(false);
-  
+
     // Validate OTP (Ensure 4-digit input)
     if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => !digit.trim())) {
       setErrorOccure(true);
       setError("Enter 4 digits OTP");
       return;
     }
-  
+
     setLoading(true);
     try {
       const response = await axios.post(`${API_URL}auth/verify-otp`, {
         mobile,
         otp: OTP, // Convert array to string
       });
-  
+
       // console.log("Response:", response.data);
-  
+
       if (response.data.result) {
         const { accessToken, refreshToken } = response.data.data;
-  
+
         // Store tokens securely in AsyncStorage
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
-  
+
         setStep("profile"); // Move to the next step after successful verification
       } else {
         alert(response.data.message || "OTP verification failed");
@@ -522,34 +526,34 @@ const OTP=otp.join('')
       console.error("Error verifying OTP:", error);
       alert(error.response?.data?.message || "Error verifying OTP");
     }
-  
+
     setLoading(false);
   };
-  
-  
-  
+
+
+
   const validateName = (name) => {
     if (!name.trim()) {
       return "Name cannot be empty";
     }
-  
+
     if (!/^[A-Za-z\s]+$/.test(name)) {
       return "Name must contain only letters and spaces";
     }
-  
+
     if (name.length < 2 || name.length > 50) {
       return "Name must be between 2 and 50 characters";
     }
-  
+
     return null; // No errors
   };
-  
-  
+
+
 
   const handleCompleteProfile = async () => {
     setLoading(true);
     setErrorOccure(false);
-  
+
     // Validate Profile Name
     const errorMessage = validateName(profileName);
     if (errorMessage) {
@@ -558,29 +562,38 @@ const OTP=otp.join('')
       setLoading(false);
       return;
     }
-  
+    if (verifiedcode === false && promocode.length > 0) {
+      verifyReferralCode()
+      Alert.alert('verfy code ')
+      // return;
+    }
     try {
       // Retrieve Access Token
       const accessToken = await AsyncStorage.getItem('accessToken');
       if (!accessToken) {
         throw new Error('Authentication token not found');
       }
-  
+
       console.log('Request Payload:', { mobile, name: profileName });
-  
+
       // Make API Request
       const response = await axios.post(
         `${API_URL}auth/complete-profile`,
-        { mobile, name: profileName },
+        {
+          mobile,
+          name: profileName,
+          // ...(promocode ? { referralCode: promocode } : {}), // Include only if promocode is available
+        },
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
         }
       );
-  
+
+
       // console.log('API Response:', response);
-  
+
       if (response.status === 200 && response.data?.result) {
         navigation.navigate('SkillsScreen');
       } else {
@@ -588,14 +601,14 @@ const OTP=otp.join('')
       }
     } catch (error) {
       console.error('Error in handleCompleteProfile:', error);
-  
+
       let errorMsg = 'Something went wrong. Please try again.';
       if (error.response) {
         errorMsg = error.response.data?.message || errorMsg;
       } else if (error.message) {
         errorMsg = error.message;
       }
-  
+
       setErrorOccure(true);
       setError(errorMsg);
       alert(errorMsg);
@@ -603,27 +616,90 @@ const OTP=otp.join('')
       setLoading(false);
     }
   };
-  
+
 
   const handleChangeText = (text, index) => {
     if (text.length > 1 || !/^\d?$/.test(text)) return; // Allow only a single digit (0-9)
-  
+
     let newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
-  
+
     // Move focus to the next input if text is entered
     if (text && index < 3) {
       inputRefs[index + 1].current.focus();
     }
   };
-  
+
   const handleKeyPress = (e, index) => {
     if (e.nativeEvent.key === "Backspace" && index > 0 && !otp[index]) {
       inputRefs[index - 1].current.focus();
     }
   };
-  
+
+  const verifyReferralCode = async () => {
+    setLoading(true);
+
+    setErrorOccure(false);
+    setError("");
+
+    // Validate Referral Code (8-digit alphanumeric)
+    const referralCodePattern = /^[a-zA-Z0-9]{8}$/;
+    if (!referralCodePattern.test(promocode)) {
+      setErrorOccure(true);
+      setError("Must be 8 alphanumeric characters.");
+      setLoading(false);
+      return;
+    }
+
+    try {
+      // Retrieve Access Token
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      if (!accessToken) {
+        throw new Error("Authentication token not found");
+      }
+
+      console.log("Verifying Referral Code:", promocode);
+
+      // Make API Request
+      const response = await axios.post(
+        `${API_URL}auth/verify-referral-code`,
+        { referralCode: promocode },
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+
+      console.log("API Response:", response.data);
+
+      if (response.data?.result===true) {
+        Alert.alert("Referral code verified successfully!");
+        setVerifyCode(true);
+
+      } else {
+        setErrorOccure(true);
+        setError(response.data?.message || "Invalid referral code");
+      }
+    } catch (error) {
+      setErrorOccure(true);
+      setError("Error in verifyReferralCode:");
+
+      let errorMsg = "Something went wrong. Please try again.";
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      setErrorOccure(true);
+      setError(errorMsg);
+      alert(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
@@ -633,7 +709,7 @@ const OTP=otp.join('')
           <CarouselComponent data={data} renderItem={renderItem} height={hp("37%")} />
         </View>
       </View>
-      
+
       <LinearGradient colors={["#F3B2B2", "#FFFFFF"]} style={styles.formContainer}>
         {step === "mobile" && (
           <View style={{ alignItems: 'center', width: wp('90%'), marginTop: hp('4') }}>
@@ -676,7 +752,7 @@ const OTP=otp.join('')
                   onKeyPress={(e) => handleKeyPress(e, index)}
                 />
               ))}
-             
+
             </View>
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
@@ -688,16 +764,16 @@ const OTP=otp.join('')
         {step === "profile" && (
           <>
             <Text style={styles.label}>Complete Profile</Text>
-            <TextInput style={styles.input} 
-            placeholder="Enter name" 
-            alue={profileName} 
-            onChangeText={setProfileName} />
+            <TextInput style={styles.input}
+              placeholder="Enter name"
+              alue={profileName}
+              onChangeText={setProfileName} />
 
             <TextInput
               style={styles.input}
               placeholder="Enter Mobile Number"
               value={mobile}
-             
+
               editable={false}
             />
             <View style={[styles.input, { flexDirection: 'row' }]}>
@@ -705,15 +781,18 @@ const OTP=otp.join('')
                 placeholder="Enter Promo Code"
                 value={promocode}
                 onChangeText={setPromocode}
+                style={{ width: wp("67") }}
+                maxLength={8}
               />
               <CustomButton
                 title="Apply"
-                align="center"
-                style={{ paddingHorizontal: wp("4"), padding: wp("3%"), left: wp('3.3') }}
+                align="left"
+                style={{ paddingHorizontal: wp("4"), padding: wp("3%"), }}
                 textstyle={{ fontSize: wp("3.4%") }}
+                onPress={verifyReferralCode}
 
               />
-              
+
             </View>
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
@@ -727,7 +806,7 @@ const OTP=otp.join('')
           <Image source={require("../assets/icons/I1.png")} style={styles.avatar} />
         </View>
       )}
-      <Loader visible={loading}/>
+      <Loader visible={loading} />
     </View>
 
   );
