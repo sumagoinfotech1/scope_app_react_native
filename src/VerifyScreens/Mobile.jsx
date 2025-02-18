@@ -476,7 +476,7 @@ const Mobile = ({ navigation }) => {
 
       console.log("Response:", response.data);
 
-      if (response.data.result===true) {
+      if (response.data.result === true) {
         setStep("otp");
         setLoading(false);
       } else {
@@ -674,7 +674,7 @@ const Mobile = ({ navigation }) => {
 
       console.log("API Response:", response.data);
 
-      if (response.data?.result===true) {
+      if (response.data?.result === true) {
         Alert.alert("Referral code verified successfully!");
         setVerifyCode(true);
 
