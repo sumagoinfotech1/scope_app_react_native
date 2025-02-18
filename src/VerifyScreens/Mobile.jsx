@@ -443,7 +443,8 @@ const Mobile = ({ navigation }) => {
   const [errorOccure, setErrorOccure] = useState(false);
   const [verifiedcode, setVerifyCode] = useState(false);
   const OTP = otp.join('')
-
+  const [timer, setTimer] = useState(60); // Start from 60 seconds
+  const [isResendDisabled, setIsResendDisabled] = useState(true);
 
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -458,7 +459,18 @@ const Mobile = ({ navigation }) => {
   ];
 
 
+  useEffect(() => {
+    setIsResendDisabled(true);
+    if (timer > 0) {
+      const interval = setInterval(() => {
+        setTimer((prevTime) => prevTime - 1);
+      }, 1000);
 
+      return () => clearInterval(interval); // Cleanup on unmount
+    } else {
+      setIsResendDisabled(false); // Enable resend button when timer hits 0
+    }
+  }, [timer]);
   const handleSendOtp = async () => {
     setErrorOccure(false);
 
@@ -479,6 +491,7 @@ const Mobile = ({ navigation }) => {
       if (response.data.result === true) {
         setStep("otp");
         setLoading(false);
+        setTimer('60')
       } else {
         setErrorOccure(true);
         setError(response.data.message || "Failed to send OTP");
@@ -526,7 +539,7 @@ const Mobile = ({ navigation }) => {
     } catch (error) {
       setErrorOccure(true);
       console.error("Error verifying OTP:", error);
-     setError(error|| "Error verifying OTP");
+     setError(error.message|| "Error verifying OTP");
     }
 
     setLoading(false);
@@ -757,9 +770,14 @@ const Mobile = ({ navigation }) => {
               ))}
 
             </View>
+            <TouchableOpacity disabled={isResendDisabled} onPress={handleSendOtp}>
+               <Text style={{fontWeight:"bold",fontSize:wp('3.5'),color:Colors.black}}>Resent OTP {isResendDisabled ? `In: 00:${timer}` : null}
+               </Text>
+            </TouchableOpacity>
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
+            
             <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} />
           </>
         )}
