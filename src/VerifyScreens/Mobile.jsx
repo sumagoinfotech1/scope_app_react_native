@@ -520,14 +520,17 @@ const Mobile = ({ navigation }) => {
 
         setStep("profile"); // Move to the next step after successful verification
       } else {
-        alert(response.data.message || "OTP verification failed");
+        setErrorOccure(true);
+        setError(response.data.message || "OTP verification failed");
       }
     } catch (error) {
+      setErrorOccure(true);
       console.error("Error verifying OTP:", error);
-      alert(error.response?.data?.message || "Error verifying OTP");
+     setError(error|| "Error verifying OTP");
     }
 
     setLoading(false);
+    setErrorOccure(false);
   };
 
 
@@ -551,6 +554,10 @@ const Mobile = ({ navigation }) => {
 
 
   const handleCompleteProfile = async () => {
+    if (verifiedcode === false && promocode.length > 0) {
+      verifyReferralCode();
+      return;
+    }
     setLoading(true);
     setErrorOccure(false);
 
@@ -562,11 +569,7 @@ const Mobile = ({ navigation }) => {
       setLoading(false);
       return;
     }
-    if (verifiedcode === false && promocode.length > 0) {
-      verifyReferralCode()
-      Alert.alert('verfy code ')
-      // return;
-    }
+   
     try {
       // Retrieve Access Token
       const accessToken = await AsyncStorage.getItem('accessToken');

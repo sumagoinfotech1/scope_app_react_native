@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, FlatList, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Dimensions, FlatList, Alert, ActivityIndicator, ScrollView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { Svg, Circle } from "react-native-svg";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -8,15 +8,23 @@ import CustomButton from "../ReusableComponents/CustomButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CarouselComponent from "../ReusableComponents/CarouselComponent";
 import HeaderName from "../ReusableComponents/HeaderName";
-import { ScrollView } from "react-native-gesture-handler";
+
+import axios from "axios";
+import Loader from "../ReusableComponents/Loader";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { API_URL } from '@env';
 const { width } = Dimensions.get("window");
 
 const SkillsScreen = ({ navigation }) => {
 
   const [step, setStep] = useState("intrest"); // Tracks the current step
   const [selectedItems, setSelectedItems] = useState([]);
-
+  const [categories, setCategories] = useState([]);
+  const [skill, setSkill] = useState([]);
   const [loading, setLoading] = useState(false); // Show loader while API fetches
+  const [errorOccure, setErrorOccure] = useState(false);
+  const [error, setError] = useState("");
+  console.log(skill, 'heuu');
 
   const data = [
     {
@@ -64,29 +72,142 @@ const SkillsScreen = ({ navigation }) => {
     { id: "8", title: "🎥 Video Making" },
     { id: "9", title: "📑 Ms Excel" },
   ];
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" color="#F66" />
-      </View>
-    );
-  }
+  useEffect(() => {
+    fetchCategories()
+    return () => { }
+  }, [])
+  const fetchCategories = () => {
+    console.log('function called');
+
+    setLoading(true);
+    setErrorOccure(false);
+    setError("");
+
+    // Retrieve Access Token
+    AsyncStorage.getItem('accessToken')
+      .then((accessToken) => {
+        console.log('Access Token:', accessToken);
+
+        if (!accessToken) {
+          throw new Error('Authentication token not found');
+        }
+
+        console.log('Fetching Categories...');
+
+        // Make GET API Request
+        return axios.get(`${API_URL}category/all`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+      })
+      .then((response) => {
+        console.log('API Response:', response.data);
+
+        if (response.data.result === true) {
+          setCategories(response.data.data); // Store categories in state
+          // Alert.alert('Categories fetched successfully');
+          console.log('Categories:', response.data.data.map(item => item.name));
+        } else {
+          throw new Error(response.data?.message || 'Failed to fetch categories');
+        }
+      })
+      .catch((error) => {
+        console.error('Error in fetchCategories:', error);
+
+        let errorMsg = 'Something went wrong. Please try again.';
+        if (error.response) {
+          errorMsg = error.response.data?.message || errorMsg;
+        } else if (error.message) {
+          errorMsg = error.message;
+        }
+
+        setLoading(false);
+        setErrorOccure(true);
+        setError(errorMsg);
+        Alert.alert(errorMsg);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
+
+
+
+  // if (loading) {
+  //   return (
+  //     <View style={styles.center}>
+  //       <ActivityIndicator size="large" color="#F66" />
+  //     </View>
+  //   );
+  // }
   const mainApp = () => {
     if (selectedItems.length >= 3) {
-        navigation.replace("MainApp");
+      navigation.replace("MainApp");
     } else {
-        return Alert.alert('Select at least 3 items');
+      return Alert.alert('Select at least 3 items');
     }
-};
+  };
 
   const category = (id) => {
     setStep("skills")
   }
+  const fetchSkillById = async (skillId) => {
+    console.log('Fetching Skill:', skillId);
+
+    setLoading(true);
+    setErrorOccure(false);
+    setError("");
+
+    try {
+      // Retrieve Access Token
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      console.log('Access Token:', accessToken);
+
+      if (!accessToken) {
+        throw new Error('Authentication token not found');
+      }
+
+      // Make API Request
+      const response = await axios.get(`${API_URL}skill/all`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      console.log('API Response:', response.data);
+
+      if (response.data.result === true) {
+        setSkill(response.data.data); // Store skill data in state
+        setStep("skills")
+        Alert.alert('Skill fetched successfully');
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch skill');
+      }
+    } catch (error) {
+      console.error('Error in fetchSkillById:', error);
+
+      let errorMsg = 'Something went wrong. Please try again.';
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      setErrorOccure(true);
+      setError(errorMsg);
+      Alert.alert('Error', errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const CardItem = ({ item }) => {
     return (
-      <TouchableOpacity style={styles.card} onPress={() => category(item.id)}>
-        <Image source={item.image} style={styles.image} />
-        <Text style={styles.title}>{item.title}</Text>
+      <TouchableOpacity style={styles.card} onPress={() => fetchSkillById(item.id)}>
+        <Image source={{ uri: item.image }} style={styles.image} />
+        <Text style={styles.title}>{item.name}</Text>
         <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
           {item.description}
         </Text>
@@ -113,7 +234,7 @@ const SkillsScreen = ({ navigation }) => {
         style={[styles.card1, isSelected && styles.selectedCard]}
       >
         <Text style={[styles.title, isSelected && styles.selectedText]}>
-          {item.title}
+          {item.name}
         </Text>
       </TouchableOpacity>
     );
@@ -132,7 +253,7 @@ const SkillsScreen = ({ navigation }) => {
         {step === "intrest" && (
           <>
             <FlatList
-              data={data}
+              data={categories}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => <CardItem item={item} />}
               numColumns={2} // Two-column layout
@@ -148,16 +269,34 @@ const SkillsScreen = ({ navigation }) => {
         {step === "skills" && (
           <>
             <Text style={styles.heading}>Select At Least Three <Text style={{ color: "red" }}>*</Text></Text>
-            <FlatList
-              data={data1}
+            {/* <FlatList
+              data={skill}
               keyExtractor={(item) => item.id}
               renderItem={renderItem1}
-              numColumns={2}
+              numColumns={3}
               columnWrapperStyle={styles.row}
               contentContainerStyle={styles.listContainer}
               showsVerticalScrollIndicator={false}
-            />
+            /> */}
+            <ScrollView >
 
+              <View style={styles.row}>
+                {skill.map((item) => {
+                  const isSelected = selectedItems.includes(item.id);
+                  return (
+                    <TouchableOpacity
+                      key={item.id}
+                      onPress={() => toggleSelection(item.id)}
+                      style={[styles.card1, isSelected && styles.selectedCard]}
+                    >
+                      {/* <Image source={{ uri: `${API_URL}${item.image}` }} style={styles.skillImage} /> */}
+                      <Text style={[styles.title, isSelected && styles.selectedText]}>{item.name}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+
+            </ScrollView>
             <CustomButton
               title="Next"
               align="right"
@@ -243,7 +382,7 @@ const styles = StyleSheet.create({
   iconContainer: {
     position: "relative",
     margin: hp("1"),
-    alignSelf:'flex-end'
+    alignSelf: 'flex-end'
   },
   heading: {
     fontSize: 16,
@@ -251,17 +390,20 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   row: {
-    justifyContent: "space-evenly",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
+    alignItems:'flex-start'
   },
   card1: {
     // flex: 1,
-    width: wp("40"),
+    // width: wp("40"),
     backgroundColor: "#fff",
     borderRadius: 15,
     paddingVertical: wp("2%"),
-    paddingHorizontal: wp("2%"),
+    paddingHorizontal: wp("7%"),
     alignItems: "center",
-    margin: wp("1.7%"),
+    margin: wp("1%"),
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
