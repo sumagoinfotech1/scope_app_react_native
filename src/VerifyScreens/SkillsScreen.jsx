@@ -8,11 +8,12 @@ import CustomButton from "../ReusableComponents/CustomButton";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import CarouselComponent from "../ReusableComponents/CarouselComponent";
 import HeaderName from "../ReusableComponents/HeaderName";
-
+import { showToast } from '../utils/toastService';
 import axios from "axios";
 import Loader from "../ReusableComponents/Loader";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from '@env';
+import api from "../utils/axiosInstance";
 const { width } = Dimensions.get("window");
 
 const SkillsScreen = ({ navigation }) => {
@@ -96,10 +97,8 @@ const SkillsScreen = ({ navigation }) => {
         console.log('Fetching Categories...');
 
         // Make GET API Request
-        return axios.get(`${API_URL}category/all`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+        return api.get("category/all", {
+       
         });
       })
       .then((response) => {
@@ -152,25 +151,15 @@ const SkillsScreen = ({ navigation }) => {
   // };
   const mainApp = async () => {
     if (selectedItems.length < 2) {
-      return Alert.alert('Select at least 3 items');
+      return showToast('error', 'Error', 'Select at least 3 items');
     }
 
     try {
       setLoading(true);
       setErrorOccure(false);
-
-      // Retrieve Access Token
-      const accessToken = await AsyncStorage.getItem('accessToken');
       const User_id = await AsyncStorage.getItem('User_id');
-      if (!accessToken) {
-        Alert.alert('accestoken')
-
-        throw new Error('Authentication token not found');
-      }
+ 
       if (!User_id) {
-    
-        Alert.alert('userid',User_id)
-
         throw new Error('User Id not found');
       }
       // API Request Payload
@@ -183,21 +172,19 @@ const SkillsScreen = ({ navigation }) => {
       console.log('Request Payload:', payload);
 
       // API Call
-      const response = await axios.post(`${API_URL}answers/create`, payload, {
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await api.post("answers/create", payload, {
+     
       });
 
       const data = response.data;
       console.log('API Response:', data);
 
       if (data?.result === true) {
-        Alert.alert('Success', data.message);
+         showToast('success', 'Success', data.message);
         navigation.replace('MainApp');
       } else {
         setError(data.message || 'Failed to submit answers');
+        showToast('error', 'Error', data.message|| 'Failed to submit answers');
       }
     } catch (error) {
       let errorMsg = 'Something went wrong. Please try again.';
@@ -234,19 +221,11 @@ const SkillsScreen = ({ navigation }) => {
     setError("");
 
     try {
-      // Retrieve Access Token
-      const accessToken = await AsyncStorage.getItem('accessToken');
-      console.log('Access Token:', accessToken);
-
-      if (!accessToken) {
-        throw new Error('Authentication token not found');
-      }
+     
 
       // Make API Request
-      const response = await axios.get(`${API_URL}skill/all/${skillId}`, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+      const response = await api.get(`skill/all/${skillId}`, {
+      
       });
 
       console.log('API Response:', response.data);

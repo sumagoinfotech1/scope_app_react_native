@@ -6,6 +6,8 @@ import Mobile from './src/VerifyScreens/Mobile'
 import MainApp from './src/TabMainApp/MainApp'
 import SplashScreen from 'react-native-splash-screen';
 import SkillsScreen from './src/VerifyScreens/SkillsScreen'
+import Toast from 'react-native-toast-message';
+import { navigationRef } from './src/utils/axiosInstance'
 const Stack = createNativeStackNavigator();
 
 
@@ -26,9 +28,10 @@ const App = () => {
     }, 3000);
   }, []);
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
     <StatusBar hidden={true}/>
       <RootStack />
+      <Toast />
     </NavigationContainer>
   )
 }
