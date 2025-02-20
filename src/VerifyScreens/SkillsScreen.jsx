@@ -24,7 +24,8 @@ const SkillsScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(false); // Show loader while API fetches
   const [errorOccure, setErrorOccure] = useState(false);
   const [error, setError] = useState("");
-  console.log(skill, 'heuu');
+  const [mainCategoryId, setMainCategory] = useState("");
+  console.log(selectedItems, 'selectedItems');
 
   const data = [
     {
@@ -109,7 +110,7 @@ const SkillsScreen = ({ navigation }) => {
           // Alert.alert('Categories fetched successfully');
           console.log('Categories:', response.data.data.map(item => item.name));
         } else {
-          throw new Error(response.data?.message || 'Failed to fetch categories');
+          setError(response.data?.message || 'Failed to fetch categories');
         }
       })
       .catch((error) => {
@@ -125,7 +126,7 @@ const SkillsScreen = ({ navigation }) => {
         setLoading(false);
         setErrorOccure(true);
         setError(errorMsg);
-        Alert.alert(errorMsg);
+
       })
       .finally(() => {
         setLoading(false);
@@ -142,14 +143,86 @@ const SkillsScreen = ({ navigation }) => {
   //     </View>
   //   );
   // }
-  const mainApp = () => {
-    if (selectedItems.length >= 3) {
-      navigation.replace("MainApp");
-    } else {
+  // const mainApp = () => {
+  //   if (selectedItems.length >= 3) {
+  //     navigation.replace("MainApp");
+  //   } else {
+  //     return Alert.alert('Select at least 3 items');
+  //   }
+  // };
+  const mainApp = async () => {
+    if (selectedItems.length < 2) {
       return Alert.alert('Select at least 3 items');
     }
-  };
 
+    try {
+      setLoading(true);
+      setErrorOccure(false);
+
+      // Retrieve Access Token
+      const accessToken = await AsyncStorage.getItem('accessToken');
+      const User_id = await AsyncStorage.getItem('User_id');
+      if (!accessToken) {
+        Alert.alert('accestoken')
+
+        throw new Error('Authentication token not found');
+      }
+      if (!User_id) {
+    
+        Alert.alert('userid',User_id)
+
+        throw new Error('User Id not found');
+      }
+      // API Request Payload
+      const payload = {
+        user_id: User_id,
+        main_category_id: mainCategoryId,
+        skill_ids: selectedItems, // Assuming selectedItems contains skill_ids
+      };
+
+      console.log('Request Payload:', payload);
+
+      // API Call
+      const response = await axios.post(`${API_URL}answers/create`, payload, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = response.data;
+      console.log('API Response:', data);
+
+      if (data?.result === true) {
+        Alert.alert('Success', data.message);
+        navigation.replace('MainApp');
+      } else {
+        setError(data.message || 'Failed to submit answers');
+      }
+    } catch (error) {
+      let errorMsg = 'Something went wrong. Please try again.';
+
+      if (axios.isAxiosError(error)) {
+        if (error.response) {
+          errorMsg = error.response.data?.message || 'Server error occurred';
+          console.log('Server Error:', error.response.data);
+        } else if (error.request) {
+          errorMsg = 'No response from server. Check your internet connection.';
+          console.log('No Response:', error.request);
+        } else {
+          console.log('Request Error:', error.message);
+        }
+      } else {
+        errorMsg = error.message;
+      }
+
+      setErrorOccure(true);
+      setError(errorMsg);
+
+    } finally {
+      setLoading(false);
+    }
+  };
   const category = (id) => {
     setStep("skills")
   }
@@ -170,7 +243,7 @@ const SkillsScreen = ({ navigation }) => {
       }
 
       // Make API Request
-      const response = await axios.get(`${API_URL}skill/all`, {
+      const response = await axios.get(`${API_URL}skill/all/${skillId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -181,7 +254,8 @@ const SkillsScreen = ({ navigation }) => {
       if (response.data.result === true) {
         setSkill(response.data.data); // Store skill data in state
         setStep("skills")
-        Alert.alert('Skill fetched successfully');
+        setMainCategory(skillId)
+
       } else {
         throw new Error(response.data?.message || 'Failed to fetch skill');
       }
@@ -197,7 +271,7 @@ const SkillsScreen = ({ navigation }) => {
 
       setErrorOccure(true);
       setError(errorMsg);
-      Alert.alert('Error', errorMsg);
+
     } finally {
       setLoading(false);
     }
@@ -249,7 +323,11 @@ const SkillsScreen = ({ navigation }) => {
         </View>
       </View>
       {/* Form Section */}
+     
       <LinearGradient colors={["#F3B2B2", "#FFFFFF"]} style={styles.formContainer}>
+      {errorOccure ? <View style={styles.errorcontainer}>
+        <Text style={styles.errorText}>{error}</Text>
+      </View> : null}
         {step === "intrest" && (
           <>
             <FlatList
@@ -282,15 +360,15 @@ const SkillsScreen = ({ navigation }) => {
 
               <View style={styles.row}>
                 {skill.map((item) => {
-                  const isSelected = selectedItems.includes(item.id);
+                  const isSelected = selectedItems.includes(item.skill_id);
                   return (
                     <TouchableOpacity
-                      key={item.id}
-                      onPress={() => toggleSelection(item.id)}
+                      key={item.skill_id}
+                      onPress={() => toggleSelection(item.skill_id)}
                       style={[styles.card1, isSelected && styles.selectedCard]}
                     >
                       {/* <Image source={{ uri: `${API_URL}${item.image}` }} style={styles.skillImage} /> */}
-                      <Text style={[styles.title, isSelected && styles.selectedText]}>{item.name}</Text>
+                      <Text style={[styles.title, isSelected && styles.selectedText]}>{item.skill_name}</Text>
                     </TouchableOpacity>
                   );
                 })}
@@ -307,6 +385,7 @@ const SkillsScreen = ({ navigation }) => {
         )}
 
       </LinearGradient>
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -393,7 +472,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'flex-start',
-    alignItems:'flex-start'
+    alignItems: 'flex-start'
   },
   card1: {
     // flex: 1,
@@ -429,6 +508,14 @@ const styles = StyleSheet.create({
   listContainer: {
     paddingBottom: wp("3%"),
   },
+  errorcontainer: {
+    alignItems: "center",
+    justifyContent: 'center',
+  },
+  errorText: {
+    color: 'red',
+    fontSize: wp('4')
+  }
 });
 
 export default SkillsScreen;

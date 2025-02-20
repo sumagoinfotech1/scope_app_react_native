@@ -525,12 +525,12 @@ const Mobile = ({ navigation }) => {
       // console.log("Response:", response.data);
 
       if (response.data.result) {
-        const { accessToken, refreshToken } = response.data.data;
+        const { accessToken, refreshToken ,id} = response.data.data;
 
         // Store tokens securely in AsyncStorage
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
-
+        await AsyncStorage.setItem("User_id", id);
         setStep("profile"); // Move to the next step after successful verification
       } else {
         setErrorOccure(true);
