@@ -169,7 +169,7 @@ const Skills = ({ navigation, route }) => {
                     <Text style={styles.errorText}>{error}</Text>
                 </View> : null}
 
-                <Text style={styles.heading}>Select At Least Threeffff <Text style={{ color: "red" }}>*</Text></Text>
+                <Text style={styles.heading}>Select At Least Three <Text style={{ color: "red" }}>*</Text></Text>
                 {/* <FlatList
               data={skill}
               keyExtractor={(item) => item.id}
