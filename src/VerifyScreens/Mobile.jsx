@@ -333,7 +333,7 @@ const Mobile = ({ navigation }) => {
         </View>
       </View>
 
-      <LinearGradient colors={["#F3B2B2", "#FFFFFF"]} style={styles.formContainer}>
+      <LinearGradient colors={["#FFFFFF", "#FFFFFF"]} style={styles.formContainer}>
         {step === "mobile" && (
           <View style={{ alignItems: 'center', width: wp('90%'), marginTop: hp('4') }}>
 

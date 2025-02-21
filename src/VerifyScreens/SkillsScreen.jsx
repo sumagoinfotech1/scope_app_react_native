@@ -303,7 +303,7 @@ const SkillsScreen = ({ navigation }) => {
       </View>
       {/* Form Section */}
      
-      <LinearGradient colors={["#F3B2B2", "#FFFFFF"]} style={styles.formContainer}>
+      <LinearGradient colors={["#FFFFFF", "#FFFFFF"]} style={styles.formContainer}>
       {errorOccure ? <View style={styles.errorcontainer}>
         <Text style={styles.errorText}>{error}</Text>
       </View> : null}

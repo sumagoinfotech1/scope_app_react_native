@@ -8,6 +8,8 @@ import Colors from '../../../ReusableComponents/Colors';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CustomButton from '../../../ReusableComponents/CustomButton';
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../../utils/axiosInstance";
 const data = [
   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
@@ -27,6 +29,49 @@ const Home = () => {
       <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
     </View>
   );
+
+
+  const fetchCategories = () => {
+ 
+    // Retrieve Access Token
+    AsyncStorage.getItem('accessToken')
+      .then(() => {
+     
+
+        console.log('Fetching Categories...');
+
+        // Make GET API Request
+        return api.get("category/all", {
+       
+        });
+      })
+      .then((response) => {
+        console.log('API Response:', response.data);
+
+        if (response.data.result === true) {
+          // Alert.alert('Categories fetched successfully');
+          console.log('Categories:', response.data.data.map(item => item.name));
+        } else {
+          setError(response.data?.message || 'Failed to fetch categories');
+        }
+      })
+      .catch((error) => {
+        console.error('Error in fetchCategories:', error);
+
+        let errorMsg = 'Something went wrong. Please try again.';
+        if (error.response) {
+          errorMsg = error.response.data?.message || errorMsg;
+        } else if (error.message) {
+          errorMsg = error.message;
+        }
+
+      
+
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
 
   const MeetupCard = ({ item }) => {
     return (
@@ -50,7 +95,7 @@ const Home = () => {
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4') ,width: wp("45"),}]}>
             <FontAwesome name="map-marker" size={16} color="black" />
-            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}sdsdasdadddas</Text>
+            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
           </View>
           <View style={{ alignItems: "flex-end" }}>
             <CustomButton
@@ -95,7 +140,7 @@ const Home = () => {
             <CustomButton
               title="Register"
               align="right"
-              // onPress={handleSendOtp}
+              onPress={fetchCategories}
               style={{ padding: wp('1.4'), backgroundColor: Colors.black, borderRadius: wp('1') }}
               textstyle={{ fontSize: wp("3.9%") }}
             />
