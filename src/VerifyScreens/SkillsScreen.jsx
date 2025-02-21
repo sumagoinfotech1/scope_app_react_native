@@ -213,54 +213,54 @@ const SkillsScreen = ({ navigation }) => {
   const category = (id) => {
     setStep("skills")
   }
-  const fetchSkillById = async (skillId) => {
+  const fetchSkillById =  (skillId) => {
     console.log('Fetching Skill:', skillId);
+    navigation.navigate('Skills', { skillId });
+    // setLoading(true);
+    // setErrorOccure(false);
+    // setError("");
 
-    setLoading(true);
-    setErrorOccure(false);
-    setError("");
-
-    try {
+    // try {
      
 
-      // Make API Request
-      const response = await api.get(`skill/all/${skillId}`, {
+    //   // Make API Request
+    //   const response = await api.get(`skill/all/${skillId}`, {
       
-      });
+    //   });
 
-      console.log('API Response:', response.data);
+    //   console.log('API Response:', response.data);
 
-      if (response.data.result === true) {
-        setSkill(response.data.data); // Store skill data in state
-        setStep("skills")
-        setMainCategory(skillId)
+    //   if (response.data.result === true) {
+    //     setSkill(response.data.data); // Store skill data in state
+    //     setStep("skills")
+    //     setMainCategory(skillId)
 
-      } else {
-        throw new Error(response.data?.message || 'Failed to fetch skill');
-      }
-    } catch (error) {
-      console.error('Error in fetchSkillById:', error);
+    //   } else {
+    //     throw new Error(response.data?.message || 'Failed to fetch skill');
+    //   }
+    // } catch (error) {
+    //   console.error('Error in fetchSkillById:', error);
 
-      let errorMsg = 'Something went wrong. Please try again.';
-      if (error.response) {
-        errorMsg = error.response.data?.message || errorMsg;
-      } else if (error.message) {
-        errorMsg = error.message;
-      }
+    //   let errorMsg = 'Something went wrong. Please try again.';
+    //   if (error.response) {
+    //     errorMsg = error.response.data?.message || errorMsg;
+    //   } else if (error.message) {
+    //     errorMsg = error.message;
+    //   }
 
-      setErrorOccure(true);
-      setError(errorMsg);
+    //   setErrorOccure(true);
+    //   setError(errorMsg);
 
-    } finally {
-      setLoading(false);
-    }
+    // } finally {
+    //   setLoading(false);
+    // }
   };
 
   const CardItem = ({ item }) => {
     return (
       <TouchableOpacity style={styles.card} onPress={() => fetchSkillById(item.id)}>
         <Image source={{ uri: item.image }} style={styles.image} />
-        <Text style={styles.title}>{item.name}</Text>
+        <Text style={styles.title}>{item.name}</Text> 
         <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
           {item.description}
         </Text>

@@ -8,6 +8,8 @@ import SplashScreen from 'react-native-splash-screen';
 import SkillsScreen from './src/VerifyScreens/SkillsScreen'
 import Toast from 'react-native-toast-message';
 import { navigationRef } from './src/utils/axiosInstance'
+import Skills from './src/VerifyScreens/Skills'
+
 const Stack = createNativeStackNavigator();
 
 
@@ -16,6 +18,7 @@ const RootStack = () => {
     <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Mobile'>
       <Stack.Screen name="Mobile" component={Mobile} />
       <Stack.Screen name="SkillsScreen" component={SkillsScreen}  />
+      <Stack.Screen name="Skills" component={Skills}  />
       <Stack.Screen name="MainApp" component={MainApp} />
     </Stack.Navigator>
   )
