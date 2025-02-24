@@ -23,7 +23,7 @@ const meetupData = [
   { id: '4', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/a5/77/4c/a5774cfed2b9a6bbc14ffea6148b7fb9.jpg', price: '600', offerprice: '300', joinmembers: "400" },
 ];
 
-const Home = () => {
+const Home = ({navigation}) => {
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
@@ -72,7 +72,12 @@ const Home = () => {
         setLoading(false);
       });
   };
-
+const gotoMeetup=()=>{
+  navigation.navigate('MeetUpsScreen')
+}
+const gotoWorkShop=()=>{
+  navigation.navigate('WorkShopScreen')
+}
   const MeetupCard = ({ item }) => {
     return (
       <View style={styles.card}>
@@ -173,7 +178,7 @@ const Home = () => {
           <CustomButton
             title="See More"
             align="right"
-            // onPress={handleSendOtp}
+            onPress={()=>gotoMeetup()}
             style={{ marginRight: wp('2') }}
 
           />
@@ -192,7 +197,7 @@ const Home = () => {
           <CustomButton
             title="See More"
             align="right"
-            // onPress={handleSendOtp}
+            onPress={()=>gotoWorkShop()}
             style={{ marginRight: wp('2') }}
 
           />

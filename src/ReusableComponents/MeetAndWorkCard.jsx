@@ -1,0 +1,141 @@
+import React from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+
+import CustomButton from './CustomButton'; // Assuming you have a CustomButton component for reuse
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
+import Colors from './Colors';
+
+const MeetAndWorkCard = ({ item ,onpress}) => {
+  return (
+    <TouchableOpacity style={styles.card} onPress={onpress}>
+      {/* Header Section */}
+      <View style={styles.header}>
+        <Image source={{ uri: item.image }} style={styles.headerImage} />
+      </View>
+      <View style={{ paddingHorizontal: wp('3') }}>
+        {/* Content Section */}
+        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+          {item.title}
+        </Text>
+
+        {/* Date and Time */}
+        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+          <View style={styles.infoRow}>
+            <Text style={styles.date}>{item.date}</Text>
+            <MaterialIcons name="access-time" size={22} color="black" />
+            <Text style={styles.time}>{item.time}</Text>
+          </View>
+
+          <View>
+            <Text style={styles.pricetag}>{item.price} Rs</Text>
+          </View>
+        </View>
+
+        {/* Location and Register Button */}
+        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+          <View style={styles.locationContainer}>
+            <FontAwesome name="map-marker" size={16} color="black" />
+            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
+              {item.location}
+            </Text>
+          </View>
+
+        </View>
+        
+         
+      
+      </View>
+      <CustomButton
+            title="Register"
+            align="center"
+            // onPress={handleSendOtp} // You can pass actions here
+            style={styles.registerButton}
+            textstyle={styles.registerText}
+          />
+    </TouchableOpacity>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    width: wp("91%"),
+    backgroundColor: '#ffff',
+    borderRadius: wp("2%"),
+    // padding: wp("2%"),
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 6,
+    marginTop: wp("3%"),
+    // marginBottom: wp("15%"),
+    margin: wp("1%"),
+  },
+  header: {
+    alignItems: 'center',
+  },
+  headerImage: {
+    width: wp("91%"),
+    height: hp("14%"),
+    resizeMode: 'cover',
+    borderRadius: wp("2%"),
+  },
+  title: {
+    fontSize: wp('4.6'),
+    fontWeight: 'bold',
+    marginTop: 10,
+    textAlign: 'left',
+    color: Colors.black,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    // marginVertical: wp("1%"),
+    elevation: 3,
+  },
+  date: {
+    color: 'red',
+    fontWeight: 'bold',
+    marginRight: wp("2.5%"),
+    fontSize: wp('5'),
+  },
+  time: {
+    marginLeft: wp("1%"),
+    fontSize: wp('4'),
+  },
+  locationContainer: {
+    flexDirection: 'row',
+    backgroundColor: "#E2E2E2",
+    padding: wp('1.3'),
+    borderRadius: wp('4'),
+    width: wp("60%"),
+    alignItems: 'center',
+    paddingHorizontal: wp('3')
+  },
+  location: {
+    marginLeft: wp("2%"),
+    color: Colors.black,
+    fontSize: wp("4%"),
+    padding: wp("1%"),
+    width: wp("55%"),
+  },
+  registerButton: {
+    padding: wp('2.5'),
+    backgroundColor: Colors.black,
+    borderRadius: wp('3.5'),
+    width: wp('87%')
+  },
+  registerText: {
+    fontSize: wp("4.5%"),
+    
+  },
+  pricetag: {
+    fontSize: wp('7'),
+    fontWeight: 'bold',
+    color: "red"
+  }
+});
+
+export default MeetAndWorkCard;

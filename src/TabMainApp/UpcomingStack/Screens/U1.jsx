@@ -8,6 +8,7 @@ import Colors from '../../../ReusableComponents/Colors';
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CustomButton from '../../../ReusableComponents/CustomButton';
+import ImageCard from '../../../ReusableComponents/ImageCard';
 
 const DATA = [
   {
@@ -78,15 +79,15 @@ const U1 = () => {
       </TouchableOpacity>
     </TouchableOpacity>
   );
-  const ImageCard = () => (
-    <View style={styles.ImageCard}>
-      <Image
-        source={{ uri: "https://i.pinimg.com/736x/06/16/32/061632d4efe20eb88834e335ccbee1e9.jpg" }}
-        style={styles.CardImage}
-        resizeMode="cover"
-      />
-    </View>
-  );
+  // const ImageCard = () => (
+  //   <View style={styles.ImageCard}>
+  //     <Image
+  //       source={{ uri: "https://i.pinimg.com/736x/06/16/32/061632d4efe20eb88834e335ccbee1e9.jpg" }}
+  //       style={styles.CardImage}
+  //       resizeMode="cover"
+  //     />
+  //   </View>
+  // );
   return (
     <GradientContainer style={styles.maincontainer}>
   
@@ -101,7 +102,7 @@ const U1 = () => {
           <View>
             <CardItem item={item} />
             {/* Show ImageCard only once after the third card */}
-            {index === 2 && bannerImage && <ImageCard />}
+            {index === 2 && bannerImage && <ImageCard imageUrl="https://i.pinimg.com/736x/06/16/32/061632d4efe20eb88834e335ccbee1e9.jpg" />}
           </View>
         )}
       />

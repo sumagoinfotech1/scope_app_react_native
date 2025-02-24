@@ -2,7 +2,7 @@ import React from "react";
 import { View, StyleSheet } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
-const GradientContainer = ({ colors = ["#F3B2B2", "#FFFFFF"], style, children }) => {
+const GradientContainer = ({ colors = ["#F3B2B2", "#FFFF"], style, children }) => {
   return (
     <LinearGradient colors={colors} style={[styles.container, style]}>
       {children}
