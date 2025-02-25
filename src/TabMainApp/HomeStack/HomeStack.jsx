@@ -7,16 +7,18 @@ import WorkShopDetails from './Screens/WorkShopDetails';
 import MeetUpsDetails from './Screens/MeetUpsDetails';
 import MeetUpsScreen from './Screens/MeetUpsScreen';
 import RewardsScreen from './Screens/RewardsScreen';
+import CongratsScreen from './Screens/CongratsScreen';
 const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   return (
-    <Stack.Navigator initialRouteName='Home'>
+    <Stack.Navigator initialRouteName='CongratsScreen'>
     <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
     <Stack.Screen name="WorkShopScreen" component={WorkShopScreen} options={{ headerShown: false }} />
     <Stack.Screen name="WorkShopDetails" component={WorkShopDetails} options={{ headerShown: false }} />
     <Stack.Screen name="MeetUpsScreen" component={MeetUpsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="MeetUpsDetails" component={MeetUpsDetails} options={{ headerShown: false }} />
     <Stack.Screen name="RewardsScreen" component={RewardsScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="CongratsScreen" component={CongratsScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

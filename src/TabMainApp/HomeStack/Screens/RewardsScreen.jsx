@@ -15,7 +15,7 @@ const RewardsScreen = () => {
             {/* Header Section */}
             <ImageBackground source={require('../../../assets/icons/Ellipse2.png')} style={styles.headerContainer}>
                 <View source={require('../../../assets/icons/Ellipse2.png')} style={styles.header}>
-                    <Image source={{ uri: 'https://cdn-icons-png.flaticon.com/512/1828/1828884.png' }} style={styles.coinIcon} />
+                    <Image source={require('../../../assets/icons/RefereEarnCoin.png')}  style={styles.coinIcon} />
                     <Text style={styles.points}>
                         6000 <Text style={styles.pointsText}>Points</Text>
                     </Text>
@@ -66,8 +66,8 @@ const styles = StyleSheet.create({
         paddingTop: wp('10%'),
     },
     coinIcon: {
-        width: wp('22%'),
-        height: wp('22%'),
+        width: wp('32%'),
+        height: wp('32%'),
         marginBottom: wp('2%'),
     },
     points: {

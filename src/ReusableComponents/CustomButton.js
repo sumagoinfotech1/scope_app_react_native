@@ -16,6 +16,7 @@ const styles = StyleSheet.create({
   container: {
     width: '100%',  
     // marginVertical: wp("1%"), 
+    // marginHorizontal:wp('3%')
   },
   button: {
     backgroundColor: Colors.background,

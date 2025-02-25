@@ -8,7 +8,7 @@ const Stack = createNativeStackNavigator();
 const UpcomingStack = () => {
   return (
     <Stack.Navigator initialRouteName='UpcomimgEventScreen'>
-    <Stack.Screen name="U1" component={U1} options={{ headerShown: false }} />
+    {/* <Stack.Screen name="U1" component={U1} options={{ headerShown: false }} /> */}
     <Stack.Screen name="UpcomimgEventScreen" component={UpcomimgEventScreen} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
