@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity ,Platform} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -95,7 +95,8 @@ const styles = StyleSheet.create({
     // shadowRadius: 10,
     // shadowOffset: { width: 0, height: 5 },
     // elevation: 6,
-    marginTop: wp("3%"),
+ 
+    marginTop: Platform.OS === 'ios' ? wp('10%') : wp("3%"),
     margin: wp("1%"),
   },
   headerImage: {

@@ -91,7 +91,7 @@
 // });
 
 import React, { useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image,ImageBackground} from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image,ImageBackground,Platform} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader';
 
@@ -203,5 +203,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#3A3A3A',
         alignItems: 'center',
         justifyContent: 'center',
+       
+
     },
 });
