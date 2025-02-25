@@ -7,8 +7,11 @@ import Colors from '../../../ReusableComponents/Colors';
 import CustomButton from '../../../ReusableComponents/CustomButton';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { showToast } from '../../../utils/toastService';
+import TicketModal from '../../../ReusableComponents/TicketModal';
+
 const ReferalScreen = () => {
     const [referralCode] = useState('SDSGDHG');
+    const [ticketmodalVisible, setTicketModalVisible] = useState(false);
     const copyToClipboard = () => {
         Clipboard.setString(referralCode);
         showToast('info', 'Copied');
@@ -65,11 +68,11 @@ const ReferalScreen = () => {
             <CustomButton
                 title="Refer To Friends"
                 align="right"
-                // onPress={handleSendOtp}
+                onPress={()=>setTicketModalVisible(true)}
                 style={{ padding: wp('2.8'), backgroundColor: Colors.black, marginHorizontal: wp('7'), marginVertical: wp('4') }}
                 textstyle={{ fontSize: wp("4.2%") }}
             />
-
+            <TicketModal visible={ticketmodalVisible} onClose={() => setTicketModalVisible(false)} />
         </View>
     );
 };
