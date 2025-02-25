@@ -112,6 +112,7 @@ const gotoWorkShop=()=>{
             />
           </View>
         </View>
+       
       </View>
     );
   };
@@ -151,6 +152,7 @@ const gotoWorkShop=()=>{
             />
           </View>
         </View>
+       
       </View>
     );
   };
@@ -158,6 +160,11 @@ const gotoWorkShop=()=>{
   return (
     <GradientContainer style={styles.maincontainer}>
       <ScrollView>
+      <View style={{position:'static',}}>
+        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RewardsScreen')}>
+            <Image source={require('../../../assets/icons/Maskgroup.png')} style={styles.icon} />
+        </TouchableOpacity>
+        </View>
       <View style={{ marginTop: Platform.OS === 'ios' ? hp("7%") : hp("2%"), marginBottom:hp("2%")}}>
         <ScreenHeader headername={"EVENTS"} />
         </View>
@@ -213,6 +220,7 @@ const gotoWorkShop=()=>{
             resizeMode="contain" // You can change to "contain" or "stretch" if needed
           />
         </View>
+     
       </ScrollView>
     </GradientContainer>
   )
@@ -305,5 +313,32 @@ const styles = StyleSheet.create({
 
 
   },
+  button: {
+    position: 'absolute',
+    // bottom: wp('5%'),
+    // right: wp('5%'),
+    backgroundColor: '#E7E7E7',
+    width: wp('14%'),
+    height: wp('12%'),
+    // borderRadius: wp('7%'),
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOpacity: 0.2,
+    shadowRadius: 5,
+    elevation: 5,
+    alignSelf:"flex-end",
+    marginVertical:wp('3'),
+    borderTopLeftRadius:wp('7%'),
+    borderBottomLeftRadius:wp('7%'),
+    paddingHorizontal:wp('8'),
+   
+},
+icon: {
+    width: wp('7%'),
+    height: wp('7%'),
+    tintColor: '#000',
+    resizeMode:'cover'
+},
 
 })
