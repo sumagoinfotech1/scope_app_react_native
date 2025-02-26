@@ -11,7 +11,7 @@ import CongratsScreen from './Screens/CongratsScreen';
 const Stack = createNativeStackNavigator();
 const HomeStack = () => {
   return (
-    <Stack.Navigator initialRouteName='Home'>
+    <Stack.Navigator initialRouteName='CongratsScreen'>
     <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
     <Stack.Screen name="WorkShopScreen" component={WorkShopScreen} options={{ headerShown: false }} />
     <Stack.Screen name="WorkShopDetails" component={WorkShopDetails} options={{ headerShown: false }} />
