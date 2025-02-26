@@ -40,8 +40,8 @@ const Skills = ({ navigation, route }) => {
 
 
     const mainApp = async () => {
-        if (selectedItems.length < 2) {
-            return showToast('error', 'Error', 'Select at least 3 items');
+        if (selectedItems.length < 1) {
+            return showToast('error', 'Error', 'Select at least 1 items');
         }
 
         try {
@@ -115,7 +115,10 @@ const Skills = ({ navigation, route }) => {
     
         try {
             // Make API Request
-            const response = await api.get(`skill/all/${skillId}`);
+            // const response = await api.get(`skill/all/${skillId}`);
+            const response = await api.get('skill/all', {
+                params: { skillId },
+              });
     
             console.log("API Response:", response.data);
     
@@ -183,15 +186,15 @@ const Skills = ({ navigation, route }) => {
 
                     <View style={styles.row}>
                         {skill.map((item) => {
-                            const isSelected = selectedItems.includes(item.skill_id);
+                            const isSelected = selectedItems.includes(item.id);
                             return (
                                 <TouchableOpacity
-                                    key={item.skill_id}
-                                    onPress={() => toggleSelection(item.skill_id)}
+                                    key={item.id}
+                                    onPress={() => toggleSelection(item.id)}
                                     style={[styles.card1, isSelected && styles.selectedCard]}
                                 >
                                     {/* <Image source={{ uri: `${API_URL}${item.image}` }} style={styles.skillImage} /> */}
-                                    <Text style={[styles.title, isSelected && styles.selectedText]}>{item.skill_name}</Text>
+                                    <Text style={[styles.title, isSelected && styles.selectedText]}>{item.name}</Text>
                                 </TouchableOpacity>
                             );
                         })}

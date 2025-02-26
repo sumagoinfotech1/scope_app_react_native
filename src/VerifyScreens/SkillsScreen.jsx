@@ -26,7 +26,7 @@ const SkillsScreen = ({ navigation }) => {
   const [errorOccure, setErrorOccure] = useState(false);
   const [error, setError] = useState("");
   const [mainCategoryId, setMainCategory] = useState("");
-  console.log(selectedItems, 'selectedItems');
+  console.log(categories, 'categories');
 
   const data = [
     {
@@ -79,7 +79,7 @@ const SkillsScreen = ({ navigation }) => {
     return () => { }
   }, [])
   const fetchCategories = () => {
-    console.log('function called');
+    // console.log('function called');
 
     setLoading(true);
     setErrorOccure(false);
@@ -102,12 +102,12 @@ const SkillsScreen = ({ navigation }) => {
         });
       })
       .then((response) => {
-        console.log('API Response:', response.data);
+        // console.log('API Response:', response.data);
 
         if (response.data.result === true) {
           setCategories(response.data.data); // Store categories in state
           // Alert.alert('Categories fetched successfully');
-          console.log('Categories:', response.data.data.map(item => item.name));
+          console.log('CategoriesRavi:', response.data.data.map(item => item.name));
         } else {
           setError(response.data?.message || 'Failed to fetch categories');
         }
@@ -214,7 +214,7 @@ const SkillsScreen = ({ navigation }) => {
     setStep("skills")
   }
   const fetchSkillById =  (skillId) => {
-    console.log('Fetching Skill:', skillId);
+    console.log('Fetching Skill kan:', skillId);
     navigation.navigate('Skills', { skillId });
     // setLoading(true);
     // setErrorOccure(false);
@@ -270,28 +270,8 @@ const SkillsScreen = ({ navigation }) => {
       </TouchableOpacity>
     );
   };
-  const toggleSelection = (id) => {
-    setSelectedItems((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((item) => item !== id)
-        : [...prevSelected, id]
-    );
-  };
 
-  const renderItem1 = ({ item }) => {
-    const isSelected = selectedItems.includes(item.id);
 
-    return (
-      <TouchableOpacity
-        onPress={() => toggleSelection(item.id)}
-        style={[styles.card1, isSelected && styles.selectedCard]}
-      >
-        <Text style={[styles.title, isSelected && styles.selectedText]}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-    );
-  };
   return (
     <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <View style={styles.container}>
@@ -323,45 +303,7 @@ const SkillsScreen = ({ navigation }) => {
           </>
         )}
 
-        {step === "skills" && (
-          <>
-            <Text style={styles.heading}>Select At Least Three <Text style={{ color: "red" }}>*</Text></Text>
-            {/* <FlatList
-              data={skill}
-              keyExtractor={(item) => item.id}
-              renderItem={renderItem1}
-              numColumns={3}
-              columnWrapperStyle={styles.row}
-              contentContainerStyle={styles.listContainer}
-              showsVerticalScrollIndicator={false}
-            /> */}
-            <ScrollView >
-
-              <View style={styles.row}>
-                {skill.map((item) => {
-                  const isSelected = selectedItems.includes(item.skill_id);
-                  return (
-                    <TouchableOpacity
-                      key={item.skill_id}
-                      onPress={() => toggleSelection(item.skill_id)}
-                      style={[styles.card1, isSelected && styles.selectedCard]}
-                    >
-                      {/* <Image source={{ uri: `${API_URL}${item.image}` }} style={styles.skillImage} /> */}
-                      <Text style={[styles.title, isSelected && styles.selectedText]}>{item.skill_name}</Text>
-                    </TouchableOpacity>
-                  );
-                })}
-              </View>
-
-            </ScrollView>
-            <CustomButton
-              title="Next"
-              align="right"
-              onPress={() => mainApp()}
-              style={{ paddingHorizontal: 30, backgroundColor: "black" }}
-            />
-          </>
-        )}
+       
 
       </LinearGradient>
       <Loader visible={loading} />

@@ -59,7 +59,7 @@ const Mobile = ({ navigation }) => {
 
   const handleSendOtp = async () => {
     setErrorOccure(false);
-
+    setOtp(["", "", "", ""]);
     if (!/^\d{10}$/.test(mobile)) {
       setErrorOccure(true);
       setError("Enter a valid 10-digit mobile number");
@@ -104,7 +104,7 @@ const Mobile = ({ navigation }) => {
   const handleVerifyOtp = async () => {
     setErrorOccure(false);
     setError(""); // Clear previous errors
-
+    
     // Ensure OTP is an array of exactly 4 digits
     if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => digit.trim() === "")) {
       setErrorOccure(true);
@@ -377,7 +377,7 @@ const Mobile = ({ navigation }) => {
               ))}
 
             </View>
-            <TouchableOpacity disabled={isResendDisabled} onPress={handleSendOtp}>
+            <TouchableOpacity disabled={isResendDisabled} onPress={()=>{handleSendOtp()}}>
               <Text style={{ fontWeight: "bold", fontSize: wp('3.5'), color: Colors.black }}>Resent OTP {isResendDisabled ? `In: 00:${timer}` : null}
               </Text>
             </TouchableOpacity>

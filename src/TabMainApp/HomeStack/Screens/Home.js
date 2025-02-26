@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView ,Platform} from 'react-native'
-import React, { memo } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import ScreenHeader from '../../../ReusableComponents/ScreenHeader'
 import GradientContainer from '../../../ReusableComponents/GradientContainer'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -10,6 +10,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import CustomButton from '../../../ReusableComponents/CustomButton';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../../utils/axiosInstance";
+import { showToast } from '../../../utils/toastService';
 const data = [
   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
@@ -24,54 +25,59 @@ const meetupData = [
 ];
 
 const Home = ({navigation}) => {
-  const renderItem = ({ item }) => (
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState(false);
+const [error, setError] = useState(null);
+
+// console.log('eventsss',events);
+
+const getEvents = async () => {
+  try {
+    setLoading(true);
+    // console.log('Fetching Events...');
+
+    // Make API Request
+    const response = await api.get('event/get_events_grouped_by_eventtype');
+
+    if (response.status === 200 && response.data?.result) {
+      setEvents(response.data.data); // Store data in state
+      console.log('data 13',response.data.data.map((item)=>item.name));
+      
+    } else {
+      showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
+      throw new Error(response.data?.message || 'Failed to fetch events');
+    }
+  } catch (error) {
+    console.error('Error in getEvents:', error);
+
+    let errorMsg = 'Something went wrong. Please try again.';
+    if (error.response) {
+      errorMsg = error.response.data?.message || errorMsg;
+    } else if (error.message) {
+      errorMsg = error.message;
+    }
+
+    setError(errorMsg);
+  } finally {
+    setLoading(false);
+  }
+};
+
+// Fetch data on component mount
+useEffect(() => {
+  getEvents();
+}, []);
+
+
+
+
+
+const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
     </View>
   );
 
-
-  const fetchCategories = () => {
- 
-    // Retrieve Access Token
-    AsyncStorage.getItem('accessToken')
-      .then(() => {
-     
-
-        console.log('Fetching Categories...');
-
-        // Make GET API Request
-        return api.get("category/all", {
-       
-        });
-      })
-      .then((response) => {
-        console.log('API Response:', response.data);
-
-        if (response.data.result === true) {
-          // Alert.alert('Categories fetched successfully');
-          console.log('Categories:', response.data.data.map(item => item.name));
-        } else {
-          setError(response.data?.message || 'Failed to fetch categories');
-        }
-      })
-      .catch((error) => {
-        console.error('Error in fetchCategories:', error);
-
-        let errorMsg = 'Something went wrong. Please try again.';
-        if (error.response) {
-          errorMsg = error.response.data?.message || errorMsg;
-        } else if (error.message) {
-          errorMsg = error.message;
-        }
-
-      
-
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  };
 const gotoMeetup=()=>{
   navigation.navigate('MeetUpsScreen')
 }
@@ -146,7 +152,7 @@ const gotoWorkShop=()=>{
             <CustomButton
               title="Register"
               align="right"
-              onPress={fetchCategories}
+              // onPress={fetchCategories}
               style={{ padding: wp('1.4'), backgroundColor: Colors.black, borderRadius: wp('1') }}
               textstyle={{ fontSize: wp("3.9%") }}
             />
@@ -171,6 +177,8 @@ const gotoWorkShop=()=>{
         <View style={styles.bannerContainer}>
           <CarouselComponent data={data} renderItem={renderItem} />
         </View>
+        
+        <View>
         <View style={{ marginBottom: hp('2') }}>
           <ScreenHeader headername={"MEET UPS"} />
         </View>
@@ -220,7 +228,7 @@ const gotoWorkShop=()=>{
             resizeMode="contain" // You can change to "contain" or "stretch" if needed
           />
         </View>
-     
+        </View>
       </ScrollView>
     </GradientContainer>
   )

@@ -15,7 +15,7 @@ const Stack = createNativeStackNavigator();
 
 const RootStack = () => {
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='MainApp'>
+    <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName='Mobile'>
       <Stack.Screen name="Mobile" component={Mobile} />
       <Stack.Screen name="SkillsScreen" component={SkillsScreen}  />
       <Stack.Screen name="Skills" component={Skills}  />
