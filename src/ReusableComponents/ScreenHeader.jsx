@@ -15,9 +15,10 @@ const ScreenHeader = ({headername}) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    // marginBottom:hp("2%"),
+    alignItems: 'flex-start',
+    // justifyContent: 'flex-start',
+    marginLeft:hp("3%"),
+    marginBottom:hp("1%"),
   },
   logo: {
     fontSize: wp("6.5%"),

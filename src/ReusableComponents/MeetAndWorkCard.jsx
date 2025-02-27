@@ -7,9 +7,10 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Colors from './Colors';
 
-const MeetAndWorkCard = ({ item ,onpress}) => {
+const MeetAndWorkCard = ({ item, onpress }) => {
   return (
-    <TouchableOpacity style={styles.card} onPress={onpress}>
+    <View style={styles.card}>
+    <TouchableOpacity  onPress={onpress}>
       {/* Header Section */}
       <View style={styles.header}>
         <Image source={{ uri: item.image }} style={styles.headerImage} />
@@ -23,38 +24,45 @@ const MeetAndWorkCard = ({ item ,onpress}) => {
         {/* Date and Time */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={styles.infoRow}>
-            <Text style={styles.date}>{item.date}</Text>
+            <Text style={styles.date}>{item.from_date}</Text>
             <MaterialIcons name="access-time" size={22} color="black" />
-            <Text style={styles.time}>{item.time}</Text>
+            <Text style={styles.time}>{item.from_time}</Text>
           </View>
+          {item.paid_or_free === 'Paid' ? <View>
+            <Text style={styles.pricetag}>₹{item.early_bird_price}</Text>
+          </View> : null}
 
-          <View>
-            <Text style={styles.pricetag}>{item.price} Rs</Text>
-          </View>
         </View>
 
         {/* Location and Register Button */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={styles.locationContainer}>
             <FontAwesome name="map-marker" size={16} color="black" />
+            {item.paid_or_free === 'Paid' ?
             <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
-              {item.location}
-            </Text>
+            {item.max_attendees} Members Joined
+          </Text>
+            :<Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
+            {item.location}
+          </Text>}
+            
           </View>
 
         </View>
-        
-         
-      
+
+
+
       </View>
-      <CustomButton
-            title="Register"
-            align="center"
-            // onPress={handleSendOtp} // You can pass actions here
-            style={styles.registerButton}
-            textstyle={styles.registerText}
-          />
     </TouchableOpacity>
+
+      <CustomButton
+        title="Register"
+        align="center"
+        // onPress={handleSendOtp} // You can pass actions here
+        style={styles.registerButton}
+        textstyle={styles.registerText}
+      />
+    </View>
   );
 };
 
@@ -63,7 +71,7 @@ const styles = StyleSheet.create({
     width: wp("91%"),
     backgroundColor: '#ffff',
     borderRadius: wp("2%"),
-    // padding: wp("2%"),
+    paddingBottom: wp("2%"),
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -79,11 +87,11 @@ const styles = StyleSheet.create({
   headerImage: {
     width: wp("91%"),
     height: hp("14%"),
-    resizeMode: 'cover',
+    resizeMode: 'contain',
     borderRadius: wp("2%"),
   },
   title: {
-    fontSize: wp('4.6'),
+    fontSize: wp('5'),
     fontWeight: 'bold',
     marginTop: 10,
     textAlign: 'left',
@@ -99,7 +107,7 @@ const styles = StyleSheet.create({
     color: 'red',
     fontWeight: 'bold',
     marginRight: wp("2.5%"),
-    fontSize: wp('5'),
+    fontSize: wp('4'),
   },
   time: {
     marginLeft: wp("1%"),
@@ -108,28 +116,29 @@ const styles = StyleSheet.create({
   locationContainer: {
     flexDirection: 'row',
     backgroundColor: "#E2E2E2",
-    padding: wp('1.3'),
+    padding: wp('1.1'),
     borderRadius: wp('4'),
     width: wp("60%"),
     alignItems: 'center',
-    paddingHorizontal: wp('3')
+    paddingHorizontal: wp('3'),
+    marginBottom:wp('1.7')
   },
   location: {
     marginLeft: wp("2%"),
     color: Colors.black,
     fontSize: wp("4%"),
-    padding: wp("1%"),
+    padding: wp("0%"),
     width: wp("55%"),
   },
   registerButton: {
-    padding: wp('2.5'),
+    padding: wp('2'),
     backgroundColor: Colors.black,
     borderRadius: wp('3.5'),
     width: wp('87%')
   },
   registerText: {
     fontSize: wp("4.5%"),
-    
+
   },
   pricetag: {
     fontSize: wp('7'),
