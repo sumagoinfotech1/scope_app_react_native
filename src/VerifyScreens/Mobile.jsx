@@ -243,7 +243,7 @@ const Mobile = ({ navigation }) => {
         await AsyncStorage.setItem("refreshToken", refreshToken);
         await AsyncStorage.setItem("User_id", id);
         // await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
-        await AsyncStorage.setItem("isLogin", JSON.stringify(true));
+        // await AsyncStorage.setItem("isLogin", JSON.stringify(true));
         await AsyncStorage.setItem("mobile", mobile);
         showToast("success", "OTP Verified Successfully");
         setStep("profile");

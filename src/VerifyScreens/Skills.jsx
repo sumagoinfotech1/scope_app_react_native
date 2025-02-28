@@ -71,6 +71,7 @@ const Skills = ({ navigation, route }) => {
 
             if (data?.result === true) {
                 showToast('success', 'Success', data.message);
+                await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(true));
                 navigation.replace('MainApp');
             } else {
                 setError(data.message || 'Failed to submit answers');

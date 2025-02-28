@@ -9,46 +9,63 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import StarRating from 'react-native-star-rating-widget';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const ProfileScreen = ({navigation}) => {
+const ProfileScreen = ({ navigation }) => {
     const [rating, setRating] = useState(4);
     const [isModalVisible, setModalVisible] = useState(false);
-  const [loading, setLoading] = useState(false); // Show loader while API fetches
+    const [islogin, setLogin] = useState('');
+    const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
         name: "Anoop Nanekar",
         phone: "9888688998",
         email: "username@gmail.com",
         avatar: "https://i.pinimg.com/736x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg"
     };
-    // useEffect(() => {
-    //     const checkUserStatus = async () => {
-    //       setLoading(true)
-    //       try {
-    //         const isLogin = await AsyncStorage.getItem("isLogin");
-           
-      
-    //         console.log("isLogin", isLogin);
-    
-   
-         
-    //       } catch (error) {
-    //         console.error("Error fetching profile status:", error);
-    //         setLoading(false)
-    //       }
-    //     };
-      
-    //     checkUserStatus();
-    //   }, []); // Removed `navigation` from dependencies
-      
+    useEffect(() => {
+        const checkUserStatus = async () => {
+            setLoading(true)
+            try {
+                const isLogin = await AsyncStorage.getItem("isLogin");
+
+
+                console.log("isLogin", isLogin);
+                setLogin(isLogin)
+
+
+            } catch (error) {
+                console.error("Error fetching profile status:", error);
+                setLoading(false)
+            }
+        };
+
+        checkUserStatus();
+    }, []); // Removed `navigation` from dependencies
+
+    const logout = async () => {
+        try {
+            await AsyncStorage.setItem("isLogin", JSON.stringify(false));
+            await AsyncStorage.removeItem("User_id");
+            await AsyncStorage.removeItem("accessToken");
+            await AsyncStorage.removeItem("refreshToken");
+            await AsyncStorage.removeItem("mobile");// Optional: Remove user ID on logout
+            console.log("User logged out successfully");
+            // Navigate back to the Mobile screen
+            navigation.replace("Mobile");
+        } catch (error) {
+            console.error("Error during logout:", error);
+        }
+    };
+
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
-              
+
                 <Image source={{ uri: user.avatar }} style={styles.avatar} />
                 <View style={styles.userInfo}>
                     <Text style={styles.name}>{user.name}</Text>
                     <Text style={styles.phone}>{user.phone}</Text>
                     <Text style={styles.email}>{user.email}</Text>
-                
+
                 </View>
             </View>
 
@@ -59,7 +76,7 @@ const ProfileScreen = ({navigation}) => {
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}onPress={()=>{navigation.navigate('FAQScreen')}}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('FAQScreen') }}>
                     <FontAwesome5 name="question-circle" size={20} color="#000" />
                     <Text style={styles.menuText}>FAQ</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
@@ -71,13 +88,13 @@ const ProfileScreen = ({navigation}) => {
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem} onPress={()=>{navigation.navigate('ReferalScreen')}}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('ReferalScreen') }}>
                     <FontAwesome5 name="user-friends" size={20} color="#000" />
                     <Text style={styles.menuText}>Referral</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => logout()}>
                     <FontAwesome5 name="sign-out-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Logout</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
