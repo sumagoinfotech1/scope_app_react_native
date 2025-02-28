@@ -13,8 +13,8 @@ const HomeStack = () => {
   return (
     <Stack.Navigator initialRouteName='Home'>
     <Stack.Screen name="Home" component={Home} options={{ headerShown: false }} />
-    <Stack.Screen name="WorkShopScreen" component={WorkShopScreen} options={{ headerShown: false }} />
-    <Stack.Screen name="WorkShopDetails" component={WorkShopDetails} options={{ headerShown: false }} />
+    {/* <Stack.Screen name="WorkShopScreen" component={WorkShopScreen} options={{ headerShown: false }} />
+    <Stack.Screen name="WorkShopDetails" component={WorkShopDetails} options={{ headerShown: false }} /> */}
     <Stack.Screen name="MeetUpsScreen" component={MeetUpsScreen} options={{ headerShown: false }} />
     <Stack.Screen name="MeetUpsDetails" component={MeetUpsDetails} options={{ headerShown: false }} />
     <Stack.Screen name="RewardsScreen" component={RewardsScreen} options={{ headerShown: false }} />

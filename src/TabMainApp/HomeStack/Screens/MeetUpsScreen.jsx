@@ -24,11 +24,11 @@
 //     const [hasMore, setHasMore] = useState(true);
 //     const getEventsByd = async (id, page = 1) => {
 //         if (isFetchingMore || (!hasMore && page !== 1)) return; // Prevent unnecessary API calls
-      
+
 //         try {
 //           if (page === 1) setLoading(true); // Show main loader for the first fetch
 //           setIsFetchingMore(true);
-      
+
 //           // Make API Request with pagination in the request body
 //           const response = await api.get(`event/get_by_eventype/${id}`, {
 //             // pageSize: 10,
@@ -37,11 +37,11 @@
 //       {}
 //           if (response.status === 200 && response.data?.result) {
 //             const newData = response.data.data;
-      
+
 //             setEventsById(prevData => (page === 1 ? newData : [...prevData, ...newData]));
 //             setHasMore(newData.length === 10); // If fewer than 6 items are returned, no more data is available
 //             setCurrentPage(page);
-      
+
 //             console.log('Fetched Events:', newData.map(item => item.name));
 //           } else {
 //             showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
@@ -61,14 +61,14 @@
 //           setIsFetchingMore(false);
 //         }
 //       };
-      
+
 //       // Function to load more data when scrolling
 //       const loadMoreEvents = () => {
 //         if (!isFetchingMore && hasMore) {
 //           getEventsByd(id, currentPage + 1);
 //         }
 //       };
-    
+
 //       // Fetch data on component mount
 //       useEffect(() => {
 //         getEventsByd(id);
@@ -134,6 +134,7 @@ const MeetUpsScreen = ({ navigation, route }) => {
     const [isFetchingMore, setIsFetchingMore] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(null);
+    const [heading, setHeading] = useState([]);
 
     const getMeetups = async (page = 1) => {
         if (isFetchingMore || (totalPages !== null && page > totalPages)) return; // Prevent duplicate calls
@@ -151,7 +152,7 @@ const MeetUpsScreen = ({ navigation, route }) => {
                 const newData = response.data.data;
                 const totalItems = response.data.totalItems || 0;
                 const calculatedTotalPages = Math.ceil(totalItems / 6);
-
+                setHeading(response.data.data[0].event_type_id.name)
                 setMeetupData((prevData) => (page === 1 ? newData : [...prevData, ...newData]));
                 setCurrentPage(page);
                 setTotalPages(calculatedTotalPages);
@@ -183,19 +184,19 @@ const MeetUpsScreen = ({ navigation, route }) => {
     }, []);
 
     // Navigate to Meetup Details screen with ID
-    const gotodetails = (meetupId) => {
-        navigation.navigate('MeetUpsDetails', { id: meetupId });
+    const gotodetails = (id) => {
+        navigation.navigate('MeetUpsDetails', { id });
     };
 
     return (
         <GradientContainer style={styles.mainContainer}>
             {/* Background Header */}
-            <ImageBackground 
-                source={require('../../../assets/icons/image.png')} 
-                style={styles.imageContainer} 
+            <ImageBackground
+                source={require('../../../assets/icons/image.png')}
+                style={styles.imageContainer}
                 resizeMode="cover"
             >
-                <MainAppScreenHeader headername={"MEETUPS"} />
+                <MainAppScreenHeader headername={heading} />
             </ImageBackground>
 
             {/* Meetup List */}
@@ -204,7 +205,7 @@ const MeetUpsScreen = ({ navigation, route }) => {
                     data={meetupData}
                     keyExtractor={(item) => item.id.toString()} // Ensure ID is a string
                     renderItem={({ item }) => (
-                        <MeetAndWorkCard item={item} onpress={() => gotodetails(item)} />
+                        <MeetAndWorkCard item={item} onpress={() => gotodetails(item.id)} />
                     )}
                     contentContainerStyle={{ paddingBottom: hp('15') }} // Extra padding at bottom
                     showsVerticalScrollIndicator={false}
@@ -224,18 +225,18 @@ export default MeetUpsScreen;
 
 const styles = StyleSheet.create({
     mainContainer: {
-                flex: 1,
-                alignItems: "center",
-                justifyContent: 'flex-start'
-            },
-            imageContainer: {
-                backgroundColor: "red",
-                width: wp('100%'),
-                alignItems: "center",
-                height: hp('15'),
-                justifyContent: "center",
-        
-            },
+        flex: 1,
+        alignItems: "center",
+        justifyContent: 'flex-start'
+    },
+    imageContainer: {
+        backgroundColor: "red",
+        width: wp('100%'),
+        alignItems: "center",
+        height: hp('15'),
+        justifyContent: "center",
+
+    },
     listContainer: {
         // flex: 1,
         // width: '100%',

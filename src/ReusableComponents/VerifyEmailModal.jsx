@@ -1,11 +1,13 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-import Colors from "../ReusableComponents/Colors"; // Replace with your Colors file
+
 
 const VerifyEmailModal = ({ isVisible, onClose, onConfirm }) => {
   const [email, setEmail] = useState("");
 
+
+  
   return (
     <Modal transparent visible={isVisible} animationType="fade">
       <View style={styles.overlay}>
@@ -26,7 +28,7 @@ const VerifyEmailModal = ({ isVisible, onClose, onConfirm }) => {
               <Text style={styles.noButtonText}>No</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.yesButton} onPress={onConfirm}>
+            <TouchableOpacity style={styles.yesButton} onPress={()=>onConfirm(email)}>
               <Text style={styles.yesButtonText}>Yes</Text>
             </TouchableOpacity>
           </View>

@@ -370,12 +370,6 @@ const data = [
   { id: 3, title: 'Item 3', image: 'https://i.pinimg.com/736x/1f/d1/6c/1fd16c0483c99a1e70b58c6a4698488d.jpg' },
 ];
 
-const meetupData = [
-  { id: '1', title: 'Visual Elements Of User Interface Design', date: '04 Feb 25', time: '02:40 PM', location: 'Govind Nagar Nashik', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '2', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/50/35/57/503557d678025e87d3c017dd6a9fba14.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '3', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/f7/8c/ef/f78cef0dd20b57db43cc6c93cc4e7303.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '4', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/a5/77/4c/a5774cfed2b9a6bbc14ffea6148b7fb9.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-];
 
 const Home = ({ navigation }) => {
   const [events, setEvents] = useState([]);
@@ -433,12 +427,12 @@ const Home = ({ navigation }) => {
 
   const gotoMeetup = (id) => {
     // console.log('iddd',id);
-    
-    navigation.navigate('MeetUpsScreen',{id})
+
+    navigation.navigate('MeetUpsScreen', { id })
   }
   const MeetupCard = ({ item }) => {
     return (
-      <View style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
@@ -464,19 +458,20 @@ const Home = ({ navigation }) => {
             <CustomButton
               title="Register"
               align="right"
-              // onPress={handleSendOtp}
+              onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
               style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('2'), width: wp('35') }}
               textstyle={{ fontSize: wp("3.9%") }}
+
             />
           </View>
         </View>
 
-      </View>
+      </TouchableOpacity>
     );
   };
   const WorkShopCard = ({ item }) => {
     return (
-      <View style={styles.card}>
+      <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
@@ -490,7 +485,7 @@ const Home = ({ navigation }) => {
           <Text style={styles.date}>₹ {item.early_bird_price}</Text>
           <MaterialIcons name="local-offer" size={16} color="black" />
           <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
-          ₹ {item.initial_price}
+            ₹ {item.initial_price}
           </Text>
         </View>
 
@@ -504,13 +499,13 @@ const Home = ({ navigation }) => {
             <CustomButton
               title="Register"
               align="right"
-              // onPress={fetchCategories}
+              onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
               style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('2'), width: wp('35') }}
               textstyle={{ fontSize: wp("3.9%") }}
             />
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     );
   };
 
@@ -566,9 +561,9 @@ const Home = ({ navigation }) => {
             </View>
           )}
         />
- 
-          <ScreenHeader headername={"EARN REWARDS"} />
-        
+
+        <ScreenHeader headername={"EARN REWARDS"} />
+
         <View style={styles.ImageCard}>
           <Image
             // source={{ uri: "https://i.pinimg.com/736x/06/16/32/061632d4efe20eb88834e335ccbee1e9.jpg" }}
@@ -636,7 +631,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginVertical: wp("1%"),
-    elevation: 3
+    // elevation: 3
   },
   date: {
     color: 'red',

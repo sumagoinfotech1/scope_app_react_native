@@ -1,25 +1,44 @@
 
 
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StarRating from 'react-native-star-rating-widget';
 import Modal from 'react-native-modal';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const ProfileScreen = ({navigation}) => {
     const [rating, setRating] = useState(4);
     const [isModalVisible, setModalVisible] = useState(false);
-
+  const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
         name: "Anoop Nanekar",
         phone: "9888688998",
         email: "username@gmail.com",
         avatar: "https://i.pinimg.com/736x/4c/85/31/4c8531dbc05c77cb7a5893297977ac89.jpg"
     };
-
+    // useEffect(() => {
+    //     const checkUserStatus = async () => {
+    //       setLoading(true)
+    //       try {
+    //         const isLogin = await AsyncStorage.getItem("isLogin");
+           
+      
+    //         console.log("isLogin", isLogin);
+    
+   
+         
+    //       } catch (error) {
+    //         console.error("Error fetching profile status:", error);
+    //         setLoading(false)
+    //       }
+    //     };
+      
+    //     checkUserStatus();
+    //   }, []); // Removed `navigation` from dependencies
+      
     return (
         <View style={styles.container}>
             <View style={styles.header}>

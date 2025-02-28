@@ -6,7 +6,7 @@ const ImageCard = ({ imageUrl, style, imageStyle, resizeMode = "cover" }) => {
   return (
     <View style={[styles.imageCard, style]}>
       <Image
-        source={{ uri: imageUrl }}
+        source={ imageUrl }
         style={[styles.cardImage, imageStyle]}
         resizeMode={resizeMode}
       />

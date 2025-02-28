@@ -31,6 +31,47 @@ const Mobile = ({ navigation }) => {
   const [timer, setTimer] = useState(60); // Start from 60 seconds
   const [isResendDisabled, setIsResendDisabled] = useState(true);
 
+  useEffect(() => {
+    const checkUserStatus = async () => {
+      setLoading(true)
+      try {
+        const storedProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
+        const storedAnswerSubmitted = await AsyncStorage.getItem("isAnswerSubmitted");
+  
+        // Convert stored values from string to boolean
+        const profileCompleted = storedProfileCompleted ? JSON.parse(storedProfileCompleted) : false;
+        const answerSubmitted = storedAnswerSubmitted ? JSON.parse(storedAnswerSubmitted) : false;
+  
+        console.log("profile", profileCompleted);
+        console.log("answer", answerSubmitted);
+  
+        // Navigation logic based on stored values
+        if (profileCompleted) {
+          if (answerSubmitted) {
+            navigation.replace("MainApp");
+            setLoading(false)
+          } else {
+            navigation.replace("SkillsScreen");
+            setLoading(false)
+          }
+        } else {
+          setStep("mobile");
+          setLoading(false)
+        }
+      } catch (error) {
+        console.error("Error fetching profile status:", error);
+        setLoading(false)
+      }
+    };
+  
+    checkUserStatus();
+  }, []); // Removed `navigation` from dependencies
+  
+  
+
+
+
+
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image source={{ uri: item.image }} style={styles.carouselImage} />
@@ -101,10 +142,81 @@ const Mobile = ({ navigation }) => {
 
     setLoading(false);
   };
+  // const handleVerifyOtp = async () => {
+  //   setErrorOccure(false);
+  //   setError(""); // Clear previous errors
+
+  //   // Ensure OTP is an array of exactly 4 digits
+  //   if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => digit.trim() === "")) {
+  //     setErrorOccure(true);
+  //     setError("Enter a valid 4-digit OTP");
+  //     return;
+  //   }
+
+  //   setLoading(true);
+
+  //   try {
+  //     const isProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
+  //     const response = await api.post("auth/verify-otp", {
+  //       mobile,
+  //       otp: OTP, // Convert array to string
+  //     });
+
+  //     console.log("response otp veryfy:", isProfileCompleted);
+
+  //     if (response.data.result === true) {
+  //       const { accessToken, refreshToken, id, isProfileCompleted, mobile, is_answer_submitted } = response.data.data;
+
+  //       // Store tokens securely
+  //       await AsyncStorage.setItem("accessToken", accessToken);
+  //       await AsyncStorage.setItem("refreshToken", refreshToken);
+  //       await AsyncStorage.setItem("User_id", id);
+  //       await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
+  //       await AsyncStorage.setItem("is_answer_submitted", JSON.stringify(is_answer_submitted));
+  //       await AsyncStorage.setItem("mobile", mobile);
+
+  //       showToast("success", "OTP Verified Successfully");
+  //       if (isProfileCompleted) {
+  //         if (is_answer_submitted) {
+  //           navigation.replace('MainApp');
+  //         }
+  //         else (
+  //           navigation.replace('SkillsScreen')
+  //         )
+  //       }
+  //       setStep("profile");
+  //       setOtp(["", "", "", ""]); // Reset OTP input after success
+  //     } else {
+  //       setErrorOccure(true);
+  //       setError(response.data.message || "OTP verification failed");
+  //       setOtp(["", "", "", ""]); // Reset OTP input on failure
+  //     }
+  //   } catch (error) {
+  //     console.error("Error verifying OTP:", error);
+
+  //     let errorMessage = "Error verifying OTP. Try again";
+
+  //     if (error.response) {
+  //       // Server responded with an error
+  //       errorMessage = error.response.data.message || "Invalid OTP, please try again";
+  //     } else if (error.request) {
+  //       // No response received
+  //       errorMessage = "Network error, please check your internet connection";
+  //     } else {
+  //       // Other errors
+  //       errorMessage = "Something went wrong. Please try again";
+  //     }
+
+  //     setErrorOccure(true);
+  //     setError(errorMessage);
+  //   }
+
+  //   setLoading(false);
+  // };
   const handleVerifyOtp = async () => {
     setErrorOccure(false);
     setError(""); // Clear previous errors
-    
+
     // Ensure OTP is an array of exactly 4 digits
     if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => digit.trim() === "")) {
       setErrorOccure(true);
@@ -115,28 +227,25 @@ const Mobile = ({ navigation }) => {
     setLoading(true);
 
     try {
-      const isProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
+      // API request to verify OTP
       const response = await api.post("auth/verify-otp", {
         mobile,
-        otp: OTP, // Convert array to string
+        otp: OTP // Convert array to string
       });
 
-      console.log("isProfileCompleted:", isProfileCompleted);
+      console.log("response otp verify:", response.data);
 
       if (response.data.result === true) {
-        const { accessToken, refreshToken, id, isProfileCompleted, mobile } = response.data.data;
+        const { accessToken, refreshToken, id, isProfileCompleted, mobile, is_answer_submitted } = response.data.data;
 
         // Store tokens securely
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
         await AsyncStorage.setItem("User_id", id);
-        await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
+        // await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
+        await AsyncStorage.setItem("isLogin", JSON.stringify(true));
         await AsyncStorage.setItem("mobile", mobile);
-
         showToast("success", "OTP Verified Successfully");
-        if(isProfileCompleted){
-          navigation.replace('MainApp');
-        }
         setStep("profile");
         setOtp(["", "", "", ""]); // Reset OTP input after success
       } else {
@@ -150,21 +259,16 @@ const Mobile = ({ navigation }) => {
       let errorMessage = "Error verifying OTP. Try again";
 
       if (error.response) {
-        // Server responded with an error
         errorMessage = error.response.data.message || "Invalid OTP, please try again";
       } else if (error.request) {
-        // No response received
         errorMessage = "Network error, please check your internet connection";
-      } else {
-        // Other errors
-        errorMessage = "Something went wrong. Please try again";
       }
 
       setErrorOccure(true);
       setError(errorMessage);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
 
@@ -283,21 +387,21 @@ const Mobile = ({ navigation }) => {
     }
 
     try {
-     
+
 
       console.log("Verifying Referral Code:", promocode);
 
       // Make API Request
       const response = await api.post(
-       "auth/verify-referral-code",
+        "auth/verify-referral-code",
         { referralCode: promocode },
-   
+
       );
 
       console.log("API Response:", response.data);
 
       if (response.data?.result === true) {
-      
+
         showToast('success', 'Success', "Referral code verified successfully!");
         setVerifyCode(true);
 
@@ -377,7 +481,7 @@ const Mobile = ({ navigation }) => {
               ))}
 
             </View>
-            <TouchableOpacity disabled={isResendDisabled} onPress={()=>{handleSendOtp()}}>
+            <TouchableOpacity disabled={isResendDisabled} onPress={() => { handleSendOtp() }}>
               <Text style={{ fontWeight: "bold", fontSize: wp('3.5'), color: Colors.black }}>Resent OTP {isResendDisabled ? `In: 00:${timer}` : null}
               </Text>
             </TouchableOpacity>

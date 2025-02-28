@@ -17,13 +17,14 @@ const styles = StyleSheet.create({
     width: '100%',  
     // marginBottom: wp("1%"), 
     // marginHorizontal:wp('3%')
+    elevation: 4,
   },
   button: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.black,
     padding: wp("2%"),
     borderRadius: wp("2%"),
     alignItems: 'center',
-    elevation: 4,
+   
 
   },
   buttonText: {
