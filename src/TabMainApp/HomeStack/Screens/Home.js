@@ -511,7 +511,7 @@ const Home = ({ navigation }) => {
 
   return (
     <GradientContainer style={styles.maincontainer}>
-      <ScrollView>
+      <ScrollView nestedScrollEnabled={true}>
         <View style={{ position: 'static', }}>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RewardsScreen')}>
             <Image source={require('../../../assets/icons/Maskgroup.png')} style={styles.icon} />

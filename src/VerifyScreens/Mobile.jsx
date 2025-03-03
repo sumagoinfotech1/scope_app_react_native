@@ -31,47 +31,131 @@ const Mobile = ({ navigation }) => {
   const [timer, setTimer] = useState(60); // Start from 60 seconds
   const [isResendDisabled, setIsResendDisabled] = useState(true);
 
+  // useEffect(() => {
+  //   const checkUserStatus = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const storedProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
+  //       const storedAnswerSubmitted = await AsyncStorage.getItem("isAnswerSubmitted");
+  //       const mobile = await AsyncStorage.getItem("mobile");
+  //       const isLogin = await AsyncStorage.getItem("isLogin");
+  
+  //       // Convert stored values from string to boolean
+  //       const profileCompleted = storedProfileCompleted ? JSON.parse(storedProfileCompleted) : false;
+  //       const answerSubmitted = storedAnswerSubmitted ? JSON.parse(storedAnswerSubmitted) : false;
+  //       const isUserLoggedIn = isLogin === "true"; // Ensure correct type comparison
+  
+  //       console.log("profileCompleted:", profileCompleted);
+  //       console.log("answerSubmitted:", answerSubmitted);
+  //       console.log("isLogin:", isUserLoggedIn);
+  
+  //       if (isUserLoggedIn) {
+  //         if (profileCompleted) {
+  //           if (answerSubmitted) {
+  //             navigation.replace("MainApp");
+  //           } else {
+  //             navigation.replace("SkillsScreen");
+  //           }
+  //         } else {
+  //           setStep("profile");
+  //           setMobile(mobile);
+  //         }
+  //       } else {
+  //         // navigation.replace("Mobile");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching profile status:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  
+  //   checkUserStatus();
+  // }, []); // Removed `navigation` from dependencies
+  
+
+  // useEffect(() => {
+  //   const checkUserStatus = async () => {
+  //     setLoading(true);
+  //     try {
+  //       const [storedProfileCompleted, storedAnswerSubmitted, mobile, isLogin] = await Promise.all([
+  //         AsyncStorage.getItem("isProfileCompleted"),
+  //         AsyncStorage.getItem("isAnswerSubmitted"),
+  //         AsyncStorage.getItem("mobile"),
+  //         AsyncStorage.getItem("isLogin"),
+  //       ]);
+  
+  //       const isUserLoggedIn = isLogin === "true"; // Ensure correct boolean check
+  //       const profileCompleted = JSON.parse(storedProfileCompleted || "false");
+  //       const answerSubmitted = JSON.parse(storedAnswerSubmitted || "false");
+  
+  //       console.log("profileCompleted:", profileCompleted);
+  //       console.log("answerSubmitted:", answerSubmitted);
+  //       console.log("isLogin:", isUserLoggedIn);
+  
+  //       if (isUserLoggedIn) {
+  //         if (!profileCompleted) {
+  //           setStep("profile");
+  //           setMobile(mobile);
+  //         } else {
+  //           navigation.replace(answerSubmitted ? "MainApp" : "SkillsScreen");
+  //         }
+  //       } else {
+  //         // User is not logged in, navigate to Mobile
+  //         navigation.replace("Mobile");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching profile status:", error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+  
+  //   checkUserStatus();
+  // }, []);
+  
+
   useEffect(() => {
-    const checkUserStatus = async () => {
-      setLoading(true)
+    const checkLoginStatus = async () => {
+      setLoading(true);
       try {
+        const mobile = await AsyncStorage.getItem("mobile");
+        const isLogin = await AsyncStorage.getItem("isLogin");
+        console.log("isLogin:", isLogin); // Debugging
+  
+        if (isLogin !== "true") {
+          setStep("mobile");
+          return;
+        }
+  
         const storedProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
         const storedAnswerSubmitted = await AsyncStorage.getItem("isAnswerSubmitted");
   
-        // Convert stored values from string to boolean
-        const profileCompleted = storedProfileCompleted ? JSON.parse(storedProfileCompleted) : false;
-        const answerSubmitted = storedAnswerSubmitted ? JSON.parse(storedAnswerSubmitted) : false;
+        console.log("Raw Profile Completed:", storedProfileCompleted);
+        console.log("Raw Answer Submitted:", storedAnswerSubmitted);
   
-        console.log("profile", profileCompleted);
-        console.log("answer", answerSubmitted);
+        const profileCompleted = storedProfileCompleted === "true";  // Convert to boolean
+        const answerSubmitted = storedAnswerSubmitted === "true";  // Convert to boolean
   
-        // Navigation logic based on stored values
-        if (profileCompleted) {
-          if (answerSubmitted) {
-            navigation.replace("MainApp");
-            setLoading(false)
-          } else {
-            navigation.replace("SkillsScreen");
-            setLoading(false)
-          }
+        console.log("Converted Profile Completed:", profileCompleted);
+        console.log("Converted Answer Submitted:", answerSubmitted);
+  
+        if (!profileCompleted) {
+          setStep("profile");
+          setMobile(mobile);
         } else {
-          setStep("mobile");
-          setLoading(false)
+          navigation.replace(answerSubmitted ? "MainApp" : "SkillsScreen");
         }
       } catch (error) {
-        console.error("Error fetching profile status:", error);
-        setLoading(false)
+        console.error("Error fetching login status:", error);
+      } finally {
+        setLoading(false);
       }
     };
   
-    checkUserStatus();
-  }, []); // Removed `navigation` from dependencies
+    checkLoginStatus();
+  }, []);
   
-  
-
-
-
-
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image source={{ uri: item.image }} style={styles.carouselImage} />
@@ -216,37 +300,46 @@ const Mobile = ({ navigation }) => {
   const handleVerifyOtp = async () => {
     setErrorOccure(false);
     setError(""); // Clear previous errors
-
+  
     // Ensure OTP is an array of exactly 4 digits
     if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => digit.trim() === "")) {
       setErrorOccure(true);
       setError("Enter a valid 4-digit OTP");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
       // API request to verify OTP
       const response = await api.post("auth/verify-otp", {
         mobile,
         otp: OTP // Convert array to string
       });
-
+  
       console.log("response otp verify:", response.data);
-
+  
       if (response.data.result === true) {
         const { accessToken, refreshToken, id, isProfileCompleted, mobile, is_answer_submitted } = response.data.data;
-
+  
         // Store tokens securely
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
         await AsyncStorage.setItem("User_id", id);
-        // await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
-        // await AsyncStorage.setItem("isLogin", JSON.stringify(true));
         await AsyncStorage.setItem("mobile", mobile);
+        await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
+        await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(is_answer_submitted));
+        await AsyncStorage.setItem("isLogin", JSON.stringify(true));
+  
         showToast("success", "OTP Verified Successfully");
-        setStep("profile");
+  
+        // Determine next step based on profile completion and answer submission status
+        if (!isProfileCompleted) {
+          setStep("profile"); // Navigate to profile if it's not completed
+        } else {
+          navigation.replace(is_answer_submitted ? "MainApp" : "SkillsScreen");
+        }
+  
         setOtp(["", "", "", ""]); // Reset OTP input after success
       } else {
         setErrorOccure(true);
@@ -255,21 +348,22 @@ const Mobile = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-
+  
       let errorMessage = "Error verifying OTP. Try again";
-
+  
       if (error.response) {
         errorMessage = error.response.data.message || "Invalid OTP, please try again";
       } else if (error.request) {
         errorMessage = "Network error, please check your internet connection";
       }
-
+  
       setErrorOccure(true);
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
+  
 
 
 
