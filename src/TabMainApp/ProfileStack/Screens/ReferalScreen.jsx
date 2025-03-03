@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -8,14 +8,64 @@ import CustomButton from '../../../ReusableComponents/CustomButton';
 import Clipboard from '@react-native-clipboard/clipboard';
 import { showToast } from '../../../utils/toastService';
 import TicketModal from '../../../ReusableComponents/TicketModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../../utils/axiosInstance';
+import Loader from '../../../ReusableComponents/Loader';
 
 const ReferalScreen = () => {
-    const [referralCode] = useState('SDSGDHG');
-    const [ticketmodalVisible, setTicketModalVisible] = useState(false);
+
+    // const [ticketmodalVisible, setTicketModalVisible] = useState(false);
     const copyToClipboard = () => {
         Clipboard.setString(referralCode);
         showToast('info', 'Copied');
     };
+    const [loading, setLoading] = useState(true);
+    const [referralCode, setReferralCode] = useState("");
+    console.log(referralCode,referralCode);
+    
+//     useEffect(() => {
+//         createUserReferral();
+//       }, []);
+// const createUserReferral = async () => {
+//   try {
+//     setLoading(true);
+
+//     // Get user ID from AsyncStorage
+//     const userId = await AsyncStorage.getItem("User_id");
+
+//     if (!userId) {
+//       throw new Error("User ID is required");
+//     }
+//     console.log(userId, 'viva');
+
+//     // API Request to Create Referral
+//     const response = await api.post(`user-referral/create/${userId}`);
+//     console.log('response', response);
+
+//     // ✅ Success Case: If result === true
+//     if (response.data?.result === true) {
+//       setReferralCode(response.data.data.referral_code);
+//       showToast("success", "Success", response.data.message);
+//     } 
+//     // ❌ Failure Case: If result === false
+//     else if (response.data?.result === false) {
+//       showToast("error", "Error", response.data.message || "Referral creation failed");
+//       console.log('////',response.data.message );
+      
+//     } 
+//     // ❌ Handle unexpected responses
+//     else {
+//       throw new Error("Unexpected response from server");
+//     }
+//   } catch (error) {
+//     console.error("❌ Error creating referral:", error);
+//     showToast("error", "Error", error.response?.data?.message || error.message || "Something went wrong");
+//   } finally {
+//     setLoading(false);
+//   }
+// };
+
+      
     return (
         <View style={styles.container}>
             {/* Back Button */}
@@ -68,11 +118,12 @@ const ReferalScreen = () => {
             <CustomButton
                 title="Refer To Friends"
                 align="right"
-                onPress={()=>setTicketModalVisible(true)}
+                // onPress={()=>setTicketModalVisible(true)}
                 style={{ padding: wp('2.8'), backgroundColor: Colors.black, marginHorizontal: wp('7'), marginVertical: wp('4') }}
                 textstyle={{ fontSize: wp("4.2%") }}
             />
-            <TicketModal visible={ticketmodalVisible} onClose={() => setTicketModalVisible(false)} />
+            <Loader visible={loading}/>
+            {/* <TicketModal visible={ticketmodalVisible} onClose={() => setTicketModalVisible(false)} /> */}
         </View>
     );
 };

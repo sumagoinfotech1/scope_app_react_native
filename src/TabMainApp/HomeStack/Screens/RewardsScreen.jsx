@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, FlatList, StyleSheet, Text, Image, Dimensions ,ImageBackground} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, FlatList, StyleSheet, Text, Image, Dimensions, ImageBackground, Alert } from 'react-native';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../../../utils/axiosInstance';
+import Loader from '../../../ReusableComponents/Loader';
+import { showToast } from '../../../utils/toastService';
 const { width } = Dimensions.get('window');
 
 const transactions = [
@@ -10,14 +13,85 @@ const transactions = [
 ];
 
 const RewardsScreen = () => {
+
+    const [rewardHistory, setRewardHistory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
+    const getRewardHistory = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+      
+          // Get user ID from AsyncStorage
+          const userId = await AsyncStorage.getItem('User_id');
+          console.log('Retrieved User ID:', userId);
+      
+          if (!userId) {
+            throw new Error('User ID not found in AsyncStorage');
+          }
+      
+          // Make API request
+          const response = await api.get(`reward-history/user?id=${userId}`);
+          console.log('API Response:', response.data);  
+      
+          if (response.status === 200) {
+            if (response.data?.result) {
+              setRewardHistory(response.data.data); // Store data in state
+            } 
+          } else if (response.status === 400) {
+            showToast("error", response.data?.message || "Bad Request: Reward history not found.");
+            setError(response.data?.message || "Bad Request: Reward history not found.");
+          } 
+        } catch (error) {
+          console.error('Error fetching reward history:', error);
+      
+          if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400) {
+              showToast("error", data?.message || "Bad Request: Reward history not found.");
+              setError(data?.message || "Bad Request: Reward history not found.");
+            } else {
+              showToast("error", data?.message || "An error occurred");
+              setError(data?.message || "An error occurred");
+            }
+          } else {
+            showToast("error", "Network error. Please check your internet connection.");
+            setError("Network error. Please check your internet connection.");
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
+      
+
+
+    useEffect(() => {
+        getRewardHistory();
+    }, []);
+
+    const formatTimestamp = (timestamp) => {
+        const date = new Date(timestamp);
+      
+        const options = {
+          year: "numeric",
+          month: "long",
+          day: "2-digit",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true, // 12-hour format
+        };
+      
+        return date.toLocaleString("en-US", options); 
+      };
     return (
         <View style={styles.container}>
             {/* Header Section */}
             <ImageBackground source={require('../../../assets/icons/Ellipse2.png')} style={styles.headerContainer}>
                 <View source={require('../../../assets/icons/Ellipse2.png')} style={styles.header}>
-                    <Image source={require('../../../assets/icons/RefereEarnCoin.png')}  style={styles.coinIcon} />
+                    <Image source={require('../../../assets/icons/RefereEarnCoin.png')} style={styles.coinIcon} />
                     <Text style={styles.points}>
-                        6000 <Text style={styles.pointsText}>Points</Text>
+                       6000 <Text style={styles.pointsText}>Points</Text>
                     </Text>
                     <Text style={styles.rewardText}>
                         Keep Earning Reward Something{"\n"}Exciting Awaiting For You
@@ -27,20 +101,22 @@ const RewardsScreen = () => {
 
             {/* Transactions List */}
             <FlatList
-                data={transactions}
+                data={rewardHistory}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <View style={styles.transactionCard}>
                         <View style={styles.transactionContent}>
-                            <Text style={styles.transactionTitle}>{item.title}</Text>
-                            <Text style={styles.transactionTime}>{item.time}</Text>
+                            <Text style={styles.transactionTitle}>{item.description}</Text>
+                            <Text style={styles.transactionTime}>{formatTimestamp(item.createdAt)}</Text>
                         </View>
-                        <Text style={styles.transactionPoints}>{item.points}</Text>
+                        <Text style={styles.transactionPoints}>+{item.amount}</Text>
                     </View>
                 )}
                 contentContainerStyle={styles.listContainer}
                 showsVerticalScrollIndicator={false}
             />
+            <View style={{ alignItems: "center", justifyContent: "center" }}><Text>{error}</Text></View>
+            <Loader visible={loading} />
         </View>
     );
 };
@@ -57,9 +133,9 @@ const styles = StyleSheet.create({
         paddingBottom: wp('1%'),
         width: wp("100%"),
         height: wp("100%"),
-        justifyContent:"center",
-        resizeMode:'contain'
-        
+        justifyContent: "center",
+        resizeMode: 'contain'
+
     },
     header: {
         alignItems: 'center',
@@ -101,17 +177,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.1,
         shadowRadius: 5,
         elevation: 3,
-        borderWidth:1
+        borderWidth: 1
     },
     transactionContent: {
         flex: 1,
-       
+
     },
     transactionTitle: {
-        fontSize: wp('3.5%'),
+        fontSize: wp('4%'),
         fontWeight: 'bold',
         color: '#000',
-        width:wp('55')
+        width: wp('70')
     },
     transactionTime: {
         fontSize: wp('3.5%'),
@@ -120,7 +196,7 @@ const styles = StyleSheet.create({
     },
     transactionPoints: {
         color: '#FFA500',
-        fontSize: wp('4.5%'),
+        fontSize: wp('5.5%'),
         fontWeight: 'bold',
     },
 });

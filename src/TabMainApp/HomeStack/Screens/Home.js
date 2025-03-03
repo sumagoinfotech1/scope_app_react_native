@@ -364,6 +364,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../../utils/axiosInstance";
 import { showToast } from '../../../utils/toastService';
 import Loader from '../../../ReusableComponents/Loader';
+import { useIsFocused } from "@react-navigation/native";
 const data = [
   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
@@ -375,7 +376,7 @@ const Home = ({ navigation }) => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
+  const isFocused = useIsFocused();
   // console.log('eventsss',events);
 
   const getEvents = async () => {
@@ -411,10 +412,12 @@ const Home = ({ navigation }) => {
   };
 
   // Fetch data on component mount
-  useEffect(() => {
-    getEvents();
-  }, []);
 
+  useEffect(() => {
+    if (isFocused) {
+      getEvents();
+    }
+  }, [isFocused]);
 
 
 

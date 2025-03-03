@@ -85,10 +85,18 @@
 // export default api;
 
 
+
+
+
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { API_URL } from "@env";
 import Toast from 'react-native-toast-message';
+import { createNavigationContainerRef } from "@react-navigation/native";
+import { showToast } from "./toastService";
+
+// Navigation Ref for handling navigation outside components
+export const navigationRef = createNavigationContainerRef();
 
 // Create an Axios instance
 const api = axios.create({
@@ -99,7 +107,7 @@ const api = axios.create({
 });
 
 // Function to refresh the token
-const refreshAccessToken = async (navigateToLogin) => {
+const refreshAccessToken = async () => {
   try {
     const refreshToken = await AsyncStorage.getItem("refreshToken");
 
@@ -107,9 +115,7 @@ const refreshAccessToken = async (navigateToLogin) => {
       throw new Error("No refresh token found");
     }
 
-    const response = await axios.post(`${API_URL}auth/refresh-token`, {
-      refreshToken,
-    });
+    const response = await api.post("auth/refresh-token", { refreshToken });
 
     if (!response.data.result) {
       throw new Error("Invalid refresh token");
@@ -126,11 +132,18 @@ const refreshAccessToken = async (navigateToLogin) => {
   } catch (error) {
     console.error("Token refresh failed:", error);
 
-    // Clear AsyncStorage if refresh fails (both tokens expired)
-    await AsyncStorage.clear();
+    // Set user login status to false and clear storage
+    await AsyncStorage.setItem("isLogin", "false");
+    await AsyncStorage.removeItem("accessToken");
+    await AsyncStorage.removeItem("refreshToken");
 
-    // Navigate user to login screen
-    if (navigateToLogin) navigateToLogin();
+    // Show toast error message
+    showToast('error', 'Session Expired', 'Please log in again.');
+
+    // Navigate to login screen
+    if (navigationRef.isReady()) {
+      navigationRef.navigate("Mobile");
+    }
 
     return null;
   }
@@ -157,25 +170,19 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true; // Prevent infinite loops
 
-      const newToken = await refreshAccessToken(() => {
-        // Pass navigation callback
-        navigationRef.current?.replace("Mobile");
-         showToast('error', 'Error',  'We are Glad You are Back! Please Again Back.')
-      });
+      const newToken = await refreshAccessToken();
 
       if (newToken) {
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
-        return axios(originalRequest);
+        return api(originalRequest); // Retry request with new token
       }
     }
 
+    // If still unauthorized, mark user as logged out
+    await AsyncStorage.setItem("isLogin", "false");
+    showToast('error', 'Session Expired', 'Please log in again.');
     return Promise.reject(error);
   }
 );
-
-// Navigation Ref for handling navigation outside components
-import { createNavigationContainerRef } from "@react-navigation/native";
-import { showToast } from "./toastService";
-export const navigationRef = createNavigationContainerRef();
 
 export default api;
