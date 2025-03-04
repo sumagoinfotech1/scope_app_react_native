@@ -377,6 +377,7 @@ const Home = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
+  const [slider, setSlider] = useState([]);
   // console.log('eventsss',events);
 
   const getEvents = async () => {
@@ -410,12 +411,43 @@ const Home = ({ navigation }) => {
       setLoading(false);
     }
   };
+  const getSlider = async () => {
+    try {
+      setLoading(true);
+      // console.log('Fetching Events...');
 
+      // Make API Request
+      const response = await api.get('home-slider/all');
+
+      if (response.status === 200 && response.data?.result) {
+        setSlider(response.data.data); // Store data in state
+        console.log('dataRavi', response.data.data.map((item) => item.name));
+
+      } else {
+        // showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
+        throw new Error(response.data?.message || 'Failed to fetch events');
+      }
+    } catch (error) {
+      console.error('Error in getEvents:', error);
+
+      let errorMsg = 'Something went wrong. Please try again.';
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
   // Fetch data on component mount
 
   useEffect(() => {
     if (isFocused) {
       getEvents();
+      getSlider()
     }
   }, [isFocused]);
 
@@ -524,7 +556,7 @@ const Home = ({ navigation }) => {
           <ScreenHeader headername={"EVENTS"} />
         </View>
         <View style={styles.bannerContainer}>
-          <CarouselComponent data={data} renderItem={renderItem} />
+          <CarouselComponent data={slider} renderItem={renderItem} />
         </View>
         <FlatList
           data={events}

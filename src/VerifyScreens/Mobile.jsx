@@ -30,7 +30,7 @@ const Mobile = ({ navigation }) => {
   const OTP = otp.join('')
   const [timer, setTimer] = useState(60); // Start from 60 seconds
   const [isResendDisabled, setIsResendDisabled] = useState(true);
-
+  const [slider, setSlider] = useState([]);
   useEffect(() => {
     const checkLoginStatus = async () => {
       setLoading(true);
@@ -70,8 +70,44 @@ const Mobile = ({ navigation }) => {
     };
   
     checkLoginStatus();
+    getSlider()
   }, []);
   
+  const getSlider = async () => {
+    try {
+      setLoading(true);
+      // console.log('Fetching Events...');
+
+      // Make API Request
+      const response = await api.get('home-slider/all');
+
+      if (response.status === 200 && response.data?.result) {
+        setSlider(response.data.data); // Store data in state
+        console.log('dataRavi', response.data.data.map((item) => item.name));
+
+      } else {
+        // showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
+        throw new Error(response.data?.message || 'Failed to fetch events');
+      }
+    } catch (error) {
+      console.error('Error in getEvents:', error);
+
+      let errorMsg = 'Something went wrong. Please try again.';
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Fetch data on component mount
+
+
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
       <Image source={{ uri: item.image }} style={styles.carouselImage} />
@@ -373,7 +409,7 @@ const Mobile = ({ navigation }) => {
       <View style={styles.container}>
         <HeaderName />
         <View style={styles.bannerContainer}>
-          <CarouselComponent data={data} renderItem={renderItem} height={hp("37%")} />
+          <CarouselComponent data={slider} renderItem={renderItem} height={hp("37%")} />
         </View>
       </View>
 
@@ -565,7 +601,7 @@ const styles = StyleSheet.create({
     height: hp("33%"),
     borderRadius: 20,
     backgroundColor: "black",
-    resizeMode: "cover",
+    resizeMode: "stretch",
     borderWidth: 2,
     borderColor: Colors.white,
   },

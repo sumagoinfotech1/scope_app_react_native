@@ -1,12 +1,20 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
+import { showToast } from '../../../utils/toastService';
+import api from '../../../utils/axiosInstance';
+import { useIsFocused } from '@react-navigation/native';
+import Loader from '../../../ReusableComponents/Loader';
 
 const FAQScreen = () => {
     const [expandedId, setExpandedId] = useState(null);
-
+  const isFocused = useIsFocused();
+   const [loading, setLoading] = useState(false);
+  const [events, setEvents] = useState([]);
+  console.log('events',events);
+  
     const faqs = [
         { id: '1', question: "How To Add Event ?", answer: "New Event Added 🚀\nA New Workshop On [Topic] Is Now Live! Register Before Seats Fill Up!" },
         { id: '2', question: "How To Add Event ?", answer: "" },
@@ -19,19 +27,59 @@ const FAQScreen = () => {
         setExpandedId(expandedId === id ? null : id);
     };
 
+    const getFaq = async () => {
+        try {
+          setLoading(true);
+          // console.log('Fetching Events...');
+    
+          // Make API Request
+          const response = await api.get('faq/all');
+    
+          if (response.status === 200 && response.data?.result) {
+            setEvents(response.data.data); // Store data in state
+            console.log('dataRavi', response.data.data.map((item) => item.name));
+    
+          } else {
+            showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
+            throw new Error(response.data?.message || 'Failed to fetch events');
+          }
+        } catch (error) {
+          console.error('Error in getEvents:', error);
+    
+          let errorMsg = 'Something went wrong. Please try again.';
+          if (error.response) {
+            errorMsg = error.response.data?.message || errorMsg;
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+    
+          setError(errorMsg);
+        } finally {
+          setLoading(false);
+        }
+      };
+    
+      // Fetch data on component mount
+    
+      useEffect(() => {
+        if (isFocused) {
+            getFaq();
+        }
+      }, [isFocused]);
+
     const renderItem = ({ item }) => (
         <View>
             <TouchableOpacity style={styles.card} onPress={() => toggleExpand(item.id)}>
                 <View style={styles.cardHeader}>
-                    <Text style={styles.question}>{item.question}</Text>
+                    <Text style={styles.question}>{item.name}</Text>
                     <FontAwesome5 name={expandedId === item.id ? "chevron-down" : "chevron-up"} size={wp('3%')} color="#fff" />
                 </View>
             </TouchableOpacity>
 
             {expandedId === item.id && item.answer !== "" && (
                 <View style={styles.answerContainer}>
-                    <Text style={styles.answerTitle}>New Event Added 🚀</Text>
-                    <Text style={styles.answer}>{item.answer}</Text>
+                    <Text style={styles.answerTitle}>{item.name}</Text>
+                    <Text style={styles.answer}>{item.description}</Text>
                 </View>
             )}
         </View>
@@ -46,11 +94,12 @@ const FAQScreen = () => {
 
             {/* FAQ List */}
             <FlatList
-                data={faqs}
+                data={events}
                 keyExtractor={(item) => item.id}
                 renderItem={renderItem}
                 contentContainerStyle={styles.list}
             />
+             <Loader visible={loading} />
         </View>
     );
 };
