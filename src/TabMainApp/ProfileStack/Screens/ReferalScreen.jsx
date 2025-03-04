@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, ImageBackground, Alert,Share } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader';
@@ -19,53 +19,123 @@ const ReferalScreen = () => {
         Clipboard.setString(referralCode);
         showToast('info', 'Copied');
     };
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [errorOccured, setErrorOccured] = useState(false);
+    const [error, setError] = useState("");
     const [referralCode, setReferralCode] = useState("");
-    console.log(referralCode,referralCode);
+    const [userId, setUserid] = useState("");
+    console.log(referralCode, referralCode);
+
+
+    useEffect(() => {
+        const fetchUserIdAndCreateReferral = async () => {
+          try {
+            const storedUserId = await AsyncStorage.getItem('User_id');
+            if (storedUserId) {
+              handleCreateReferral(storedUserId);
+              setUserid(storedUserId)
+            } else {
+              showToast('error', 'User ID Missing', 'No user ID found in storage');
+            }
+          } catch (error) {
+            console.error('Error fetching user ID:', error);
+          }
+        };
     
-//     useEffect(() => {
-//         createUserReferral();
-//       }, []);
-// const createUserReferral = async () => {
-//   try {
-//     setLoading(true);
-
-//     // Get user ID from AsyncStorage
-//     const userId = await AsyncStorage.getItem("User_id");
-
-//     if (!userId) {
-//       throw new Error("User ID is required");
-//     }
-//     console.log(userId, 'viva');
-
-//     // API Request to Create Referral
-//     const response = await api.post(`user-referral/create/${userId}`);
-//     console.log('response', response);
-
-//     // ✅ Success Case: If result === true
-//     if (response.data?.result === true) {
-//       setReferralCode(response.data.data.referral_code);
-//       showToast("success", "Success", response.data.message);
-//     } 
-//     // ❌ Failure Case: If result === false
-//     else if (response.data?.result === false) {
-//       showToast("error", "Error", response.data.message || "Referral creation failed");
-//       console.log('////',response.data.message );
+        fetchUserIdAndCreateReferral();
+      }, []);
+      const handleCreateReferral = async (userId) => {
+        setErrorOccured(false);
+        setLoading(true);
+    
+        try {
+          const response = await api.post(`user-referral/create/${userId}`);
+    
+          console.log("Response:", response.data);
+    
+          if (response.data.result === true) {
+            // showToast('success', 'Referral Created', 'Referral created successfully');
+            setReferralCode(response.data.data.referral_code)
+          } else {
+            setErrorOccured(true);
+            setError(response.data.message || "Failed to create referral");
+            showToast('error', 'Referral Failed', response.data.message || "Failed to create referral");
+          }
+        } catch (error) {
+          setErrorOccured(true);
+    
+          if (error.response) {
+            console.log("Error Response:", error.response);
+    
+            if (error.response.status === 400 && error.response.data.result===false) {
+                fetchUserReferral(userId)
+            
+            } else {
+              setError(error.response.data?.message || "Error creating referral");
+              showToast('error', 'Error', error.response.data?.message || "Error creating referral");
+            }
+          } else {
+            setError("Network error. Please check your connection.");
+            showToast('error', 'Network Error', "Please check your internet connection.");
+          }
+        }
+    
+        setLoading(false);
+      };
+      const fetchUserReferral = async (userId) => {
+ 
+        try {
+         
       
-//     } 
-//     // ❌ Handle unexpected responses
-//     else {
-//       throw new Error("Unexpected response from server");
-//     }
-//   } catch (error) {
-//     console.error("❌ Error creating referral:", error);
-//     showToast("error", "Error", error.response?.data?.message || error.message || "Something went wrong");
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
+          const response = await api.get(`user-referral/user?id=${userId}`);
       
+          console.log("ResponseFetch:", response.data.data[0].referral_code);
+      
+          if (response.status === 200) {
+            // showToast('success', 'Referral Data Loaded', 'Referral details retrieved successfully');
+            setReferralCode(response.data.data[0].referral_code) 
+            return response.data;
+          } else {
+            showToast('error', 'Error', 'Failed to fetch referral data');
+            return null;
+          }
+        } catch (error) {
+          if (error.response) {
+            console.log("Error Responseee:", error.response);
+      
+            if (error.response.status === 400) {
+              showToast('error', 'Bad Request', "Invalid request. Please check your data.");
+            } else {
+              showToast('error', 'Error', error.response.data?.message || "Error fetching referral data");
+            }
+          } else {
+            showToast('error', 'Network Error', "Please check your internet connection.");
+          }
+          return null;
+        }
+      };
+ 
+    const shareReferralLink = async () => {
+        try {
+     
+        //   // Construct the referral link dynamically
+        //   const referralLink = `https://yourapp.com/signup?referralCode=${userId}`;
+        const referralLink = `https://website.sumagotraining.in/`;
+          // Share the referral message
+          const result = await Share.share({
+            message: `🚀 Join our amazing app and earn rewards! 🎉\n\nUse my referral code: *${referralCode}* to sign up.\n\nClick here to join: ${referralLink}`,
+          });
+      
+          if (result.action === Share.sharedAction) {
+            showToast('success', 'Shared Successfully', 'Your referral link has been shared.');
+          } else if (result.action === Share.dismissedAction) {
+            showToast('info', 'Share Cancelled', 'You cancelled sharing.');
+          }
+        } catch (error) {
+          console.error("Error sharing referral link:", error);
+          showToast('error', 'Error', 'Failed to share referral link.');
+        }
+      };
     return (
         <View style={styles.container}>
             {/* Back Button */}
@@ -118,11 +188,11 @@ const ReferalScreen = () => {
             <CustomButton
                 title="Refer To Friends"
                 align="right"
-                // onPress={()=>setTicketModalVisible(true)}
+                onPress={()=>shareReferralLink()}
                 style={{ padding: wp('2.8'), backgroundColor: Colors.black, marginHorizontal: wp('7'), marginVertical: wp('4') }}
                 textstyle={{ fontSize: wp("4.2%") }}
             />
-            <Loader visible={loading}/>
+            <Loader visible={loading} />
             {/* <TicketModal visible={ticketmodalVisible} onClose={() => setTicketModalVisible(false)} /> */}
         </View>
     );
