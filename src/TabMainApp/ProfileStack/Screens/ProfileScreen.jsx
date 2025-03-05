@@ -17,7 +17,11 @@ const ProfileScreen = ({ navigation }) => {
     const [rating, setRating] = useState(4);
     const [isModalVisible, setModalVisible] = useState(false);
     const [islogin, setLogin] = useState('');
+    const [feedbackText, setfeedbackText] = useState('');
+    const [errorOccured, setErrorOccure] = useState(false);
     const [UserId, setUser] = useState('');
+    console.log('feedbackText',feedbackText);
+    
     const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
         name: "Anoop Nanekar",
@@ -131,7 +135,45 @@ const ProfileScreen = ({ navigation }) => {
             console.error("Error during logout:", error);
         }
     };
-
+    const submitFeedback = async () => {
+        try {
+          setLoading(true);
+          setErrorOccure(false);
+      
+          console.log('Submitting Feedback:', { feedback: feedbackText, rating });
+      
+          // API Request
+          const response = await api.post('feedback/create', {
+            feedback: feedbackText,
+            rating: rating,
+          });
+      
+          console.log('Feedback Response:', response.data);
+      
+          if (response.status === 200 && response.data?.result) {
+            showToast('success', 'Feedback Submitted', 'Thank you for your feedback!');
+            setModalVisible(false)
+            return response.data;
+          } else {
+            showToast('error', 'Error', response.data?.message || 'Failed to submit feedback.');
+            throw new Error(response.data?.message || 'Failed to submit feedback.');
+          }
+        } catch (error) {
+          console.error('Error in submitFeedback:', error);
+      
+          let errorMsg = 'Something went wrong. Please try again.';
+          if (error.response) {
+            errorMsg = error.response.data?.message || errorMsg;
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+      
+          setErrorOccure(true);
+          setError(errorMsg);
+        } finally {
+          setLoading(false);
+        }
+      };
 
     return (
         <View style={styles.container}>
@@ -202,11 +244,12 @@ const ProfileScreen = ({ navigation }) => {
                         style={styles.feedbackInput}
                         placeholder="Share your feedback"
                         multiline
+                        onChangeText={(value) => setfeedbackText(value)}
                     />
-                    <Text style={styles.ratingText}>Rate Us {rating}.0</Text>
-                    <StarRating rating={rating} onChange={setRating} starSize={22} />
+                    <Text style={styles.ratingText}>Rate Us {rating}</Text>
+                    <StarRating rating={rating} onChange={setRating} starSize={32} />
 
-                    <TouchableOpacity style={styles.saveButton}>
+                    <TouchableOpacity style={styles.saveButton} onPress={()=>submitFeedback()}>
                         <Text style={styles.saveText}>Save</Text>
                     </TouchableOpacity>
 
