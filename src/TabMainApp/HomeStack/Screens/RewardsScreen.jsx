@@ -15,6 +15,7 @@ const transactions = [
 const RewardsScreen = () => {
 
     const [rewardHistory, setRewardHistory] = useState([]);
+    const [rewardCoins, setRewardCoins] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
     const getRewardHistory = async () => {
@@ -63,10 +64,55 @@ const RewardsScreen = () => {
         }
       };
       
-
+      const getRewardCoins = async () => {
+        try {
+          setLoading(true);
+          setError(null);
+      
+          // Get user ID from AsyncStorage
+          const userId = await AsyncStorage.getItem('User_id');
+          console.log('Retrieved User ID:', userId);
+      
+          if (!userId) {
+            throw new Error('User ID not found in AsyncStorage');
+          }
+      
+          // Make API request
+          const response = await api.get(`coins/count?id=${userId}`);
+          console.log('Coins Response:', response.data.data);  
+      
+          if (response.status === 200) {
+            if (response.data?.result) {
+              setRewardCoins(response.data.data); // Store data in state
+            } 
+          } else if (response.status === 400) {
+            showToast("error", response.data?.message || "Bad Request: Reward history not found.");
+            setError(response.data?.message || "Bad Request: Reward history not found.");
+          } 
+        } catch (error) {
+          console.error('Error fetching reward history:', error);
+      
+          if (error.response) {
+            const { status, data } = error.response;
+            if (status === 400) {
+              showToast("error", data?.message || "Bad Request: Reward history not found.");
+              setError(data?.message || "Bad Request: Reward history not found.");
+            } else {
+              showToast("error", data?.message || "An error occurred");
+              setError(data?.message || "An error occurred");
+            }
+          } else {
+            showToast("error", "Network error. Please check your internet connection.");
+            setError("Network error. Please check your internet connection.");
+          }
+        } finally {
+          setLoading(false);
+        }
+      };
 
     useEffect(() => {
         getRewardHistory();
+        getRewardCoins();
     }, []);
 
     const formatTimestamp = (timestamp) => {
@@ -91,7 +137,7 @@ const RewardsScreen = () => {
                 <View source={require('../../../assets/icons/Ellipse2.png')} style={styles.header}>
                     <Image source={require('../../../assets/icons/RefereEarnCoin.png')} style={styles.coinIcon} />
                     <Text style={styles.points}>
-                       6000 <Text style={styles.pointsText}>Points</Text>
+                       {rewardCoins.count} <Text style={styles.pointsText}>Points</Text>
                     </Text>
                     <Text style={styles.rewardText}>
                         Keep Earning Reward Something{"\n"}Exciting Awaiting For You
