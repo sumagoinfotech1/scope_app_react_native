@@ -9,6 +9,10 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import StarRating from 'react-native-star-rating-widget';
 import Modal from 'react-native-modal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { showToast } from '../../../utils/toastService';
+import api from '../../../utils/axiosInstance';
+import Loader from '../../../ReusableComponents/Loader';
+import SweetAlert from 'react-native-sweet-alert';
 const ProfileScreen = ({ navigation }) => {
     const [rating, setRating] = useState(4);
     const [isModalVisible, setModalVisible] = useState(false);
@@ -29,7 +33,7 @@ const ProfileScreen = ({ navigation }) => {
 
                 console.log("isLogin", isLogin);
                 setLogin(isLogin)
-
+                setLoading(false)
 
             } catch (error) {
                 console.error("Error fetching profile status:", error);
@@ -39,7 +43,52 @@ const ProfileScreen = ({ navigation }) => {
 
         checkUserStatus();
     }, []); // Removed `navigation` from dependencies
-
+    const showDeleteAlert = () => {
+        SweetAlert.showAlertWithOptions({
+          title: "Are you sure?",
+          subTitle: "Once deleted, you will lose access to your account, and this action cannot be reversed.",
+          style: 'warning',
+        //   confirmButtonTitle: "Yes, Delete",
+        //   confirmButtonColor: "red",
+        //   otherButtonTitle: "No, Cancel",
+        //   otherButtonColor: "red",
+          cancellable: true, 
+        }, (isConfirmed) => {
+          if (isConfirmed) {
+            deleteAccountRequest(); // Call your function to delete the account
+          }
+        });
+      };
+    const deleteAccountRequest = async () => {
+        try {
+          const response = await api.post('deleteAccountRequestRoute/create'); // No data sent in the request
+      
+          console.log("Delete Account Response:", response.data);
+      
+          if (response.data.result) {
+            showToast('success', 'Request Submitted', 'Your account deletion request has been submitted successfully.');
+            await AsyncStorage.clear()
+            navigation.navigate('Mobile')
+            return response.data;
+          } else {
+            showToast('error', 'Request Failed', response.data.message || 'Failed to submit deletion request.');
+            return null;
+          }
+        } catch (error) {
+          console.error("Delete Account Error:", error.response || error);
+      
+          if (error.response) {
+            showToast('error', 'Error', error.response.data?.message || 'Error processing deletion request.');
+            await AsyncStorage.clear()
+            navigation.navigate('Mobile')
+          } else {
+            showToast('error', 'Network Error', 'Please check your internet connection.');
+          }
+      
+          return null;
+        }
+      };
+      
     const logout = async () => {
         try {
             await AsyncStorage.setItem("isLogin", JSON.stringify(false));
@@ -100,7 +149,7 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem} onPress={()=>showDeleteAlert()}>
                     <FontAwesome5 name="trash-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Delete Account</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
@@ -138,6 +187,7 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </Modal>
+            <Loader visible={loading} />
         </View>
     );
 };

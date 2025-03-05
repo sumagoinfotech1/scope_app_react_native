@@ -1214,6 +1214,7 @@ PODS:
     - Yoga
   - RNSVG (15.11.2):
     - React-Core
+  - RNSweetAlert (3.1.0)
   - RNVectorIcons (10.2.0):
     - DoubleConversion
     - glog
@@ -1308,6 +1309,7 @@ DEPENDENCIES:
   - RNFastImage (from `../node_modules/react-native-fast-image`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - RNSweetAlert (from `../node_modules/react-native-sweet-alert`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -1442,6 +1444,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-screens"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  RNSweetAlert:
+    :path: "../node_modules/react-native-sweet-alert"
   RNVectorIcons:
     :path: "../node_modules/react-native-vector-icons"
   Yoga:
@@ -1510,6 +1514,7 @@ SPEC CHECKSUMS:
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
   RNScreens: ed207570d48fe4d0579343f02148dd8c83b1abf8
   RNSVG: 2df577ee9762d1b6deef820173b59b064c2570fe
+  RNSweetAlert: 1aa4e70d8f8540aa6b9c18c019f62a25e36720b6
   RNVectorIcons: 6c795cacc9276decc31d8e1a139b9cc6fc0479ca
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
