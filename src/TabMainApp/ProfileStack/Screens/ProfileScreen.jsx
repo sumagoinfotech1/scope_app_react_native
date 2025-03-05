@@ -189,7 +189,7 @@ const ProfileScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.menuContainer}>
-                <TouchableOpacity style={styles.menuItem}>
+                <TouchableOpacity style={styles.menuItem} onPress={()=>navigation.navigate('ProfileEdit',{UserId})}>
                     <FontAwesome5 name="user" size={20} color="#000" />
                     <Text style={styles.menuText}>Profile Details</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
