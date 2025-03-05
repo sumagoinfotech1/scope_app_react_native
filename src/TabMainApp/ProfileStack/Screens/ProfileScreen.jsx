@@ -17,6 +17,7 @@ const ProfileScreen = ({ navigation }) => {
     const [rating, setRating] = useState(4);
     const [isModalVisible, setModalVisible] = useState(false);
     const [islogin, setLogin] = useState('');
+    const [UserId, setUser] = useState('');
     const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
         name: "Anoop Nanekar",
@@ -29,11 +30,12 @@ const ProfileScreen = ({ navigation }) => {
             setLoading(true)
             try {
                 const isLogin = await AsyncStorage.getItem("isLogin");
-
+                const UserId = await AsyncStorage.getItem("User_id");
 
                 console.log("isLogin", isLogin);
                 setLogin(isLogin)
                 setLoading(false)
+                setUser(UserId)
 
             } catch (error) {
                 console.error("Error fetching profile status:", error);
@@ -88,8 +90,34 @@ const ProfileScreen = ({ navigation }) => {
           return null;
         }
       };
+      const logoutUserApi = async () => {
+        try {
+          const response = await api.post(`users/logout/${UserId}`); // Sending a POST request to logout
+      
+          console.log("Logout Response:", response.data);
+      
+          if (response.data.result) {
+            showToast('success', 'Logged Out', 'You have been logged out successfully.');
+            return response.data;
+          } else {
+            showToast('error', 'Logout Failed', response.data.message || 'Failed to log out.');
+            return null;
+          }
+        } catch (error) {
+          console.error("Logout Error:", error.response || error);
+      
+          if (error.response) {
+            showToast('error', 'Error', error.response.data?.message || 'Error processing logout request.');
+          } else {
+            showToast('error', 'Network Error', 'Please check your internet connection.');
+          }
+      
+          return null;
+        }
+      };
       
     const logout = async () => {
+        logoutUserApi()
         try {
             await AsyncStorage.setItem("isLogin", JSON.stringify(false));
             await AsyncStorage.removeItem("User_id");
