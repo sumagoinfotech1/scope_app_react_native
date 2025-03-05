@@ -20,8 +20,8 @@ const ProfileScreen = ({ navigation }) => {
     const [feedbackText, setfeedbackText] = useState('');
     const [errorOccured, setErrorOccure] = useState(false);
     const [UserId, setUser] = useState('');
-    console.log('feedbackText',feedbackText);
-    
+    console.log('feedbackText', feedbackText);
+
     const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
         name: "Anoop Nanekar",
@@ -51,75 +51,75 @@ const ProfileScreen = ({ navigation }) => {
     }, []); // Removed `navigation` from dependencies
     const showDeleteAlert = () => {
         SweetAlert.showAlertWithOptions({
-          title: "Are you sure?",
-          subTitle: "Once deleted, you will lose access to your account, and this action cannot be reversed.",
-          style: 'warning',
-        //   confirmButtonTitle: "Yes, Delete",
-        //   confirmButtonColor: "red",
-        //   otherButtonTitle: "No, Cancel",
-        //   otherButtonColor: "red",
-          cancellable: true, 
+            title: "Are you sure?",
+            subTitle: "Once deleted, you will lose access to your account, and this action cannot be reversed.",
+            style: 'warning',
+            //   confirmButtonTitle: "Yes, Delete",
+            //   confirmButtonColor: "red",
+            //   otherButtonTitle: "No, Cancel",
+            //   otherButtonColor: "red",
+            cancellable: true,
         }, (isConfirmed) => {
-          if (isConfirmed) {
-            deleteAccountRequest(); // Call your function to delete the account
-          }
+            if (isConfirmed) {
+                deleteAccountRequest(); // Call your function to delete the account
+            }
         });
-      };
+    };
     const deleteAccountRequest = async () => {
         try {
-          const response = await api.post('deleteAccountRequestRoute/create'); // No data sent in the request
-      
-          console.log("Delete Account Response:", response.data);
-      
-          if (response.data.result) {
-            showToast('success', 'Request Submitted', 'Your account deletion request has been submitted successfully.');
-            await AsyncStorage.clear()
-            navigation.navigate('Mobile')
-            return response.data;
-          } else {
-            showToast('error', 'Request Failed', response.data.message || 'Failed to submit deletion request.');
-            return null;
-          }
+            const response = await api.post('deleteAccountRequestRoute/create'); // No data sent in the request
+
+            console.log("Delete Account Response:", response.data);
+
+            if (response.data.result) {
+                showToast('success', 'Request Submitted', 'Your account deletion request has been submitted successfully.');
+                await AsyncStorage.clear()
+                navigation.navigate('Mobile')
+                return response.data;
+            } else {
+                showToast('error', 'Request Failed', response.data.message || 'Failed to submit deletion request.');
+                return null;
+            }
         } catch (error) {
-          console.error("Delete Account Error:", error.response || error);
-      
-          if (error.response) {
-            showToast('error', 'Error', error.response.data?.message || 'Error processing deletion request.');
-            await AsyncStorage.clear()
-            navigation.navigate('Mobile')
-          } else {
-            showToast('error', 'Network Error', 'Please check your internet connection.');
-          }
-      
-          return null;
+            console.error("Delete Account Error:", error.response || error);
+
+            if (error.response) {
+                showToast('error', 'Error', error.response.data?.message || 'Error processing deletion request.');
+                await AsyncStorage.clear()
+                navigation.navigate('Mobile')
+            } else {
+                showToast('error', 'Network Error', 'Please check your internet connection.');
+            }
+
+            return null;
         }
-      };
-      const logoutUserApi = async () => {
+    };
+    const logoutUserApi = async () => {
         try {
-          const response = await api.post(`users/logout/${UserId}`); // Sending a POST request to logout
-      
-          console.log("Logout Response:", response.data);
-      
-          if (response.data.result) {
-            showToast('success', 'Logged Out', 'You have been logged out successfully.');
-            return response.data;
-          } else {
-            showToast('error', 'Logout Failed', response.data.message || 'Failed to log out.');
-            return null;
-          }
+            const response = await api.post(`users/logout/${UserId}`); // Sending a POST request to logout
+
+            console.log("Logout Response:", response.data);
+
+            if (response.data.result) {
+                showToast('success', 'Logged Out', 'You have been logged out successfully.');
+                return response.data;
+            } else {
+                showToast('error', 'Logout Failed', response.data.message || 'Failed to log out.');
+                return null;
+            }
         } catch (error) {
-          console.error("Logout Error:", error.response || error);
-      
-          if (error.response) {
-            showToast('error', 'Error', error.response.data?.message || 'Error processing logout request.');
-          } else {
-            showToast('error', 'Network Error', 'Please check your internet connection.');
-          }
-      
-          return null;
+            console.error("Logout Error:", error.response || error);
+
+            if (error.response) {
+                showToast('error', 'Error', error.response.data?.message || 'Error processing logout request.');
+            } else {
+                showToast('error', 'Network Error', 'Please check your internet connection.');
+            }
+
+            return null;
         }
-      };
-      
+    };
+
     const logout = async () => {
         logoutUserApi()
         try {
@@ -137,43 +137,43 @@ const ProfileScreen = ({ navigation }) => {
     };
     const submitFeedback = async () => {
         try {
-          setLoading(true);
-          setErrorOccure(false);
-      
-          console.log('Submitting Feedback:', { feedback: feedbackText, rating });
-      
-          // API Request
-          const response = await api.post('feedback/create', {
-            feedback: feedbackText,
-            rating: rating,
-          });
-      
-          console.log('Feedback Response:', response.data);
-      
-          if (response.status === 200 && response.data?.result) {
-            showToast('success', 'Feedback Submitted', 'Thank you for your feedback!');
-            setModalVisible(false)
-            return response.data;
-          } else {
-            showToast('error', 'Error', response.data?.message || 'Failed to submit feedback.');
-            throw new Error(response.data?.message || 'Failed to submit feedback.');
-          }
+            setLoading(true);
+            setErrorOccure(false);
+
+            console.log('Submitting Feedback:', { feedback: feedbackText, rating });
+
+            // API Request
+            const response = await api.post('feedback/create', {
+                feedback: feedbackText,
+                rating: rating,
+            });
+
+            console.log('Feedback Response:', response.data);
+
+            if (response.status === 200 && response.data?.result) {
+                showToast('success', 'Feedback Submitted', 'Thank you for your feedback!');
+                setModalVisible(false)
+                return response.data;
+            } else {
+                showToast('error', 'Error', response.data?.message || 'Failed to submit feedback.');
+                throw new Error(response.data?.message || 'Failed to submit feedback.');
+            }
         } catch (error) {
-          console.error('Error in submitFeedback:', error);
-      
-          let errorMsg = 'Something went wrong. Please try again.';
-          if (error.response) {
-            errorMsg = error.response.data?.message || errorMsg;
-          } else if (error.message) {
-            errorMsg = error.message;
-          }
-      
-          setErrorOccure(true);
-          setError(errorMsg);
+            console.error('Error in submitFeedback:', error);
+
+            let errorMsg = 'Something went wrong. Please try again.';
+            if (error.response) {
+                errorMsg = error.response.data?.message || errorMsg;
+            } else if (error.message) {
+                errorMsg = error.message;
+            }
+
+            setErrorOccure(true);
+            setError(errorMsg);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
 
     return (
         <View style={styles.container}>
@@ -189,7 +189,7 @@ const ProfileScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.menuContainer}>
-                <TouchableOpacity style={styles.menuItem} onPress={()=>navigation.navigate('ProfileEdit',{UserId})}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileEdit', { UserId })}>
                     <FontAwesome5 name="user" size={20} color="#000" />
                     <Text style={styles.menuText}>Profile Details</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
@@ -219,7 +219,7 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem} onPress={()=>showDeleteAlert()}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => showDeleteAlert()}>
                     <FontAwesome5 name="trash-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Delete Account</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
@@ -227,7 +227,12 @@ const ProfileScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.footer}>
-                <Text style={styles.footerText}>Terms & Condition | V1.0.0 | Privacy Policy</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('TermAndPolicy', { webUrl: 'https://www.youtube.com/' })}>
+                <Text style={styles.footerText}>Terms & Condition | V1.0.0 | </Text> 
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('TermAndPolicy', { webUrl: 'https://web.sumagoinfotech.com/' })}>
+                <Text style={styles.footerText}>Privacy Policy</Text>
+                </TouchableOpacity>
             </View>
 
             {/* Feedback Modal */}
@@ -249,7 +254,7 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.ratingText}>Rate Us {rating}</Text>
                     <StarRating rating={rating} onChange={setRating} starSize={32} />
 
-                    <TouchableOpacity style={styles.saveButton} onPress={()=>submitFeedback()}>
+                    <TouchableOpacity style={styles.saveButton} onPress={() => submitFeedback()}>
                         <Text style={styles.saveText}>Save</Text>
                     </TouchableOpacity>
 
@@ -330,6 +335,7 @@ const styles = StyleSheet.create({
         bottom: hp('2%'),
         width: '100%',
         alignItems: 'center',
+        // flexDirection:'row'
     },
     footerText: {
         fontSize: wp('3.5%'),

@@ -6,6 +6,7 @@ import RewardsScreen from '../HomeStack/Screens/RewardsScreen';
 import ReferalScreen from './Screens/ReferalScreen';
 import FAQScreen from './Screens/FAQScreen';
 import ProfileEdit from './Screens/ProfileEdit';
+import TermAndPolicy from './Screens/TermAndPolicy';
 const Stack = createNativeStackNavigator();
 const ProfileStack = () => {
   return (
@@ -14,6 +15,7 @@ const ProfileStack = () => {
     <Stack.Screen name="ReferalScreen" component={ReferalScreen} options={{ headerShown: false }} />
     <Stack.Screen name="FAQScreen" component={FAQScreen} options={{ headerShown: false }} />
     <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ headerShown: false }} />
+    <Stack.Screen name="TermAndPolicy" component={TermAndPolicy} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

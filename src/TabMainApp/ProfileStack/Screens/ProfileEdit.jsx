@@ -203,6 +203,7 @@ import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import { showToast } from '../../../utils/toastService';
 import api from '../../../utils/axiosInstance';
+import Loader from '../../../ReusableComponents/Loader';
 
 const ProfileEdit = ({ navigation, route }) => {
     const { UserId } = route.params || {};
@@ -325,6 +326,7 @@ const ProfileEdit = ({ navigation, route }) => {
                     <Text style={styles.answer}>{name}</Text>
                 )}
             </View>
+            <Loader visible={loading} />
         </View>
     );
 };
