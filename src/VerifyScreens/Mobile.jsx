@@ -79,7 +79,7 @@ const Mobile = ({ navigation }) => {
       // console.log('Fetching Events...');
 
       // Make API Request
-      const response = await api.get('home-slider/all');
+      const response = await api.get('onboardingSlider/getAll');
 
       if (response.status === 200 && response.data?.result) {
         setSlider(response.data.data); // Store data in state

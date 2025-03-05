@@ -2,7 +2,7 @@
 
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -95,6 +95,7 @@ const ProfileScreen = ({ navigation }) => {
         }
     };
     const logoutUserApi = async () => {
+       
         try {
             const response = await api.post(`users/logout/${UserId}`); // Sending a POST request to logout
 
@@ -102,6 +103,7 @@ const ProfileScreen = ({ navigation }) => {
 
             if (response.data.result) {
                 showToast('success', 'Logged Out', 'You have been logged out successfully.');
+                // Alert.alert('jhhjhjh')
                 return response.data;
             } else {
                 showToast('error', 'Logout Failed', response.data.message || 'Failed to log out.');
