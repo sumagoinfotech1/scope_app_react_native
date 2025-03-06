@@ -14,12 +14,13 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import SweetAlert from 'react-native-sweet-alert';
 const ProfileScreen = ({ navigation }) => {
-    const [rating, setRating] = useState(4);
+    const [rating, setRating] = useState(2);
     const [isModalVisible, setModalVisible] = useState(false);
     const [islogin, setLogin] = useState('');
     const [feedbackText, setfeedbackText] = useState('');
     const [errorOccured, setErrorOccure] = useState(false);
     const [UserId, setUser] = useState('');
+      const [error, setError] = useState(null);
     console.log('feedbackText', feedbackText);
 
     const [loading, setLoading] = useState(false); // Show loader while API fetches
@@ -141,41 +142,49 @@ const ProfileScreen = ({ navigation }) => {
         try {
             setLoading(true);
             setErrorOccure(false);
-
+    
             console.log('Submitting Feedback:', { feedback: feedbackText, rating });
-
+    
             // API Request
             const response = await api.post('feedback/create', {
                 feedback: feedbackText,
                 rating: rating,
             });
-
+    
             console.log('Feedback Response:', response.data);
-
-            if (response.status === 200 && response.data?.result) {
+    
+            if (response.status === 200) {
                 showToast('success', 'Feedback Submitted', 'Thank you for your feedback!');
-                setModalVisible(false)
-                return response.data;
-            } else {
-                showToast('error', 'Error', response.data?.message || 'Failed to submit feedback.');
-                throw new Error(response.data?.message || 'Failed to submit feedback.');
+                setModalVisible(false);
+                // setFeedbackText('');
+                // setRating(0);
             }
         } catch (error) {
             console.error('Error in submitFeedback:', error);
-
+    
             let errorMsg = 'Something went wrong. Please try again.';
+    
             if (error.response) {
-                errorMsg = error.response.data?.message || errorMsg;
+                if (error.response.status === 400) {
+                    errorMsg = error.response.data?.message || 'Feedback already submitted.';
+                    showToast('error', 'Feedback Already Submitted', errorMsg);
+                } else {
+                    errorMsg = error.response.data?.message || errorMsg;
+                    showToast('error', 'Error', errorMsg);
+                }
             } else if (error.message) {
                 errorMsg = error.message;
+                showToast('error', 'Error', errorMsg);
             }
-
+    
             setErrorOccure(true);
-            setError(errorMsg);
         } finally {
             setLoading(false);
         }
     };
+    
+    
+    
 
     return (
         <View style={styles.container}>
