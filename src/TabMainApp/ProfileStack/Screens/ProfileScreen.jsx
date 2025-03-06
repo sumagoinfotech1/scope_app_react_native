@@ -13,15 +13,18 @@ import { showToast } from '../../../utils/toastService';
 import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import SweetAlert from 'react-native-sweet-alert';
+import { useIsFocused } from "@react-navigation/native";
 const ProfileScreen = ({ navigation }) => {
+    const isFocused = useIsFocused();
     const [rating, setRating] = useState(2);
     const [isModalVisible, setModalVisible] = useState(false);
     const [islogin, setLogin] = useState('');
     const [feedbackText, setfeedbackText] = useState('');
     const [errorOccured, setErrorOccure] = useState(false);
     const [UserId, setUser] = useState('');
+    const [profileData, setProfileData] = useState({});
       const [error, setError] = useState(null);
-    console.log('feedbackText', feedbackText);
+    console.log('profileData', profileData);
 
     const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
@@ -41,15 +44,16 @@ const ProfileScreen = ({ navigation }) => {
                 setLogin(isLogin)
                 setLoading(false)
                 setUser(UserId)
+                getUserData(UserId)
 
             } catch (error) {
                 console.error("Error fetching profile status:", error);
                 setLoading(false)
             }
         };
-
         checkUserStatus();
-    }, []); // Removed `navigation` from dependencies
+        if (isFocused) {}
+    }, [isFocused]); // Removed `navigation` from dependencies
     const showDeleteAlert = () => {
         SweetAlert.showAlertWithOptions({
             title: "Are you sure?",
@@ -168,6 +172,7 @@ const ProfileScreen = ({ navigation }) => {
                 if (error.response.status === 400) {
                     errorMsg = error.response.data?.message || 'Feedback already submitted.';
                     showToast('error', 'Feedback Already Submitted', errorMsg);
+                    setModalVisible(false);
                 } else {
                     errorMsg = error.response.data?.message || errorMsg;
                     showToast('error', 'Error', errorMsg);
@@ -183,6 +188,51 @@ const ProfileScreen = ({ navigation }) => {
         }
     };
     
+    const getUserData = async (userId) => {
+        try {
+            setLoading(true);
+            setError(null);
+    
+            // Make API request
+            const response = await api.get(`users?id=${userId}`);
+            console.log('User Data Response:', response.data.data);
+    
+            if (response.status === 200 && response.data?.result) {
+                const userData = response.data.data;
+                setProfileData(userData); // Store data in state
+    
+                // Display profile data in a toast message
+                showToast(
+                    "success",
+                    "Profile Data Fetched",
+                    "Data Fetch"
+                );
+            } else {
+                showToast("error", "Failed to fetch profile data.");
+                setError("Failed to fetch profile data.");
+            }
+        } catch (error) {
+            console.error('Error fetching profile data:', error);
+    
+            if (error.response) {
+                const { status, data } = error.response;
+                const errorMsg = data?.message || "An error occurred";
+    
+                if (status === 400) {
+                    showToast("error", errorMsg);
+                    setError(errorMsg);
+                } else {
+                    showToast("error", errorMsg);
+                    setError(errorMsg);
+                }
+            } else {
+                showToast("error", "Network error. Please check your internet connection.");
+                setError("Network error. Please check your internet connection.");
+            }
+        } finally {
+            setLoading(false);
+        }
+    };
     
     
 
@@ -192,15 +242,15 @@ const ProfileScreen = ({ navigation }) => {
 
                 <Image source={{ uri: user.avatar }} style={styles.avatar} />
                 <View style={styles.userInfo}>
-                    <Text style={styles.name}>{user.name}</Text>
-                    <Text style={styles.phone}>{user.phone}</Text>
-                    <Text style={styles.email}>{user.email}</Text>
+                    <Text style={styles.name}>{profileData.name}</Text>
+                    <Text style={styles.phone}>{profileData.mobile}</Text>
+                    <Text style={styles.email}>{profileData.email}</Text>
 
                 </View>
             </View>
 
             <View style={styles.menuContainer}>
-                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileEdit', { UserId })}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileEdit', { profileData })}>
                     <FontAwesome5 name="user" size={20} color="#000" />
                     <Text style={styles.menuText}>Profile Details</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />

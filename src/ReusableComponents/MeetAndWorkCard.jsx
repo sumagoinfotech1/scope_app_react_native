@@ -8,6 +8,21 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-nat
 import Colors from './Colors';
 
 const MeetAndWorkCard = ({ item, onpress }) => {
+  const formatDate = (dateString) => {
+    const months = [
+      "Jan", "Feb", "March", "April", "May", "June",
+      "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+    ];
+  
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = String(date.getFullYear()).slice(-2);
+  
+    return `${day}-${month}-${year}`;
+  };
+  console.log('itemitem',item);
+  
   return (
     <View style={styles.card}>
     <TouchableOpacity  onPress={onpress}>
@@ -24,12 +39,12 @@ const MeetAndWorkCard = ({ item, onpress }) => {
         {/* Date and Time */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={styles.infoRow}>
-            <Text style={styles.date}>{item.from_date}</Text>
+            <Text style={styles.date}>{formatDate(item.from_date)}</Text>
             <MaterialIcons name="access-time" size={22} color="black" />
             <Text style={styles.time}>{item.from_time}</Text>
           </View>
           {item.paid_or_free === 'Paid' ? <View>
-            <Text style={styles.pricetag}>₹{item.early_bird_price}</Text>
+            <Text style={styles.pricetag}>₹{item.early_bird_price|| 0}</Text>
           </View> : null}
 
         </View>

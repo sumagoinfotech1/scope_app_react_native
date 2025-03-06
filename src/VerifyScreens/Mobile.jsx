@@ -433,7 +433,9 @@ const Mobile = ({ navigation }) => {
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
 
-            <CustomButton title="Proceed" align="right" onPress={handleSendOtp} />
+            <CustomButton title="Proceed" align="right" onPress={handleSendOtp} 
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            />
           </View>
         )}
 
@@ -468,7 +470,9 @@ const Mobile = ({ navigation }) => {
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
 
-            <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} />
+            <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} 
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            />
           </>
         )}
 
@@ -498,8 +502,8 @@ const Mobile = ({ navigation }) => {
               <CustomButton
                 title="Apply"
                 align="left"
-                style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),right:-wp('3')}}
-                textstyle={{ fontSize: wp("3.4%") }}
+                style={{ paddingHorizontal: wp("4"), padding: wp("4.3%"),right:-wp('3')}}
+                textstyle={{ fontSize: wp("3.8%") }}
                 onPress={verifyReferralCode}
 
               />
@@ -508,7 +512,9 @@ const Mobile = ({ navigation }) => {
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
-            <CustomButton title="Submit" align="right" onPress={handleCompleteProfile} />
+            <CustomButton title="Submit" align="right" onPress={handleCompleteProfile} 
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            />
           </>
         )}
       </LinearGradient>
@@ -529,15 +535,16 @@ const styles = StyleSheet.create({
   bannerContainer: { alignItems: "center", justifyContent: 'center', marginBottom: hp("5%"), width: wp("100%") },
 
   avatarContainer: {
+    // flex:1,
     position: "absolute",
-    bottom: hp("4%"),
+    // bottom: hp("4%"),  
     alignItems: "center",
     justifyContent: "center",
     width: hp("15%"),
     height: hp("15%"),
     backgroundColor: Colors.secondary,
     borderRadius: hp("10%"),
-    bottom: Platform.OS === 'ios' ? hp("31") : hp("27.8%"),
+    bottom: Platform.OS === 'ios' ? hp("31") : hp("31.8%"),
 
     alignSelf: 'center',
     zIndex: 10,
@@ -568,12 +575,12 @@ const styles = StyleSheet.create({
 
   input: {
     width: "100%",
-    height: hp("5.7%"),
+    // height: hp("5.7%"),
     borderWidth: 1,
     borderColor: "#ddd",
     borderRadius: wp("2%"),
     paddingLeft: wp("3%"),
-    marginBottom: hp("1.2%"),
+    marginBottom: hp("1%"),
     backgroundColor: Colors.white,
     elevation: 10,
     fontSize: wp("3.8%"),

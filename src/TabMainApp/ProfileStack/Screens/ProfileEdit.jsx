@@ -206,16 +206,16 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 
 const ProfileEdit = ({ navigation, route }) => {
-    const { UserId } = route.params || {};
-    const [email, setEmail] = useState('example@mail.com'); // Default email
-    const [name, setName] = useState('Enter Name');
+    const {profileData}  = route.params || {};
+    const [email, setEmail] = useState(profileData.email); // Default email
+    const [name, setName] = useState(profileData.name);
     const [loading, setLoading] = useState(false);
     const [errorOccured, setErrorOccured] = useState(false);
     const [error, setError] = useState("");
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
 
-    console.log('UserId', UserId);
+    console.log('profileDataww', profileData);
 
     const updateUser = async (field) => {
         setLoading(true);
@@ -234,7 +234,7 @@ const ProfileEdit = ({ navigation, route }) => {
         }
 
         try {
-            const response = await api.put(`users/update/${UserId}`, payload);
+            const response = await api.put(`users/update/${profileData.id}`, payload);
             console.log("Response:", response.data);
 
             if (response.data.result === true) {

@@ -261,7 +261,7 @@ const SkillsScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.card} onPress={() => fetchSkillById(item.id)}>
         <Image source={{ uri: item.image }} style={styles.image} />
         <Text style={styles.title}>{item.name}</Text> 
-        <Text style={styles.description} numberOfLines={3} ellipsizeMode="tail">
+        <Text style={styles.description} numberOfLines={2} ellipsizeMode="tail">
           {item.description}
         </Text>
         <TouchableOpacity style={styles.iconContainer}>

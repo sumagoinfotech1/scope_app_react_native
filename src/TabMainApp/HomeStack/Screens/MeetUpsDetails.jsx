@@ -13,7 +13,7 @@ import Loader from "../../../ReusableComponents/Loader";
 import api from "../../../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TicketModal from "../../../ReusableComponents/TicketModal";
-
+import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
@@ -369,7 +369,19 @@ const MeetUpsDetails = ({ navigation, route }) => {
           showToast('error', 'Error', 'Failed to share referral link.');
         }
       };
-
+      const formatDate = (dateString) => {
+        const months = [
+          "Jan", "Feb", "March", "April", "May", "June",
+          "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+        ];
+      
+        const date = new Date(dateString);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = months[date.getMonth()];
+        const year = String(date.getFullYear()).slice(-2);
+      
+        return `${day}-${month}-${year}`;
+      };
 
     return (
 
@@ -388,7 +400,13 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     <View style={styles.textContainer}>
                         <Text style={styles.advancedText}>ADVANCED</Text>
                         <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{details.title}</Text>
+                        <View style={styles.infoRow}>
+                                    <Text style={styles.date}>{formatDate(details.from_date)}</Text>
+                                    <MaterialIcons name="access-time" size={20} color="black" />
+                                    <Text style={styles.time}>{details.from_time}</Text>
+                                  </View>
                         <Text style={styles.description}>{details.description}</Text>
+                         
                     </View>
                 </View>
 
@@ -503,6 +521,7 @@ const styles = StyleSheet.create({
     description: {
         fontSize: wp("4%"),
         color: "#555",
+        marginTop:wp('2')
     },
     cardTitle: {
         fontSize: wp("4.5%"),
@@ -542,6 +561,22 @@ const styles = StyleSheet.create({
         color: "#000",
         // padding:wp('0.3'),
         paddingHorizontal:wp('6')
+      },
+      infoRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        // marginVertical: wp("1%"),
+        elevation: 3,
+      },
+      date: {
+        color: 'red',
+        fontWeight: 'bold',
+        marginRight: wp("2%"),
+        fontSize: wp('4'),
+      },
+      time: {
+        marginLeft: wp("1%"),
+        fontSize: wp('3.5'),
       },
 });
 

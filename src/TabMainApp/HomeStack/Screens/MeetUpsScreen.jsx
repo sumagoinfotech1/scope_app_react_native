@@ -187,7 +187,7 @@ const MeetUpsScreen = ({ navigation, route }) => {
     const gotodetails = (id) => {
         navigation.navigate('MeetUpsDetails', { id });
     };
-
+   
     return (
         <GradientContainer style={styles.mainContainer}>
             {/* Background Header */}
