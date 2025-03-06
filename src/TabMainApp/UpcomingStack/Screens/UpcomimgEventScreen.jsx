@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity, Platform } from 'react-native';
+import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity, Platform, Linking } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -60,7 +60,14 @@ const MeetupCard = ({ item, onPress }) => {
   };
   
 
-  
+  const openGoogleMaps = (url) => {
+
+    Linking.openURL(url).catch(err => console.error("Failed to open Google Maps", err));
+  };
+  const openMeeting = (url) => {
+
+    Linking.openURL(url).catch(err => console.error("Failed to open Zoom App", err));
+  };
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(item)}>
       <Image source={{ uri: item.event_event_image }} style={styles.headerImage} />
@@ -87,21 +94,38 @@ const MeetupCard = ({ item, onPress }) => {
             </View>
 
           </View>
-          <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
+          {item.event_mode_of_event=='online'? <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
             <View style={{ left: wp('5'), zIndex: 100 }}>
               <FontAwesome name="video-camera" size={24} color="#fff" />
             </View>
+          
             <View>
               <CustomButton
                 title="Join"
                 align="right"
-                // onPress={()=>gotoWorkShop()}
+                onPress={()=>openMeeting(item.event_meeting_Link)}
                 style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('20%') }}
 
               />
             </View>
 
-          </View>
+          </View>: <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
+            <View style={{ left: wp('5'), zIndex: 100 }}>
+              <FontAwesome name="map" size={24} color="#fff" />
+            </View>
+          
+            <View>
+              <CustomButton
+                title="Direction"
+                align="right"
+                onPress={()=>openGoogleMaps(item.event_google_map_link)}
+                style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('28%') }}
+
+              />
+            </View>
+
+          </View>}
+         
         </View>
       </View>
     </TouchableOpacity>
@@ -222,14 +246,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff'
   },
   card: {
-    width: wp("91%"),
+    width: wp("93%"),
     backgroundColor: '#ffff',
-    // borderRadius: wp("2%"),
+    borderRadius: wp("2%"),
     // shadowColor: '#000',
     // shadowOpacity: 0.1,
     // shadowRadius: 10,
     // shadowOffset: { width: 0, height: 5 },
-    // elevation: 6,
+    elevation: 10,
+    padding:wp('1'),
+    alignItems:"center",
+   
 
     marginTop: Platform.OS === 'ios' ? wp('10%') : wp("3%"),
     margin: wp("1%"),
@@ -251,7 +278,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     // marginVertical: wp("1%"),
-    elevation: 3,
+    // elevation: 1,
   },
   date: {
     color: 'red',
