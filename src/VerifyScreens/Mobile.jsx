@@ -362,46 +362,49 @@ const Mobile = ({ navigation }) => {
       return;
     }
 
-    try {
+  try {
+    console.log("Verifying Referral Code:", promocode);
 
+    // Make API Request
+    const response = await api.post("auth/verify-referral-code", {
+      mobile,
+      referralCode: promocode
+    });
 
-      console.log("Verifying Referral Code:", promocode);
+    console.log("API Response:", response.data);
 
-      // Make API Request
-      const response = await api.post(
-        "auth/verify-referral-code",
-        { referralCode: promocode },
+    if (response.data?.result === true) {
+      const { referralCode, reward } = response.data?.data || {};
 
-      );
+      showToast("success", "Success", `Referral code verified successfully! You earned ${reward} points.`);
+      setVerifyCode(true);
+      setErrorOccure(false); // Clear previous errors if any
 
-      console.log("API Response:", response.data);
-
-      if (response.data?.result === true) {
-
-        showToast('success', 'Success', "Referral code verified successfully!");
-        setVerifyCode(true);
-
-      } else {
-        setErrorOccure(true);
-        setError(response.data?.message || "Invalid referral code");
-      }
-    } catch (error) {
+      // // Store referral code and reward for further use
+      // setReferralCode(referralCode);
+      // setRewardPoints(reward);
+    } else {
+      setVerifyCode(false);
       setErrorOccure(true);
-      setError("Error in verifyReferralCode:");
-
-      let errorMsg = "Something went wrong. Please try again.";
-      if (error.response) {
-        errorMsg = error.response.data?.message || errorMsg;
-      } else if (error.message) {
-        errorMsg = error.message;
-      }
-
-      setErrorOccure(true);
-      setError(errorMsg);
-
-    } finally {
-      setLoading(false);
+      setError(response.data?.message || "Invalid referral code");
+      showToast("error", "Error", response.data?.message || "Invalid referral code");
     }
+  } catch (error) {
+    let errorMsg = "Something went wrong. Please try again.";
+
+    if (error.response) {
+      errorMsg = error.response.data?.message || errorMsg;
+    } else if (error.message) {
+      errorMsg = error.message;
+    }
+
+    setVerifyCode(false);
+    setErrorOccure(true);
+    setError(errorMsg);
+    showToast("error", "Error", errorMsg);
+  } finally {
+    setLoading(false);
+  }
   };
 
   return (
@@ -495,7 +498,7 @@ const Mobile = ({ navigation }) => {
               <CustomButton
                 title="Apply"
                 align="left"
-                style={{ paddingHorizontal: wp("4"), padding: wp("3%"), }}
+                style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),right:-wp('3')}}
                 textstyle={{ fontSize: wp("3.4%") }}
                 onPress={verifyReferralCode}
 

@@ -218,7 +218,7 @@ const refreshAccessToken = async () => {
 
   try {
     const refreshToken = await AsyncStorage.getItem("refreshToken");
-    console.log('devika',refreshToken);
+
     
     if (!refreshToken) {
       console.warn("❌ No refresh token found. Redirecting to login.");
