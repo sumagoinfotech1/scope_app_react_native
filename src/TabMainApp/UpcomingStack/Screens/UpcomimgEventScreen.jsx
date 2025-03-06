@@ -11,38 +11,79 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from "@react-navigation/native";
-const meetupData = [
-  { id: '1', title: 'Visual Elements Of User Interface Design', date: '04 Feb 25', time: '02:40 PM', location: 'Govind Nagar Nashik', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '2', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/50/35/57/503557d678025e87d3c017dd6a9fba14.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '3', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/f7/8c/ef/f78cef0dd20b57db43cc6c93cc4e7303.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-  { id: '4', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/a5/77/4c/a5774cfed2b9a6bbc14ffea6148b7fb9.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-];
 
 
 
 const MeetupCard = ({ item, onPress }) => {
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(calculateTimeLeft());
+    }, 1000);
+  
+    return () => clearInterval(timer);
+  }, [eventStartTime]); // Add dependency
+  
+  
+  const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
+  
+  const calculateTimeLeft = () => {
+    const now = new Date();
+    const timeDiff = eventStartTime - now;
+  
+    if (timeDiff <= 0) {
+      return { days: 0, hours: 0, minutes: 0, seconds: 0, eventStarted: true };
+    }
+  
+    return {
+      days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+      minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
+      seconds: Math.floor((timeDiff % (1000 * 60)) / 1000),
+      eventStarted: false
+    };
+  };
+  
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const formatDate = (dateString) => {
+    const months = [
+      "Jan", "Feb", "March", "April", "May", "June",
+      "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+    ];
+  
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = String(date.getFullYear()).slice(-2);
+  
+    return `${day}-${month}-${year}`;
+  };
+  
+
+  
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(item)}>
-      <Image source={{ uri: item.event_image }} style={styles.headerImage} />
-      <View style={{ padding: wp('3%') }}>
+      <Image source={{ uri: item.event_event_image }} style={styles.headerImage} />
+      <View style={{ padding: wp('3%'),backgroundColor:'#ffff' }}>
         <Text style={styles.title}>{item.event_title}</Text>
         <View style={styles.infoRow}>
-          <Text style={styles.date}>{item.event_from_date}</Text>
+          <Text style={styles.date}>{formatDate(item.event_from_date)}</Text>
           <MaterialIcons name="access-time" size={22} color="black" />
           <Text style={styles.time}>{item.event_from_time}</Text>
         </View>
         <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.1'), borderRadius: wp('4'), width: wp("60"), marginVertical: wp('1.5') }]}>
           <FontAwesome name="map-marker" size={16} color="black" />
-          <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
+          <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.event_location}</Text>
         </View>
         <View style={styles.registerButton}>
           <View style={{ alignItems: 'center', justifyContent: 'center', width: wp('50%'), flexDirection: 'row' }}>
             <View style={{ padding: wp('1') }}>
               <MaterialCommunityIcons name="timer-sand" size={32} color="black" />
             </View>
+
             <View>
               <Text style={styles.text}>Starting In</Text>
-              <Text style={styles.text}>1:52:00 Sec</Text>
+              <Text style={styles.text}>{timeLeft.days}d {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}Sec</Text>
             </View>
 
           </View>
@@ -89,7 +130,7 @@ const UpcomimgEventScreen = () => {
 
       if (response.status === 200 && response.data?.result) {
         setEventRegistration(response.data.data); // Store data in state
-        console.log('setEventRegistration',response.data.data.map((item)=>item.event_title));
+        console.log('setEventRegistration',response.data.data);
         
       } else {
         showToast("error", response.data?.message || "No event registrations found");
@@ -157,6 +198,7 @@ const UpcomimgEventScreen = () => {
     console.log("Pressed item:", item);
   };
 
+  
   return (
     <View style={styles.container}>
       <FlatList

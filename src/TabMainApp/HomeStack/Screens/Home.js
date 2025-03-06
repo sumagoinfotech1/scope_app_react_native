@@ -390,7 +390,7 @@ const Home = ({ navigation }) => {
 
       if (response.status === 200 && response.data?.result) {
         setEvents(response.data.data); // Store data in state
-        console.log('data 13', response.data.data.map((item) => item.name));
+        console.log('data 13', response.data.data);
 
       } else {
         showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
@@ -421,7 +421,7 @@ const Home = ({ navigation }) => {
 
       if (response.status === 200 && response.data?.result) {
         setSlider(response.data.data); // Store data in state
-        console.log('dataRavi', response.data.data.map((item) => item.name));
+        // console.log('dataRavi', response.data.data.map((item) => item.name));
 
       } else {
         // showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
@@ -465,6 +465,19 @@ const Home = ({ navigation }) => {
 
     navigation.navigate('MeetUpsScreen', { id })
   }
+  const formatDate = (dateString) => {
+    const months = [
+      "Jan", "Feb", "March", "April", "May", "June",
+      "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+    ];
+  
+    const date = new Date(dateString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = months[date.getMonth()];
+    const year = String(date.getFullYear()).slice(-2);
+  
+    return `${day}-${month}-${year}`;
+  };
   const MeetupCard = ({ item }) => {
     return (
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>
@@ -478,7 +491,7 @@ const Home = ({ navigation }) => {
 
         {/* Date and Time */}
         <View style={styles.infoRow}>
-          <Text style={styles.date}>{item.from_date}</Text>
+          <Text style={styles.date}>{formatDate(item.from_date)}</Text>
           <MaterialIcons name="access-time" size={16} color="black" />
           <Text style={styles.time}>{item.from_time}</Text>
         </View>
@@ -517,10 +530,10 @@ const Home = ({ navigation }) => {
 
         {/* Date and Time */}
         <View style={styles.infoRow}>
-          <Text style={styles.date}>₹ {item.early_bird_price}</Text>
+          <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
           <MaterialIcons name="local-offer" size={16} color="black" />
           <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
-            ₹ {item.initial_price}
+            ₹ {item.initial_price || 0}
           </Text>
         </View>
 
@@ -612,7 +625,7 @@ const Home = ({ navigation }) => {
     </GradientContainer>
   )
 }
-
+ 
 export default memo(Home)
 
 const styles = StyleSheet.create({

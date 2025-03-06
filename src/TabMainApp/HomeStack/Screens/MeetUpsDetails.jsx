@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, Platform, ScrollView, Alert } from "react-native";
+import { View, Text, Image, StyleSheet, Platform, ScrollView, Alert ,TouchableOpacity, Share} from "react-native";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Colors from "../../../ReusableComponents/Colors";
 import GradientContainer from "../../../ReusableComponents/GradientContainer";
@@ -13,6 +13,7 @@ import Loader from "../../../ReusableComponents/Loader";
 import api from "../../../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TicketModal from "../../../ReusableComponents/TicketModal";
+
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
@@ -21,9 +22,11 @@ const MeetUpsDetails = ({ navigation, route }) => {
     const [loading, setLoading] = useState(false);
     const [heading, setHeading] = useState();
     const [isconfiremmodal, setCinfirmModal] = useState(false);
+        const [referralCode, setReferralCode] = useState("");
+         const [errorOccured, setErrorOccured] = useState(false);
     // const [verificationmodal, setverificationmodal] = useState(false);
     const [userId, setUserId] = useState('')
-    console.log('12', userId);
+    console.log('referralCode', referralCode);
 
     const data = {
         image: require("../../../assets/icons/image.png"), // Replace with actual image path
@@ -255,8 +258,117 @@ const MeetUpsDetails = ({ navigation, route }) => {
             setLoading(false);
         }
     };
+  
 
 
+    useEffect(() => {
+        const fetchUserIdAndCreateReferral = async () => {
+          try {
+            const storedUserId = await AsyncStorage.getItem('User_id');
+            if (storedUserId) {
+              handleCreateReferral(storedUserId);
+            //   setUserid(storedUserId)
+            } else {
+              showToast('error', 'User ID Missing', 'No user ID found in storage');
+            }
+          } catch (error) {
+            console.error('Error fetching user ID:', error);
+          }
+        };
+    
+        fetchUserIdAndCreateReferral();
+      }, []);
+      const handleCreateReferral = async (userId) => {
+        setErrorOccured(false);
+        setLoading(true);
+    
+        try {
+          const response = await api.post(`user-referral/create/${userId}`);
+    
+          console.log("Response:", response.data);
+    
+          if (response.data.result === true) {
+            // showToast('success', 'Referral Created', 'Referral created successfully');
+            setReferralCode(response.data.data.referral_code)
+          } else {
+            setErrorOccured(true);
+            setError(response.data.message || "Failed to create referral");
+            showToast('error', 'Referral Failed', response.data.message || "Failed to create referral");
+          }
+        } catch (error) {
+          setErrorOccured(true);
+    
+          if (error.response) {
+            console.log("Error Response:", error.response);
+    
+            if (error.response.status === 400 && error.response.data.result===false) {
+                fetchUserReferral(userId)
+            
+            } else {
+              setError(error.response.data?.message || "Error creating referral");
+              showToast('error', 'Error', error.response.data?.message || "Error creating referral");
+            }
+          } else {
+            setError("Network error. Please check your connection.");
+            showToast('error', 'Network Error', "Please check your internet connection.");
+          }
+        }
+    
+        setLoading(false);
+      };
+      const fetchUserReferral = async (userId) => {
+ 
+        try {
+         
+      
+          const response = await api.get(`user-referral/user?id=${userId}`);
+      
+          console.log("ResponseFetch:", response.data.data[0].referral_code);
+      
+          if (response.status === 200) {
+            // showToast('success', 'Referral Data Loaded', 'Referral details retrieved successfully');
+            setReferralCode(response.data.data[0].referral_code) 
+            return response.data;
+          } else {
+            showToast('error', 'Error', 'Failed to fetch referral data');
+            return null;
+          }
+        } catch (error) {
+          if (error.response) {
+            console.log("Error Responseee:", error.response);
+      
+            if (error.response.status === 400) {
+              showToast('error', 'Bad Request', "Invalid request. Please check your data.");
+            } else {
+              showToast('error', 'Error', error.response.data?.message || "Error fetching referral data");
+            }
+          } else {
+            showToast('error', 'Network Error', "Please check your internet connection.");
+          }
+          return null;
+        }
+      };
+   const shareReferralLink = async () => {
+        try {
+     
+        //   // Construct the referral link dynamically
+        //   const referralLink = `https://yourapp.com/signup?referralCode=${userId}`;
+        const referralLink = `https://website.sumagotraining.in/`;
+          // Share the referral message
+          const result = await Share.share({
+            message: `🚀 Join our amazing app and earn rewards! 🎉\n\nUse my referral code: *${referralCode}* to sign up.\n\nClick here to join: ${referralLink}`,
+          });
+      
+          if (result.action === Share.sharedAction) {
+            showToast('success', 'Shared Successfully', 'Your referral link has been shared.');
+          } else if (result.action === Share.dismissedAction) {
+            showToast('info', 'Share Cancelled', 'You cancelled sharing.');
+          }
+        } catch (error) {
+          console.error("Error sharing referral link:", error);
+          showToast('error', 'Error', 'Failed to share referral link.');
+        }
+      };
 
 
     return (
@@ -305,10 +417,17 @@ const MeetUpsDetails = ({ navigation, route }) => {
                         />
                     </View>
                 </View>
-                <ImageCard
-                    imageUrl={require('../../../assets/icons/share.png')}
-                />
+                <View style={{alignItems:"flex-end",justifyContent:"flex-end"}}>
+               
+                    <ImageCard
+                        imageUrl={require('../../../assets/icons/share.png')}
+                    />
 
+                    <TouchableOpacity style={styles.yesButton} onPress={()=>shareReferralLink()} >
+                                 <Text style={styles.yesButtonText}>Invite</Text>
+                               </TouchableOpacity>
+
+                </View>
 
                 <VerifyEmailModal
                     isVisible={modalVisible}
@@ -330,7 +449,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     visible={ticketModal}
                     onClose={() => setTicketModal(false)}
                     item={details}
-                   
+
                 />
             </ScrollView>
             <Loader visible={loading} />
@@ -407,6 +526,23 @@ const styles = StyleSheet.create({
         color: Colors.white,
         textAlign: "center",
     },
+    yesButton: {
+        // flex: 1,
+        backgroundColor: "#fff",
+        paddingVertical: hp("1%"),
+        borderRadius: wp("2%"),
+        alignItems: "center",
+        position:"absolute",
+        right:wp('5'),
+        bottom:wp('7'),
+      },
+      yesButtonText: {
+        fontSize: wp("4%"),
+        fontWeight: "bold",
+        color: "#000",
+        // padding:wp('0.3'),
+        paddingHorizontal:wp('6')
+      },
 });
 
 export default MeetUpsDetails;
