@@ -7,6 +7,7 @@ import ReferalScreen from './Screens/ReferalScreen';
 import FAQScreen from './Screens/FAQScreen';
 import ProfileEdit from './Screens/ProfileEdit';
 import TermAndPolicy from './Screens/TermAndPolicy';
+import UserSurvey from './Screens/UserSurvey';
 const Stack = createNativeStackNavigator();
 const ProfileStack = () => {
   return (
@@ -16,6 +17,7 @@ const ProfileStack = () => {
     <Stack.Screen name="FAQScreen" component={FAQScreen} options={{ headerShown: false }} />
     <Stack.Screen name="ProfileEdit" component={ProfileEdit} options={{ headerShown: false }} />
     <Stack.Screen name="TermAndPolicy" component={TermAndPolicy} options={{ headerShown: false }} />
+    <Stack.Screen name="UserSurvey" component={UserSurvey} options={{ headerShown: false }} />
     </Stack.Navigator>
   )
 }

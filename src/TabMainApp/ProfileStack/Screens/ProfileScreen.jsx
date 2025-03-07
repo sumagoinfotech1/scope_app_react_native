@@ -273,7 +273,11 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.menuText}>Referral</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
-
+                <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('UserSurvey',{profileData}) }}>
+                    <FontAwesome5 name="user-friends" size={20} color="#000" />
+                    <Text style={styles.menuText}>User Survey</Text>
+                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => logout()}>
                     <FontAwesome5 name="sign-out-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Logout</Text>
@@ -338,7 +342,7 @@ const styles = StyleSheet.create({
     },
     header: {
         backgroundColor: '#020202',
-        height: hp('25%'),
+        // height: hp('20%'),
         alignItems: 'center',
         flexDirection: 'row',
         padding: wp('8%'),

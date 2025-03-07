@@ -434,7 +434,7 @@ const Mobile = ({ navigation }) => {
             </View> : null}
 
             <CustomButton title="Proceed" align="right" onPress={handleSendOtp} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000',}}
             />
           </View>
         )}
@@ -471,7 +471,7 @@ const Mobile = ({ navigation }) => {
             </View> : null}
 
             <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000'}}
             />
           </>
         )}
@@ -502,7 +502,7 @@ const Mobile = ({ navigation }) => {
               <CustomButton
                 title="Apply"
                 align="left"
-                style={{ paddingHorizontal: wp("4"), padding: wp("4.3%"),right:-wp('3')}}
+                style={{ paddingHorizontal: wp("4"), padding: wp("4.3%"),right:-wp('3'), backgroundColor:'#000'}}
                 textstyle={{ fontSize: wp("3.8%") }}
                 onPress={verifyReferralCode}
 
@@ -513,7 +513,7 @@ const Mobile = ({ navigation }) => {
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
             <CustomButton title="Submit" align="right" onPress={handleCompleteProfile} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"),}}
+            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000'}}
             />
           </>
         )}

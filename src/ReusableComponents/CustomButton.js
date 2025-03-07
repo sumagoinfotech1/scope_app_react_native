@@ -14,13 +14,13 @@ const CustomButton = ({ title, onPress, style, align = 'center',textstyle }) => 
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',  
+    // width: '100%',  
     // marginBottom: wp("1%"), 
     // marginHorizontal:wp('3%')
     elevation: 4,
   },
   button: {
-    backgroundColor: Colors.black,
+    // backgroundColor: Colors.black,
     padding: wp("2%"),
     borderRadius: wp("2%"),
     alignItems: 'center',

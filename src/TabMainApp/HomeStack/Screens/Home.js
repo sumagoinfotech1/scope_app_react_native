@@ -365,6 +365,7 @@ import api from "../../../utils/axiosInstance";
 import { showToast } from '../../../utils/toastService';
 import Loader from '../../../ReusableComponents/Loader';
 import { useIsFocused } from "@react-navigation/native";
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 const data = [
   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
@@ -507,7 +508,7 @@ const Home = ({ navigation }) => {
               title="Register"
               align="right"
               onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('2'), width: wp('35') }}
+              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
               textstyle={{ fontSize: wp("3.9%") }}
 
             />
@@ -548,7 +549,7 @@ const Home = ({ navigation }) => {
               title="Register"
               align="right"
               onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('2'), width: wp('35') }}
+              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
               textstyle={{ fontSize: wp("3.9%") }}
             />
           </View>
@@ -595,17 +596,21 @@ const Home = ({ navigation }) => {
                 removeClippedSubviews={true}
               />
               {/* "See More" button appears once per item */}
+              <View style={{flexDirection:'row',alignItems:"center",justifyContent:"flex-end", marginRight: wp('2'),}}>
               <CustomButton
-                title="See More"
+                title="See More "
                 align="right"
                 onPress={() => gotoMeetup(item.id)}
                 style={{
-                  backgroundColor: '#000',
-                  marginBottom: wp('5'),
+                 
+                  marginBottom: wp('1'),
                   alignSelf: 'flex-end', // Align button to the right
-                  marginRight: wp('2'),
+                  paddingRight:-wp('5')
                 }}
+                textstyle={{color:'#000',fontSize:wp('4.5')}}
               />
+               <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+            </View>
             </View>
           )}
         />
