@@ -1,6 +1,6 @@
 
 
-import { View, Text, Button, StatusBar, Alert } from 'react-native';
+import { View, Text, Button, StatusBar, Alert ,PermissionsAndroid, Platform } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -12,6 +12,8 @@ import Toast from 'react-native-toast-message';
 import api, { navigationRef } from './src/utils/axiosInstance';
 import Skills from './src/VerifyScreens/Skills';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import messaging from '@react-native-firebase/messaging';
+
 
 const Stack = createNativeStackNavigator();
 
@@ -26,6 +28,24 @@ const RootStack = ({ initialRoute }) => {
   );
 };
 
+// 🔹 Request Notification Permission
+async function requestUserPermission() {
+  const authStatus = await messaging().requestPermission();
+  const enabled =
+      authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
+      authStatus === messaging.AuthorizationStatus.PROVISIONAL;
+
+  if (enabled) {
+      console.log('Push Notification Permission Granted!');
+      getFCMToken();
+  }
+}
+
+// 🔹 Get FCM Token
+async function getFCMToken() {
+  const token = await messaging().getToken();
+  console.log('FCM Token:', token);
+}
 const App = () => {
   const [loading, setLoading] = useState(true);
   const [initialRoute, setInitialRoute] = useState("Mobile");
@@ -36,64 +56,7 @@ const App = () => {
     }, 3000);
   }, []);
 
-  // useEffect(() => {
-  //   const checkUserConfig = async () => {
-  //     try {
-  //       const isLogin = await AsyncStorage.getItem("isLogin");
-  
-  //       console.log("isLogin:", isLogin);
-  
-  //       if (isLogin !== "true") {
-  //         setInitialRoute("Mobile");
-  //         setLoading(false);
-  //         return; // Exit early if the user is not logged in
-  //       }
-  
-  //       const userId = await AsyncStorage.getItem("User_id");
-  //       if (userId) {
-  //         await getUserConfig(userId);
-  //       } else {
-  //         setInitialRoute("Mobile");
-  //         setLoading(false);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching user config:", error);
-  //       setInitialRoute("Mobile");
-  //       setLoading(false);
-  //     }
-  //   };
-  
-  //   checkUserConfig();
-  // }, []); 
-  
-  // const getUserConfig = async (userId) => {
-  //   try {
-  //     const response = await api.get(`users/config?id=${userId}`);
-  
-  //     if (response.status === 200 && response.data?.result) {
-  //       const userConfig = response.data.data;
-  
-  //       await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(!!userConfig.isProfileCompleted));
-  //       await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(!!userConfig.isAnswerSubmitted));
-  
-  //       setInitialRoute(
-  //         userConfig.isProfileCompleted 
-  //           ? userConfig.isAnswerSubmitted 
-  //             ? "MainApp" 
-  //             : "SkillsScreen" 
-  //           : "Mobile"
-  //       );
-  //     } else {
-  //       throw new Error(response.data?.message || "Failed to fetch user config");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user config:", error);
-  //     setInitialRoute("Mobile");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-  
+
   useEffect(() => {
     const checkUserConfig = async () => {
       try {
@@ -144,7 +107,18 @@ const App = () => {
   
     checkUserConfig();
   }, []);
-  
+ 
+  useEffect(() => {
+    requestUserPermission();
+
+    // Foreground Notifications
+    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+        Alert.alert('New Notification', remoteMessage.notification?.body);
+    });
+
+    return unsubscribeForeground;
+}, []);
+
   return (
     <NavigationContainer ref={navigationRef}>
       <StatusBar hidden={true} />

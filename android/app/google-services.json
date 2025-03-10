@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "800262083580",
+    "project_id": "scopeengagement",
+    "storage_bucket": "scopeengagement.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:800262083580:android:f2dff32d4ba4bb04179879",
+        "android_client_info": {
+          "package_name": "com.scopeengagement"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoRKlK8Zk6vd4jr3i5Qs6iDnSgGYqHUf4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
