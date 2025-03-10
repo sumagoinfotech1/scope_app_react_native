@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import StarRating from 'react-native-star-rating-widget';
 import Modal from 'react-native-modal';
@@ -202,11 +203,11 @@ const ProfileScreen = ({ navigation }) => {
                 setProfileData(userData); // Store data in state
     
                 // Display profile data in a toast message
-                showToast(
-                    "success",
-                    "Profile Data Fetched",
-                    "Data Fetch"
-                );
+                // showToast(
+                //     "success",
+                //     "Profile Data Fetched",
+                //     "Data Fetch"
+                // );
             } else {
                 showToast("error", "Failed to fetch profile data.");
                 setError("Failed to fetch profile data.");
@@ -274,7 +275,7 @@ const ProfileScreen = ({ navigation }) => {
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('UserSurvey',{profileData}) }}>
-                    <FontAwesome5 name="user-friends" size={20} color="#000" />
+                    <MaterialIcons name="question-answer" size={20} color="#000" />
                     <Text style={styles.menuText}>User Survey</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>

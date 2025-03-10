@@ -476,6 +476,7 @@ const styles = StyleSheet.create({
     userInfo: {
         marginLeft: wp('5%'),
     },
+    
     name: {
         color: '#fff',
         fontSize: wp('5%'),

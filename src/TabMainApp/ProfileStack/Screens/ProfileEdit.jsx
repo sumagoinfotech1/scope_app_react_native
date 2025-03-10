@@ -137,64 +137,7 @@ const ProfileEdit = ({ navigation, route }) => {
                     <Text style={styles.answer}>{name}</Text>
                 )}
             </View>
-            <View style={styles.Subcontainer}>
-                <Text style={styles.question}>Are You Student Or Working Professional?</Text>
-                {options.map((item) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={[styles.option, selected === item.label && styles.selectedOption]}
-                        onPress={() => setSelected(item.label)}
-                    >
-                        <Text style={styles.optionText}>{item.label}</Text>
-                        <Ionicons
-                            name={selected === item.label ? 'radio-button-on' : 'radio-button-off'}
-                            size={30}
-                            color="black"
-                        />
-                    </TouchableOpacity>
-                ))}
-
-
-                <View style={{ alignItems: "flex-end" }}>
-                    <CustomButton
-                        title="Next"
-                        align="center"
-                        onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-                        style={{ padding: wp('3.5'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('85') }}
-                        textstyle={{ fontSize: wp("3.9%") }}
-                    />
-                </View>
-                
-            </View>
-            <View style={styles.Subcontainer}>
-                <Text style={styles.question}>Are You Student Or Working Professional?</Text>
-                {options.map((item) => (
-                    <TouchableOpacity
-                        key={item.id}
-                        style={[styles.option, selected === item.label && styles.selectedOption]}
-                        onPress={() => setSelected(item.label)}
-                    >
-                        <Text style={styles.optionText}>{item.label}</Text>
-                        <Ionicons
-                            name={selected === item.label ? 'radio-button-on' : 'radio-button-off'}
-                            size={30}
-                            color="black"
-                        />
-                    </TouchableOpacity>
-                ))}
-
-
-                <View style={{ alignItems: "flex-end" }}>
-                    <CustomButton
-                        title="Next"
-                        align="center"
-                        onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-                        style={{ padding: wp('3.5'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('85') }}
-                        textstyle={{ fontSize: wp("3.9%") }}
-                    />
-                </View>
-                
-            </View>
+      
             <Loader visible={loading} />
         </View>
     );
