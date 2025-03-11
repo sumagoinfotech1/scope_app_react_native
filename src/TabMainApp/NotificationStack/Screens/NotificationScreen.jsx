@@ -200,7 +200,8 @@ const styles = StyleSheet.create({
         header: {
         width: wp('100%'),
         height: hp('12%'),
-        backgroundColor: '#3A3A3A',
+        // backgroundColor: '#3A3A3A',
+        backgroundColor: '#000',
         alignItems: 'center',
         justifyContent: 'center',
        
