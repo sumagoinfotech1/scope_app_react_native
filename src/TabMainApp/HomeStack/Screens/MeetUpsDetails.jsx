@@ -26,7 +26,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
          const [errorOccured, setErrorOccured] = useState(false);
     // const [verificationmodal, setverificationmodal] = useState(false);
     const [userId, setUserId] = useState('')
-    console.log('referralCode', referralCode);
+    console.log('referralCode', id);
 
     const data = {
         image: require("../../../assets/icons/image.png"), // Replace with actual image path
@@ -229,21 +229,51 @@ const MeetUpsDetails = ({ navigation, route }) => {
             setLoading(false);
         }
     };
+    // const registerForEvent = async () => {
+    //     try {
+    //         setLoading(true);
+
+    //         // API request to register for the event
+    //         const response = await api.post('event-registration/register', {
+    //             userId: userId,
+    //             eventId: id,
+    //         });
+    //         console.log("responseee".response);
+
+    //         if (response.data?.result === true) {
+    //             showToast('success', 'Success', response.data?.message);
+    //             setCinfirmModal(false);
+    //             setTicketModal(true)
+    //         } else {
+    //             if (response.data?.message === "Email not verified") {
+    //                 setModalVisible(true); // Show email verification modal
+    //             } else {
+    //                 showToast('error', 'Error', response.data?.message);
+    //             }
+    //         }
+    //     } catch (error) {
+    //         showToast('error', 'Error', 'Something went wrong. Please try again.');
+    //         console.error('Error registering for event:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     const registerForEvent = async () => {
         try {
             setLoading(true);
-
+    
             // API request to register for the event
             const response = await api.post('event-registration/register', {
                 userId: userId,
                 eventId: id,
             });
-            console.log("responseee".response);
-
+    
+            console.log("API Response:", response);
+    
             if (response.data?.result === true) {
                 showToast('success', 'Success', response.data?.message);
                 setCinfirmModal(false);
-                setTicketModal(true)
+                setTicketModal(true);
             } else {
                 if (response.data?.message === "Email not verified") {
                     setModalVisible(true); // Show email verification modal
@@ -252,13 +282,28 @@ const MeetUpsDetails = ({ navigation, route }) => {
                 }
             }
         } catch (error) {
-            showToast('error', 'Error', 'Something went wrong. Please try again.');
             console.error('Error registering for event:', error);
+    
+            let errorMsg = 'Something went wrong. Please try again.';
+            
+            if (error.response) {
+                if (error.response.status === 400 && error.response.data?.result === false) {
+                    errorMsg = error.response.data?.message || 'Registration failed';
+                    setCinfirmModal(false);
+                } else {
+                    errorMsg = error.response.data?.message || errorMsg;
+                    setCinfirmModal(false);
+                }
+            } else if (error.message) {
+                errorMsg = error.message;
+            }
+    
+            showToast('error', 'Error', errorMsg);
         } finally {
             setLoading(false);
         }
     };
-  
+    
 
 
     useEffect(() => {

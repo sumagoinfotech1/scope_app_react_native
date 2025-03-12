@@ -17,7 +17,7 @@ const TicketModal = ({ visible, onClose ,item,setTicketModal}) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowFirstComponent(false);
-    }, 9000); // 5 seconds
+    }, 10000); // 5 seconds
 
     return () => clearTimeout(timer); // Cleanup timeout to avoid memory leaks
   }, []);
