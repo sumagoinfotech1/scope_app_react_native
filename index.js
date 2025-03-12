@@ -28,11 +28,14 @@ import App from './App';
 import { name as appName } from './app.json';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification';
+import { navigationRef } from './src/utils/axiosInstance';
+// import { createNavigationContainerRef } from "@react-navigation/native";
+// export const navigationRef = createNavigationContainerRef();
 
 // Background & Kill-State Notification Handling
 messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log("📩 Background Message:", remoteMessage);
-
+    handleNotificationNavigation(remoteMessage);
     PushNotification.localNotification({
         channelId: "default-channel",
         title: remoteMessage.notification?.title || "New Notification",
@@ -43,4 +46,53 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
     });
 });
 
+
+// const handleNotificationNavigation = (remoteMessage) => {
+//     if (!remoteMessage?.data) return;
+
+//     const { eventId, eventType } = remoteMessage.data;
+    
+//     console.log('Received Notification:', remoteMessage.data);
+
+//     if (navigationRef.current) {
+//         if (eventType === 'Meetups') {
+//             console.log('Navigating to MeetUpsDetails:', eventId);
+//             navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+//         } else if (eventType === 'Workshop') {
+//             console.log('Navigating to WorkshopDetails:', eventId);
+//             navigationRef.current.navigate('WorkshopDetails', { id: eventId });
+
+//         } else {
+//             console.log('Navigating to Home');
+//             navigationRef.current.navigate('Home'); // Default screen
+//         }
+//     } else {
+//         console.error('Navigation reference is not available');
+//     }
+// };
+const handleNotificationNavigation = (remoteMessage) => {
+    if (!remoteMessage?.data) return;
+
+    const { eventId, eventType } = remoteMessage.data;
+    
+    console.log('Received Notification:', remoteMessage.data);
+
+    if (navigationRef.current) {
+        if (eventType === 'Meetups') {
+            console.log('Navigating to MeetUpsDetails:', eventId);
+            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+        } else if (eventType === 'Workshop') {
+            console.log('Navigating to WorkshopDetails:', eventId);
+            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+        } else {
+            console.log('Navigating to Home');
+            navigationRef.current.navigate('Home'); // Default screen
+        }
+    } else {
+        console.error('Navigation reference is not available');
+    }
+};
 AppRegistry.registerComponent(appName, () => App);

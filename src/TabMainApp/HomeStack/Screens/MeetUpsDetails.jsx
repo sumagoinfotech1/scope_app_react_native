@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, Platform, ScrollView, Alert ,TouchableOpacity, Share} from "react-native";
+import { View, Text, Image, StyleSheet, Platform, ScrollView, Alert, TouchableOpacity, Share } from "react-native";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Colors from "../../../ReusableComponents/Colors";
 import GradientContainer from "../../../ReusableComponents/GradientContainer";
@@ -22,8 +22,8 @@ const MeetUpsDetails = ({ navigation, route }) => {
     const [loading, setLoading] = useState(false);
     const [heading, setHeading] = useState();
     const [isconfiremmodal, setCinfirmModal] = useState(false);
-        const [referralCode, setReferralCode] = useState("");
-         const [errorOccured, setErrorOccured] = useState(false);
+    const [referralCode, setReferralCode] = useState("");
+    const [errorOccured, setErrorOccured] = useState(false);
     // const [verificationmodal, setverificationmodal] = useState(false);
     const [userId, setUserId] = useState('')
     console.log('referralCode', id);
@@ -44,6 +44,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
 
 
     const getEventsDetails = async () => {
+        
         try {
             setLoading(true);
             // console.log('Fetching Events...');
@@ -261,15 +262,15 @@ const MeetUpsDetails = ({ navigation, route }) => {
     const registerForEvent = async () => {
         try {
             setLoading(true);
-    
+
             // API request to register for the event
             const response = await api.post('event-registration/register', {
                 userId: userId,
                 eventId: id,
             });
-    
+
             console.log("API Response:", response);
-    
+
             if (response.data?.result === true) {
                 showToast('success', 'Success', response.data?.message);
                 setCinfirmModal(false);
@@ -283,9 +284,9 @@ const MeetUpsDetails = ({ navigation, route }) => {
             }
         } catch (error) {
             console.error('Error registering for event:', error);
-    
+
             let errorMsg = 'Something went wrong. Please try again.';
-            
+
             if (error.response) {
                 if (error.response.status === 400 && error.response.data?.result === false) {
                     errorMsg = error.response.data?.message || 'Registration failed';
@@ -297,141 +298,141 @@ const MeetUpsDetails = ({ navigation, route }) => {
             } else if (error.message) {
                 errorMsg = error.message;
             }
-    
+
             showToast('error', 'Error', errorMsg);
         } finally {
             setLoading(false);
         }
     };
-    
+
 
 
     useEffect(() => {
         const fetchUserIdAndCreateReferral = async () => {
-          try {
-            const storedUserId = await AsyncStorage.getItem('User_id');
-            if (storedUserId) {
-              handleCreateReferral(storedUserId);
-            //   setUserid(storedUserId)
-            } else {
-              showToast('error', 'User ID Missing', 'No user ID found in storage');
+            try {
+                const storedUserId = await AsyncStorage.getItem('User_id');
+                if (storedUserId) {
+                    handleCreateReferral(storedUserId);
+                    //   setUserid(storedUserId)
+                } else {
+                    showToast('error', 'User ID Missing', 'No user ID found in storage');
+                }
+            } catch (error) {
+                console.error('Error fetching user ID:', error);
             }
-          } catch (error) {
-            console.error('Error fetching user ID:', error);
-          }
         };
-    
+
         fetchUserIdAndCreateReferral();
-      }, []);
-      const handleCreateReferral = async (userId) => {
+    }, []);
+    const handleCreateReferral = async (userId) => {
         setErrorOccured(false);
         setLoading(true);
-    
+
         try {
-          const response = await api.post(`user-referral/create/${userId}`);
-    
-          console.log("Response:", response.data);
-    
-          if (response.data.result === true) {
-            // showToast('success', 'Referral Created', 'Referral created successfully');
-            setReferralCode(response.data.data.referral_code)
-          } else {
+            const response = await api.post(`user-referral/create/${userId}`);
+
+            console.log("Response:", response.data);
+
+            if (response.data.result === true) {
+                // showToast('success', 'Referral Created', 'Referral created successfully');
+                setReferralCode(response.data.data.referral_code)
+            } else {
+                setErrorOccured(true);
+                setError(response.data.message || "Failed to create referral");
+                showToast('error', 'Referral Failed', response.data.message || "Failed to create referral");
+            }
+        } catch (error) {
             setErrorOccured(true);
-            setError(response.data.message || "Failed to create referral");
-            showToast('error', 'Referral Failed', response.data.message || "Failed to create referral");
-          }
-        } catch (error) {
-          setErrorOccured(true);
-    
-          if (error.response) {
-            console.log("Error Response:", error.response);
-    
-            if (error.response.status === 400 && error.response.data.result===false) {
-                fetchUserReferral(userId)
-            
+
+            if (error.response) {
+                console.log("Error Response:", error.response);
+
+                if (error.response.status === 400 && error.response.data.result === false) {
+                    fetchUserReferral(userId)
+
+                } else {
+                    setError(error.response.data?.message || "Error creating referral");
+                    showToast('error', 'Error', error.response.data?.message || "Error creating referral");
+                }
             } else {
-              setError(error.response.data?.message || "Error creating referral");
-              showToast('error', 'Error', error.response.data?.message || "Error creating referral");
+                setError("Network error. Please check your connection.");
+                showToast('error', 'Network Error', "Please check your internet connection.");
             }
-          } else {
-            setError("Network error. Please check your connection.");
-            showToast('error', 'Network Error', "Please check your internet connection.");
-          }
         }
-    
+
         setLoading(false);
-      };
-      const fetchUserReferral = async (userId) => {
- 
+    };
+    const fetchUserReferral = async (userId) => {
+
         try {
-         
-      
-          const response = await api.get(`user-referral/user?id=${userId}`);
-      
-          console.log("ResponseFetch:", response.data.data[0].referral_code);
-      
-          if (response.status === 200) {
-            // showToast('success', 'Referral Data Loaded', 'Referral details retrieved successfully');
-            setReferralCode(response.data.data[0].referral_code) 
-            return response.data;
-          } else {
-            showToast('error', 'Error', 'Failed to fetch referral data');
-            return null;
-          }
-        } catch (error) {
-          if (error.response) {
-            console.log("Error Responseee:", error.response);
-      
-            if (error.response.status === 400) {
-              showToast('error', 'Bad Request', "Invalid request. Please check your data.");
+
+
+            const response = await api.get(`user-referral/user?id=${userId}`);
+
+            console.log("ResponseFetch:", response.data.data[0].referral_code);
+
+            if (response.status === 200) {
+                // showToast('success', 'Referral Data Loaded', 'Referral details retrieved successfully');
+                setReferralCode(response.data.data[0].referral_code)
+                return response.data;
             } else {
-              showToast('error', 'Error', error.response.data?.message || "Error fetching referral data");
+                showToast('error', 'Error', 'Failed to fetch referral data');
+                return null;
             }
-          } else {
-            showToast('error', 'Network Error', "Please check your internet connection.");
-          }
-          return null;
-        }
-      };
-   const shareReferralLink = async () => {
-        try {
-     
-        //   // Construct the referral link dynamically
-        //   const referralLink = `https://yourapp.com/signup?referralCode=${userId}`;
-        const referralLink = `https://website.sumagotraining.in/`;
-          // Share the referral message
-          const result = await Share.share({
-            message: `🚀 Join our amazing app and earn rewards! 🎉\n\nUse my referral code: *${referralCode}* to sign up.\n\nClick here to join: ${referralLink}`,
-          });
-      
-          if (result.action === Share.sharedAction) {
-            showToast('success', 'Shared Successfully', 'Your referral link has been shared.');
-          } else if (result.action === Share.dismissedAction) {
-            showToast('info', 'Share Cancelled', 'You cancelled sharing.');
-          }
         } catch (error) {
-          console.error("Error sharing referral link:", error);
-          showToast('error', 'Error', 'Failed to share referral link.');
+            if (error.response) {
+                console.log("Error Responseee:", error.response);
+
+                if (error.response.status === 400) {
+                    showToast('error', 'Bad Request', "Invalid request. Please check your data.");
+                } else {
+                    showToast('error', 'Error', error.response.data?.message || "Error fetching referral data");
+                }
+            } else {
+                showToast('error', 'Network Error', "Please check your internet connection.");
+            }
+            return null;
         }
-      };
-      const formatDate = (dateString) => {
+    };
+    const shareReferralLink = async () => {
+        try {
+
+            //   // Construct the referral link dynamically
+            //   const referralLink = `https://yourapp.com/signup?referralCode=${userId}`;
+            const referralLink = `https://website.sumagotraining.in/`;
+            // Share the referral message
+            const result = await Share.share({
+                message: `🚀 Join our amazing app and earn rewards! 🎉\n\nUse my referral code: *${referralCode}* to sign up.\n\nClick here to join: ${referralLink}`,
+            });
+
+            if (result.action === Share.sharedAction) {
+                showToast('success', 'Shared Successfully', 'Your referral link has been shared.');
+            } else if (result.action === Share.dismissedAction) {
+                showToast('info', 'Share Cancelled', 'You cancelled sharing.');
+            }
+        } catch (error) {
+            console.error("Error sharing referral link:", error);
+            showToast('error', 'Error', 'Failed to share referral link.');
+        }
+    };
+    const formatDate = (dateString) => {
         const months = [
-          "Jan", "Feb", "March", "April", "May", "June",
-          "July", "Aug", "Sept", "Oct", "Nov", "Dec"
+            "Jan", "Feb", "March", "April", "May", "June",
+            "July", "Aug", "Sept", "Oct", "Nov", "Dec"
         ];
-      
+
         const date = new Date(dateString);
         const day = String(date.getDate()).padStart(2, '0');
         const month = months[date.getMonth()];
         const year = String(date.getFullYear()).slice(-2);
-      
+
         return `${day}-${month}-${year}`;
-      };
+    };
 
     return (
 
         <GradientContainer colors={["#000", "#FFFF"]} style={styles.container}>
-            <ScrollView>
+            <ScrollView style={{ flex: 1 }}>
                 <View style={{ marginVertical: hp('1') }}>
                     <MainAppScreenHeader headername={heading} />
                 </View>
@@ -446,12 +447,15 @@ const MeetUpsDetails = ({ navigation, route }) => {
                         <Text style={styles.advancedText}>ADVANCED</Text>
                         <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{details.title}</Text>
                         <View style={styles.infoRow}>
-                                    <Text style={styles.date}>{formatDate(details.from_date)}</Text>
-                                    <MaterialIcons name="access-time" size={20} color="black" />
-                                    <Text style={styles.time}>{details.from_time}</Text>
-                                  </View>
+                            <Text style={styles.date}>{formatDate(details.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(details.to_date)}</Text>
+                           
+                        </View>
+                           <View style={styles.infoRow}>
+                                  <MaterialIcons name="access-time" size={16} color="black" />
+                                  <Text style={styles.time}>{details.from_time} <Text style={{ color: '#000' }}>To</Text> {details.to_time}</Text>
+                                </View>
                         <Text style={styles.description}>{details.description}</Text>
-                         
+
                     </View>
                 </View>
 
@@ -480,15 +484,15 @@ const MeetUpsDetails = ({ navigation, route }) => {
                         />
                     </View>
                 </View>
-                <View style={{alignItems:"flex-end",justifyContent:"flex-end"}}>
-               
+                <View style={{ alignItems: "flex-end", justifyContent: "flex-end" }}>
+
                     <ImageCard
                         imageUrl={require('../../../assets/icons/share.png')}
                     />
 
-                    <TouchableOpacity style={styles.yesButton} onPress={()=>shareReferralLink()} >
-                                 <Text style={styles.yesButtonText}>Invite</Text>
-                               </TouchableOpacity>
+                    <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()} >
+                        <Text style={styles.yesButtonText}>Invite</Text>
+                    </TouchableOpacity>
 
                 </View>
 
@@ -566,7 +570,7 @@ const styles = StyleSheet.create({
     description: {
         fontSize: wp("4%"),
         color: "#555",
-        marginTop:wp('2')
+        marginTop: wp('2')
     },
     cardTitle: {
         fontSize: wp("4.5%"),
@@ -596,33 +600,33 @@ const styles = StyleSheet.create({
         paddingVertical: hp("1%"),
         borderRadius: wp("2%"),
         alignItems: "center",
-        position:"absolute",
-        right:wp('5'),
-        bottom:wp('7'),
-      },
-      yesButtonText: {
+        position: "absolute",
+        right: wp('5'),
+        bottom: wp('7'),
+    },
+    yesButtonText: {
         fontSize: wp("4%"),
         fontWeight: "bold",
         color: "#000",
         // padding:wp('0.3'),
-        paddingHorizontal:wp('6')
-      },
-      infoRow: {
+        paddingHorizontal: wp('6')
+    },
+    infoRow: {
         flexDirection: 'row',
         alignItems: 'center',
-        // marginVertical: wp("1%"),
+        marginTop: wp("1%"),
         elevation: 3,
-      },
-      date: {
+    },
+    date: {
         color: 'red',
         fontWeight: 'bold',
         marginRight: wp("2%"),
         fontSize: wp('4'),
-      },
-      time: {
+    },
+    time: {
         marginLeft: wp("1%"),
         fontSize: wp('3.5'),
-      },
+    },
 });
 
 export default MeetUpsDetails;

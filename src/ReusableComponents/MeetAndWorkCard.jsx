@@ -13,62 +13,63 @@ const MeetAndWorkCard = ({ item, onpress }) => {
       "Jan", "Feb", "March", "April", "May", "June",
       "July", "Aug", "Sept", "Oct", "Nov", "Dec"
     ];
-  
+
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
-  
+
     return `${day}-${month}-${year}`;
   };
-  console.log('itemitem',item);
-  
+  console.log('itemitem', item);
+
   return (
     <View style={styles.card}>
-    <TouchableOpacity  onPress={onpress}>
-      {/* Header Section */}
-      <View style={styles.header}>
-        <Image source={{ uri: item.image }} style={styles.headerImage} />
-      </View>
-      <View style={{ paddingHorizontal: wp('3') }}>
-        {/* Content Section */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
-          {item.title}
-        </Text>
-
-        {/* Date and Time */}
-        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <View style={styles.infoRow}>
-            <Text style={styles.date}>{formatDate(item.from_date)}</Text>
-            <MaterialIcons name="access-time" size={22} color="black" />
-            <Text style={styles.time}>{item.from_time}</Text>
-          </View>
-          {item.paid_or_free === 'Paid' ? <View>
-            <Text style={styles.pricetag}>₹{item.early_bird_price|| 0}</Text>
-          </View> : null}
-
+      <TouchableOpacity onPress={onpress}>
+        {/* Header Section */}
+        <View style={styles.header}>
+          <Image source={{ uri: item.image }} style={styles.headerImage} />
         </View>
-
-        {/* Location and Register Button */}
-        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <View style={styles.locationContainer}>
-            <FontAwesome name="map-marker" size={16} color="black" />
-            {item.paid_or_free === 'Paid' ?
-            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
-            {item.max_attendees} Members Joined
+        <View style={{ paddingHorizontal: wp('3') }}>
+          {/* Content Section */}
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">
+            {item.title}
           </Text>
-            :<Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
-            {item.location}
-          </Text>}
-            
+
+          {/* Date and Time */}
+          <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+            <View style={styles.infoRow}>
+              <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+            </View>
+            {item.paid_or_free === 'Paid' ? <View>
+              <Text style={styles.pricetag}>₹{item.early_bird_price || 0}</Text>
+            </View> : null}
+
+          </View>
+          <View style={styles.infoRow}>
+            <MaterialIcons name="access-time" size={22} color="black" />
+            <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+          </View>
+          {/* Location and Register Button */}
+          <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+            <View style={styles.locationContainer}>
+              <FontAwesome name="map-marker" size={16} color="black" />
+              {item.paid_or_free === 'Paid' ?
+                <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
+                  {item.max_attendees} Members Joined
+                </Text>
+                : <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">
+                  {item.location}
+                </Text>}
+
+            </View>
+
           </View>
 
+
+
         </View>
-
-
-
-      </View>
-    </TouchableOpacity>
+      </TouchableOpacity>
 
       <CustomButton
         title="Register"
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    // marginVertical: wp("1%"),
+    marginTop: wp("1%"),
     elevation: 3,
   },
   date: {
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
     width: wp("60%"),
     alignItems: 'center',
     paddingHorizontal: wp('3'),
-    marginBottom:wp('1.7')
+    marginBottom: wp('1.7')
   },
   location: {
     marginLeft: wp("2%"),

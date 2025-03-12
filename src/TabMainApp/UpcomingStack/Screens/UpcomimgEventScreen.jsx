@@ -16,25 +16,26 @@ import { useIsFocused } from "@react-navigation/native";
 
 const MeetupCard = ({ item, onPress }) => {
 
+
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
-  
+
     return () => clearInterval(timer);
   }, [eventStartTime]); // Add dependency
-  
-  
+
+
   const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
-  
+
   const calculateTimeLeft = () => {
     const now = new Date();
     const timeDiff = eventStartTime - now;
-  
+
     if (timeDiff <= 0) {
       return { days: 0, hours: 0, minutes: 0, seconds: 0, eventStarted: true };
     }
-  
+
     return {
       days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
       hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
@@ -43,22 +44,22 @@ const MeetupCard = ({ item, onPress }) => {
       eventStarted: false
     };
   };
-  
+
   const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
   const formatDate = (dateString) => {
     const months = [
       "Jan", "Feb", "March", "April", "May", "June",
       "July", "Aug", "Sept", "Oct", "Nov", "Dec"
     ];
-  
+
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
-  
+
     return `${day}-${month}-${year}`;
   };
-  
+
 
   const openGoogleMaps = (url) => {
 
@@ -71,12 +72,19 @@ const MeetupCard = ({ item, onPress }) => {
   return (
     <TouchableOpacity style={styles.card} onPress={() => onPress(item)}>
       <Image source={{ uri: item.event_event_image }} style={styles.headerImage} />
-      <View style={{ padding: wp('3%'),backgroundColor:'#ffff' }}>
+      <View style={{ padding: wp('3%'), backgroundColor: '#ffff' }}>
         <Text style={styles.title}>{item.event_title}</Text>
         <View style={styles.infoRow}>
-          <Text style={styles.date}>{formatDate(item.event_from_date)}</Text>
-          <MaterialIcons name="access-time" size={22} color="black" />
-          <Text style={styles.time}>{item.event_from_time}</Text>
+          {/* <Text style={styles.date}>{formatDate(item.event_from_date)}</Text> */}
+          <Text style={styles.date}>{formatDate(item.event_from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.event_to_date)}</Text>
+          
+          {item.event_paid_or_free === 'Paid' ? <View>
+          <Text style={styles.pricetag} numberOfLines={1} ellipsizeMode="tail">₹{item.early_bird_price || 0}</Text>
+        </View> : null}
+        </View>
+        <View style={styles.infoRow}>
+        <MaterialIcons name="access-time" size={22} color="black" />
+        <Text style={styles.time}>{item.event_from_time} <Text style={{ color: '#000' }}>To</Text> {item.event_to_time}</Text>
         </View>
         <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.1'), borderRadius: wp('4'), width: wp("60"), marginVertical: wp('1.5') }]}>
           <FontAwesome name="map-marker" size={16} color="black" />
@@ -94,38 +102,38 @@ const MeetupCard = ({ item, onPress }) => {
             </View>
 
           </View>
-          {item.event_mode_of_event=='online'? <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
+          {item.event_mode_of_event == 'online' ? <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
             <View style={{ left: wp('5'), zIndex: 100 }}>
               <FontAwesome name="video-camera" size={24} color="#fff" />
             </View>
-          
+
             <View>
               <CustomButton
                 title="Join"
                 align="right"
-                onPress={()=>openMeeting(item.event_meeting_Link)}
+                onPress={() => openMeeting(item.event_meeting_Link)}
                 style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('20%') }}
 
               />
             </View>
 
-          </View>: <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
+          </View> : <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
             <View style={{ left: wp('5'), zIndex: 100 }}>
               <FontAwesome name="map" size={24} color="#fff" />
             </View>
-          
+
             <View>
               <CustomButton
                 title="Direction"
                 align="right"
-                onPress={()=>openGoogleMaps(item.event_google_map_link)}
+                onPress={() => openGoogleMaps(item.event_google_map_link)}
                 style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('28%') }}
 
               />
             </View>
 
           </View>}
-         
+
         </View>
       </View>
     </TouchableOpacity>
@@ -137,6 +145,8 @@ const UpcomimgEventScreen = () => {
   const [eventRegistration, setEventRegistration] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  console.log('gggg', eventRegistration);
+
   const getEventRegistration = async () => {
     try {
       setLoading(true);
@@ -154,8 +164,8 @@ const UpcomimgEventScreen = () => {
 
       if (response.status === 200 && response.data?.result) {
         setEventRegistration(response.data.data); // Store data in state
-        console.log('setEventRegistration',response.data.data);
-        
+        console.log('setEventRegistration', response.data.data);
+
       } else {
         showToast("error", response.data?.message || "No event registrations found");
         throw new Error(response.data?.message || "No event registrations found");
@@ -176,26 +186,26 @@ const UpcomimgEventScreen = () => {
   };
   // const getEventRegistration = async (currentPage = 1) => {
   //   if (!hasMore && currentPage !== 1) return;
-  
+
   //   try {
   //     setLoading(true);
   //     setError(null);
-  
+
   //     // Get user ID from AsyncStorage
   //     const userId = await AsyncStorage.getItem("User_id");
   //     if (!userId) throw new Error("User ID not found");
-  
+
   //     // API request with pagination
   //     const response = await api.get(`event-registration/user?id=${userId}&page=${currentPage}&pageSize=10`);
-  
+
   //     if (response.status === 200 && response.data?.result) {
   //       const newEvents = response.data.data || [];
   //       const pagination = response.data.pagination;
-  
+
   //       setEventRegistration((prev) =>
   //         currentPage === 1 ? newEvents : [...prev, ...newEvents]
   //       );
-  
+
   //       setHasMore(pagination.currentPage < pagination.totalPages);
   //       setPage(pagination.currentPage + 1);
   // setLoading(false);
@@ -212,7 +222,7 @@ const UpcomimgEventScreen = () => {
   //     setLoading(false);
   //   }
   // };
-  
+
   useEffect(() => {
     if (isFocused) {
       getEventRegistration();
@@ -222,7 +232,7 @@ const UpcomimgEventScreen = () => {
     console.log("Pressed item:", item);
   };
 
-  
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -233,7 +243,7 @@ const UpcomimgEventScreen = () => {
         )}
         showsVerticalScrollIndicator={false}
       />
-       <Loader visible={loading} />
+      <Loader visible={loading} />
     </View>
   );
 };
@@ -254,9 +264,9 @@ const styles = StyleSheet.create({
     // shadowRadius: 10,
     // shadowOffset: { width: 0, height: 5 },
     elevation: 10,
-    padding:wp('1'),
-    alignItems:"center",
-   
+    padding: wp('1'),
+    alignItems: "center",
+
 
     marginTop: Platform.OS === 'ios' ? wp('10%') : wp("3%"),
     margin: wp("1%"),
@@ -320,7 +330,8 @@ const styles = StyleSheet.create({
   pricetag: {
     fontSize: wp('7%'),
     fontWeight: 'bold',
-    color: "red"
+    color: "red",
+    width: wp('25%'),
   },
   location: {
     marginLeft: wp("1%"),

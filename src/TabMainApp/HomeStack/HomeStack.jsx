@@ -2,8 +2,7 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import Home from './Screens/Home';
-import WorkShopScreen from './Screens/WorkShopScreen';
-import WorkShopDetails from './Screens/WorkShopDetails';
+
 import MeetUpsDetails from './Screens/MeetUpsDetails';
 import MeetUpsScreen from './Screens/MeetUpsScreen';
 import RewardsScreen from './Screens/RewardsScreen';

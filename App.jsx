@@ -296,7 +296,54 @@ const App = () => {
     useEffect(() => {
         setTimeout(() => SplashScreen.hide(), 3000);
     }, []);
+// const handleNotificationNavigation = (remoteMessage) => {
+//     if (!remoteMessage?.data) return;
 
+//     const { eventId, eventType } = remoteMessage.data;
+    
+//     console.log('Received Notification:', remoteMessage.data);
+
+//     if (navigationRef.current) {
+//         if (eventType === 'Meetups') {
+//             console.log('Navigating to MeetUpsDetails:', eventId);
+//             navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+//         } else if (eventType === 'Workshop') {
+//             console.log('Navigating to WorkshopDetails:', eventId);
+//             navigationRef.current.navigate('WorkshopDetails', { id: eventId });
+
+//         } else {
+//             console.log('Navigating to Home');
+//             navigationRef.current.navigate('Home'); // Default screen
+//         }
+//     } else {
+//         console.error('Navigation reference is not available');
+//     }
+// };
+const handleNotificationNavigation = (remoteMessage) => {
+    if (!remoteMessage?.data) return;
+
+    const { eventId, eventType } = remoteMessage.data;
+    
+    console.log('Received Notification:', remoteMessage.data);
+
+    if (navigationRef.current) {
+        if (eventType === 'Meetups') {
+            console.log('Navigating to MeetUpsDetails:', eventId);
+            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+        } else if (eventType === 'Workshop') {
+            console.log('Navigating to WorkshopDetails:', eventId);
+            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+
+        } else {
+            console.log('Navigating to Home');
+            navigationRef.current.navigate('Home'); // Default screen
+        }
+    } else {
+        console.error('Navigation reference is not available');
+    }
+};
     useEffect(() => {
         const checkUserConfig = async () => {
             try {
@@ -349,6 +396,8 @@ const App = () => {
 
         const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
             console.log("Foreground Notification:", remoteMessage);
+            if(remoteMessage?.data){handleNotificationNavigation(remoteMessage);}
+            // handleNotificationNavigation(remoteMessage);
             PushNotification.localNotification({
                 channelId: "default-channel",
                 title: remoteMessage.data?.title,

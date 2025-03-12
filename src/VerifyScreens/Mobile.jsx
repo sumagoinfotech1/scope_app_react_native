@@ -589,7 +589,8 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    marginVertical: hp('1')
+    marginVertical: hp('1'),
+    color:'#000'
   },
 
   otpContainer: { flexDirection: "row", justifyContent: "center", marginBottom: hp("2%") },
@@ -604,6 +605,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginHorizontal: wp("2%"),
     backgroundColor: Colors.white,
+     color:'#000'
   },
 
   carouselImage: {

@@ -379,7 +379,7 @@ const Home = ({ navigation }) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
   const [slider, setSlider] = useState([]);
-  // console.log('eventsss',events);
+  // console.log('api',events[0].events);
 
   const getEvents = async () => {
     try {
@@ -391,7 +391,7 @@ const Home = ({ navigation }) => {
 
       if (response.status === 200 && response.data?.result) {
         setEvents(response.data.data); // Store data in state
-        console.log('data 13', response.data.data);
+        // console.log('data 13', response.data.data);
 
       } else {
         showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
@@ -457,7 +457,7 @@ const Home = ({ navigation }) => {
 
   const renderItem = ({ item }) => (
     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
+      <Image source={{ uri: item.image }} style={{ width: wp("93%"), height: hp("24%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
     </View>
   );
 
@@ -471,12 +471,12 @@ const Home = ({ navigation }) => {
       "Jan", "Feb", "March", "April", "May", "June",
       "July", "Aug", "Sept", "Oct", "Nov", "Dec"
     ];
-  
+
     const date = new Date(dateString);
     const day = String(date.getDate()).padStart(2, '0');
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
-  
+
     return `${day}-${month}-${year}`;
   };
   const MeetupCard = ({ item }) => {
@@ -492,11 +492,13 @@ const Home = ({ navigation }) => {
 
         {/* Date and Time */}
         <View style={styles.infoRow}>
-          <Text style={styles.date}>{formatDate(item.from_date)}</Text>
-          <MaterialIcons name="access-time" size={16} color="black" />
-          <Text style={styles.time}>{item.from_time}</Text>
+          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
         </View>
-
+        <View style={styles.infoRow}>
+          <MaterialIcons name="access-time" size={16} color="black" />
+          <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+        </View>
         {/* Location */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
@@ -537,7 +539,15 @@ const Home = ({ navigation }) => {
             ₹ {item.initial_price || 0}
           </Text>
         </View>
-
+        {/* Date and Time */}
+        <View style={styles.infoRow}>
+          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
+        </View>
+        <View style={styles.infoRow}>
+          <MaterialIcons name="access-time" size={16} color="black" />
+          <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+        </View>
         {/* Location */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
@@ -560,7 +570,7 @@ const Home = ({ navigation }) => {
 
   return (
     <GradientContainer style={styles.maincontainer}>
-      <ScrollView nestedScrollEnabled={true}>
+      <ScrollView nestedScrollEnabled={true} style={{ flex: 1 }}>
         <View style={{ position: 'static', }}>
           <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RewardsScreen')}>
             <Image source={require('../../../assets/icons/Maskgroup.png')} style={styles.icon} />
@@ -570,7 +580,7 @@ const Home = ({ navigation }) => {
           <ScreenHeader headername={"EVENTS"} />
         </View>
         <View style={styles.bannerContainer}>
-          <CarouselComponent data={slider} renderItem={renderItem} />
+          <CarouselComponent data={slider} renderItem={renderItem} height ={ hp("28%")} />
         </View>
         <FlatList
           data={events}
@@ -596,23 +606,25 @@ const Home = ({ navigation }) => {
                 removeClippedSubviews={true}
               />
               {/* "See More" button appears once per item */}
-              <View style={{flexDirection:'row',alignItems:"center",justifyContent:"flex-end", marginRight: wp('2'),}}>
-              <CustomButton
-                title="See More "
-                align="right"
-                onPress={() => gotoMeetup(item.id)}
-                style={{
-                 
-                  marginBottom: wp('1'),
-                  alignSelf: 'flex-end', // Align button to the right
-                  paddingRight:-wp('5')
-                }}
-                textstyle={{color:'#000',fontSize:wp('4.5')}}
-              />
-               <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
-            </View>
+              <View style={{ flexDirection: 'row', alignItems: "center", justifyContent: "flex-end", marginRight: wp('2'), }}>
+                <CustomButton
+                  title="See More "
+                  align="right"
+                  onPress={() => gotoMeetup(item.id)}
+                  style={{
+
+                    marginBottom: wp('1'),
+                    alignSelf: 'flex-end', // Align button to the right
+                    paddingRight: -wp('5')
+                  }}
+                  textstyle={{ color: '#000', fontSize: wp('4.5') }}
+                />
+                <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+              </View>
             </View>
           )}
+          nestedScrollEnabled={true}
+          scrollEnabled={false}
         />
 
         <ScreenHeader headername={"EARN REWARDS"} />
@@ -630,7 +642,7 @@ const Home = ({ navigation }) => {
     </GradientContainer>
   )
 }
- 
+
 export default memo(Home)
 
 const styles = StyleSheet.create({
@@ -667,8 +679,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerImage: {
-    width: wp("95%"),
-    height: hp("14%"),
+    width: wp("94%"),
+    height: hp("17%"),
     resizeMode: 'contain',
     borderRadius: wp("2%"),
   },
@@ -683,7 +695,7 @@ const styles = StyleSheet.create({
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: wp("1%"),
+    marginTop: wp("1%"),
     // elevation: 3
   },
   date: {
