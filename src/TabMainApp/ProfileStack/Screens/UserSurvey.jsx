@@ -384,6 +384,7 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { showToast } from '../../../utils/toastService';
 const surveyData = {
     "types": {
         "category": [
@@ -509,6 +510,7 @@ const UserSurvey = ({ navigation, route }) => {
     const [questions, setQuestions] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [UserId, setUserId] = useState(null);
     const isFocused = useIsFocused();
 console.log('responsesresponses',responses);
 
@@ -531,8 +533,9 @@ console.log('responsesresponses',responses);
         setLoading(true);
         setError(null);
         try {
-            const accessToken = await AsyncStorage.getItem("accessToken");
-            if (!accessToken) throw new Error("Authentication token not found");
+            const User_id = await AsyncStorage.getItem("User_id");
+           console.log(User_id,"hgh");
+           setUserId(User_id)
 
             const response = await api.get("survey/getAllQuestionsWithAnswers");
             if (response.data.result) {
@@ -548,11 +551,7 @@ console.log('responsesresponses',responses);
         }
     };
 
-    // const handleSelectAnswer = (question_id, item) => {
-    //     console.log('raviansersss',question_id,item);
-        
-    //     setSelectedAnswer(item);
-    // };
+
     const handleSelectAnswer = (question_id, item) => {
         console.log('Selected Answer:', item);
         setSelectedAnswer(item);
@@ -580,7 +579,9 @@ console.log('responsesresponses',responses);
             setCurrentQuestion(nextQuestion);
             setSelectedAnswer(null);
         } else {
+            handleSubmitSurvey()
             console.log("Survey Completed", "Thank you for completing the survey.");
+            setCurrentQuestion(null);
         }
     };
 
@@ -594,6 +595,47 @@ console.log('responsesresponses',responses);
             navigation.goBack();
         }
     };
+
+    const handleSubmitSurvey = async () => {
+        setLoading(true);
+        // setErrorOccure(false);
+      
+        try {
+          console.log('Survey Payload:', { UserId, responses });
+      
+          // Make API Request
+          const response = await api.post(
+            'survey/create',
+            {
+              user_id: UserId,
+              responses,
+            }
+          );
+      
+          if (response.status === 200 && response.data?.result) {
+            showToast('success', 'Success', response.data?.message || 'Survey submission Completed');
+            navigation.replace('ProfileScreen'); // Change this to the appropriate screen
+          } else {
+            showToast('error', 'Error', response.data?.message || 'Survey submission failed');
+            throw new Error(response.data?.message || 'Survey submission failed');
+          }
+        } catch (error) {
+          console.error('Error in handleSubmitSurvey:', error);
+      
+          let errorMsg = 'Something went wrong. Please try again.';
+          if (error.response) {
+            errorMsg = error.response.data?.message || errorMsg;
+          } else if (error.message) {
+            errorMsg = error.message;
+          }
+      
+        //   setErrorOccure(true);
+          setError(errorMsg);
+        } finally {
+          setLoading(false);
+        }
+      };
+      
 
     return (
         <View style={styles.container}>
@@ -656,16 +698,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#F7F7F7'
     },
 
-    // Header
-    // header: {
-    //     width: wp('100%'),
-    //     height: hp('10%'),
-    //     backgroundColor: '#000',
-    //     flexDirection: 'row',
-    //     alignItems: 'center',
-    //     justifyContent: 'center',
-    //     paddingHorizontal: 15
-    // },
+  
     header: {
         backgroundColor: '#020202',
         // height: hp('20%'),

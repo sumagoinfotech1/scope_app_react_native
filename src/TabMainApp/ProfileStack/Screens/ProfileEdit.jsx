@@ -21,7 +21,7 @@ const ProfileEdit = ({ navigation, route }) => {
     const [isEditingEmail, setIsEditingEmail] = useState(false);
     const [isEditingName, setIsEditingName] = useState(false);
     const [selected, setSelected] = useState(null);
-    console.log('profileDataww', profileData);
+    // console.log('profileDataww', profileData);
 
     const updateUser = async (field) => {
         setLoading(true);

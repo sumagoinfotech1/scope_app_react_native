@@ -25,7 +25,7 @@ const ProfileScreen = ({ navigation }) => {
     const [UserId, setUser] = useState('');
     const [profileData, setProfileData] = useState({});
       const [error, setError] = useState(null);
-    console.log('profileData', profileData);
+    // console.log('profileData', profileData);
 
     const [loading, setLoading] = useState(false); // Show loader while API fetches
     const user = {
