@@ -366,6 +366,8 @@ import { showToast } from '../../../utils/toastService';
 import Loader from '../../../ReusableComponents/Loader';
 import { useIsFocused } from "@react-navigation/native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import { formatTime } from '../../../utils/timeUtils';
+
 const data = [
   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
@@ -497,7 +499,7 @@ const Home = ({ navigation }) => {
         </View>
         <View style={styles.infoRow}>
           <MaterialIcons name="access-time" size={16} color="black" />
-          <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+          <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
         </View>
         {/* Location */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
@@ -531,7 +533,12 @@ const Home = ({ navigation }) => {
         {/* Content Section */}
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
 
+     
         {/* Date and Time */}
+        <View style={[styles.infoRow,{justifyContent:"space-between"}]}>
+          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
+             {/* Date and Time */}
         <View style={styles.infoRow}>
           <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
           <MaterialIcons name="local-offer" size={16} color="black" />
@@ -539,14 +546,10 @@ const Home = ({ navigation }) => {
             ₹ {item.initial_price || 0}
           </Text>
         </View>
-        {/* Date and Time */}
-        <View style={styles.infoRow}>
-          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
-          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
         </View>
         <View style={styles.infoRow}>
           <MaterialIcons name="access-time" size={16} color="black" />
-          <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+          <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
         </View>
         {/* Location */}
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
@@ -662,6 +665,7 @@ const styles = StyleSheet.create({
 
   card: {
     width: wp("94%"),
+    // height: wp("80%"),
     backgroundColor: '#fff',
     borderRadius: wp("2%"),
     padding: wp("1.9%"),

@@ -6,6 +6,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Colors from './Colors';
+import { formatTime } from '../utils/timeUtils';
 
 const MeetAndWorkCard = ({ item, onpress }) => {
   const formatDate = (dateString) => {
@@ -48,7 +49,7 @@ const MeetAndWorkCard = ({ item, onpress }) => {
           </View>
           <View style={styles.infoRow}>
             <MaterialIcons name="access-time" size={22} color="black" />
-            <Text style={styles.time}>{item.from_time} <Text style={{ color: '#000' }}>To</Text> {item.to_time}</Text>
+            <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
           </View>
           {/* Location and Register Button */}
           <View style={[styles.infoRow, { justifyContent: "space-between" }]}>

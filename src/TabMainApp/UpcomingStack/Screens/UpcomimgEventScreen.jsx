@@ -11,11 +11,61 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from "@react-navigation/native";
+import { formatTime } from '../../../utils/timeUtils';
 
 
 
 const MeetupCard = ({ item, onPress }) => {
+  // const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
+  // const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  // useEffect(() => {
+  //   const timer = setInterval(() => {
+  //     setTimeLeft(calculateTimeLeft());
+  //   }, 1000);
 
+  //   return () => clearInterval(timer);
+  // }, [eventStartTime]); // Add dependency
+  // const calculateTimeLeft = () => {
+  //   const now = new Date();
+  //   const timeDiff = eventStartTime - now;
+
+  //   if (timeDiff <= 0) {
+  //     return { days: 0, hours: 0, minutes: 0, seconds: 0, eventStarted: true };
+  //   }
+
+  //   return {
+  //     days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+  //     hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+  //     minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
+  //     seconds: Math.floor((timeDiff % (1000 * 60)) / 1000),
+  //     eventStarted: false
+  //   };
+  // };
+
+  //new try
+  const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
+  const eventEndTime = new Date(`${item.event_to_date}T${item.event_to_time}`);
+
+  const calculateTimeLeft = () => {
+    const now = new Date();
+
+    if (now >= eventEndTime) {
+      return { status: "Session Completed" };
+    } else if (now >= eventStartTime) {
+      return { status: "Session Ongoing" };
+    } else {
+      const timeDiff = eventStartTime - now;
+      return {
+        days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
+        hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+        minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
+        seconds: Math.floor((timeDiff % (1000 * 60)) / 1000),
+        status: "Timer Ongoing",
+      };
+    }
+  };
+
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -23,29 +73,11 @@ const MeetupCard = ({ item, onPress }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [eventStartTime]); // Add dependency
+  }, [item.event_from_date, item.event_from_time, item.event_to_date, item.event_to_time]);
+
+  // return timeLeft;
 
 
-  const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
-
-  const calculateTimeLeft = () => {
-    const now = new Date();
-    const timeDiff = eventStartTime - now;
-
-    if (timeDiff <= 0) {
-      return { days: 0, hours: 0, minutes: 0, seconds: 0, eventStarted: true };
-    }
-
-    return {
-      days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
-      hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-      minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
-      seconds: Math.floor((timeDiff % (1000 * 60)) / 1000),
-      eventStarted: false
-    };
-  };
-
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
   const formatDate = (dateString) => {
     const months = [
       "Jan", "Feb", "March", "April", "May", "June",
@@ -59,8 +91,6 @@ const MeetupCard = ({ item, onPress }) => {
 
     return `${day}-${month}-${year}`;
   };
-
-
   const openGoogleMaps = (url) => {
 
     Linking.openURL(url).catch(err => console.error("Failed to open Google Maps", err));
@@ -74,17 +104,17 @@ const MeetupCard = ({ item, onPress }) => {
       <Image source={{ uri: item.event_event_image }} style={styles.headerImage} />
       <View style={{ padding: wp('3%'), backgroundColor: '#ffff' }}>
         <Text style={styles.title}>{item.event_title}</Text>
-        <View style={styles.infoRow}>
+        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           {/* <Text style={styles.date}>{formatDate(item.event_from_date)}</Text> */}
           <Text style={styles.date}>{formatDate(item.event_from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.event_to_date)}</Text>
-          
+
           {item.event_paid_or_free === 'Paid' ? <View>
-          <Text style={styles.pricetag} numberOfLines={1} ellipsizeMode="tail">₹{item.early_bird_price || 0}</Text>
-        </View> : null}
+            <Text style={styles.pricetag} numberOfLines={1} ellipsizeMode="tail">₹{item.early_bird_price || 0}</Text>
+          </View> : null}
         </View>
         <View style={styles.infoRow}>
-        <MaterialIcons name="access-time" size={22} color="black" />
-        <Text style={styles.time}>{item.event_from_time} <Text style={{ color: '#000' }}>To</Text> {item.event_to_time}</Text>
+          <MaterialIcons name="access-time" size={22} color="black" />
+          <Text style={styles.time}>{formatTime(item.event_from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.event_to_time)}</Text>
         </View>
         <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.1'), borderRadius: wp('4'), width: wp("60"), marginVertical: wp('1.5') }]}>
           <FontAwesome name="map-marker" size={16} color="black" />
@@ -97,8 +127,16 @@ const MeetupCard = ({ item, onPress }) => {
             </View>
 
             <View>
-              <Text style={styles.text}>Starting In</Text>
-              <Text style={styles.text}>{timeLeft.days}d {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}Sec</Text>
+              {timeLeft.status === "Timer Ongoing" ? (
+                <>
+                  <Text style={styles.text}>Starting In</Text>
+                  <Text style={styles.text}>
+                    {timeLeft.days}d {timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}Sec
+                  </Text>
+                </>
+              ) : (
+                <Text style={[styles.text,{fontSize:wp('4')}]}>{timeLeft.status}</Text>
+              )}
             </View>
 
           </View>
@@ -331,7 +369,7 @@ const styles = StyleSheet.create({
     fontSize: wp('7%'),
     fontWeight: 'bold',
     color: "red",
-    width: wp('25%'),
+    // width: wp('25%'),
   },
   location: {
     marginLeft: wp("1%"),

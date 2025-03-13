@@ -14,6 +14,8 @@ import api from "../../../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import TicketModal from "../../../ReusableComponents/TicketModal";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
+import { formatTime } from "../../../utils/timeUtils"
+
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
@@ -44,7 +46,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
 
 
     const getEventsDetails = async () => {
-        
+
         try {
             setLoading(true);
             // console.log('Fetching Events...');
@@ -444,16 +446,21 @@ const MeetUpsDetails = ({ navigation, route }) => {
 
                     {/* Text Section */}
                     <View style={styles.textContainer}>
-                        <Text style={styles.advancedText}>ADVANCED</Text>
+                        <View style={[styles.infoRow, { justifyContent: 'space-between' }]}>
+                            <Text style={styles.advancedText}>ADVANCED</Text>
+
+                            {details.paid_or_free === 'Paid' ? <Text style={styles.date}>₹ {details.early_bird_price || 0}</Text> : null}
+                        </View>
+
                         <Text style={styles.title} numberOfLines={2} ellipsizeMode="tail">{details.title}</Text>
                         <View style={styles.infoRow}>
                             <Text style={styles.date}>{formatDate(details.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(details.to_date)}</Text>
-                           
+
                         </View>
-                           <View style={styles.infoRow}>
-                                  <MaterialIcons name="access-time" size={16} color="black" />
-                                  <Text style={styles.time}>{details.from_time} <Text style={{ color: '#000' }}>To</Text> {details.to_time}</Text>
-                                </View>
+                        <View style={styles.infoRow}>
+                            <MaterialIcons name="access-time" size={16} color="black" />
+                            <Text style={styles.time}>{formatTime(details.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(details.to_time)}</Text>
+                        </View>
                         <Text style={styles.description}>{details.description}</Text>
 
                     </View>
