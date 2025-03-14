@@ -296,30 +296,8 @@ const App = () => {
     useEffect(() => {
         setTimeout(() => SplashScreen.hide(), 3000);
     }, []);
-// const handleNotificationNavigation = (remoteMessage) => {
-//     if (!remoteMessage?.data) return;
 
-//     const { eventId, eventType } = remoteMessage.data;
     
-//     console.log('Received Notification:', remoteMessage.data);
-
-//     if (navigationRef.current) {
-//         if (eventType === 'Meetups') {
-//             console.log('Navigating to MeetUpsDetails:', eventId);
-//             navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
-
-//         } else if (eventType === 'Workshop') {
-//             console.log('Navigating to WorkshopDetails:', eventId);
-//             navigationRef.current.navigate('WorkshopDetails', { id: eventId });
-
-//         } else {
-//             console.log('Navigating to Home');
-//             navigationRef.current.navigate('Home'); // Default screen
-//         }
-//     } else {
-//         console.error('Navigation reference is not available');
-//     }
-// };
 const handleNotificationNavigation = (remoteMessage) => {
     if (!remoteMessage?.data) return;
 
@@ -393,20 +371,26 @@ const handleNotificationNavigation = (remoteMessage) => {
         requestUserPermission();
         getFCMToken();
         configurePushNotifications();
-
         const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
             console.log("Foreground Notification:", remoteMessage);
-            if(remoteMessage?.data){handleNotificationNavigation(remoteMessage);}
-            // handleNotificationNavigation(remoteMessage);
-            PushNotification.localNotification({
-                channelId: "default-channel",
-                title: remoteMessage.data?.title,
-                message: remoteMessage.data?.message || "You have a new message",
-                bigText: remoteMessage.data?.desc || "No description available",
-                playSound: true,
-                soundName: "default",
-            });
+        
+            // if (remoteMessage?.data) {
+            //     handleNotificationNavigation(remoteMessage);
+            // }
+        
+            // Only show local notification if Firebase didn't already show it
+            if (!remoteMessage.notification) {
+                PushNotification.localNotification({
+                    channelId: "default-channel",
+                    title: remoteMessage.data?.title || "New Notification",
+                    message: remoteMessage.data?.message || "You have a new message",
+                    bigText: remoteMessage.data?.desc || "No description available",
+                    playSound: true,
+                    soundName: "default",
+                });
+            }
         });
+        
 
         const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
             console.log("App opened from notification:", remoteMessage);

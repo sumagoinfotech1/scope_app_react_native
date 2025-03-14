@@ -35,16 +35,22 @@ import { navigationRef } from './src/utils/axiosInstance';
 // Background & Kill-State Notification Handling
 messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log("📩 Background Message:", remoteMessage);
+
+    // Prevent duplicate notifications
+    if (!remoteMessage.notification) {
+        PushNotification.localNotification({
+            channelId: "default-channel",
+            title: remoteMessage.data?.title || "New Notification",
+            message: remoteMessage.data?.message || "You have a new message",
+            bigText: remoteMessage.data?.desc || "No description available",
+            playSound: true,
+            soundName: "default",
+        });
+    }
+
     handleNotificationNavigation(remoteMessage);
-    PushNotification.localNotification({
-        channelId: "default-channel",
-        title: remoteMessage.notification?.title || "New Notification",
-        message: remoteMessage.notification?.body || "You have a new message",
-        bigText: remoteMessage.data?.desc || "No description available",
-        playSound: true,
-        soundName: "default",
-    });
 });
+
 
 
 // const handleNotificationNavigation = (remoteMessage) => {
