@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity, Platform, Linking } from 'react-native';
+import React, { useEffect, useState, useMemo, useCallback, memo } from 'react';
+import { View, FlatList, StyleSheet, Text, Image, TouchableOpacity, Platform, Linking, Alert, ActivityIndicator } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
@@ -15,46 +15,24 @@ import { formatTime } from '../../../utils/timeUtils';
 
 
 
-const MeetupCard = ({ item, onPress }) => {
-  // const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
-  // const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-  // useEffect(() => {
-  //   const timer = setInterval(() => {
-  //     setTimeLeft(calculateTimeLeft());
-  //   }, 1000);
+const MeetupCard = memo(({ item, onPress }) => {
 
-  //   return () => clearInterval(timer);
-  // }, [eventStartTime]); // Add dependency
-  // const calculateTimeLeft = () => {
-  //   const now = new Date();
-  //   const timeDiff = eventStartTime - now;
+  // ✅ Memoizing event start & end times to prevent unnecessary recalculations
+  const eventTimes = useMemo(() => ({
+    start: new Date(`${item.event_from_date}T${item.event_from_time}`),
+    end: new Date(`${item.event_to_date}T${item.event_to_time}`)
+  }), [item.event_from_date, item.event_from_time, item.event_to_date, item.event_to_time]);
 
-  //   if (timeDiff <= 0) {
-  //     return { days: 0, hours: 0, minutes: 0, seconds: 0, eventStarted: true };
-  //   }
-
-  //   return {
-  //     days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
-  //     hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-  //     minutes: Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60)),
-  //     seconds: Math.floor((timeDiff % (1000 * 60)) / 1000),
-  //     eventStarted: false
-  //   };
-  // };
-
-  //new try
-  const eventStartTime = new Date(`${item.event_from_date}T${item.event_from_time}`);
-  const eventEndTime = new Date(`${item.event_to_date}T${item.event_to_time}`);
-
-  const calculateTimeLeft = () => {
+  // ✅ Memoizing time calculation function
+  const calculateTimeLeft = useCallback(() => {
     const now = new Date();
 
-    if (now >= eventEndTime) {
+    if (now >= eventTimes.end) {
       return { status: "Session Completed" };
-    } else if (now >= eventStartTime) {
+    } else if (now >= eventTimes.start) {
       return { status: "Session Ongoing" };
     } else {
-      const timeDiff = eventStartTime - now;
+      const timeDiff = eventTimes.start - now;
       return {
         days: Math.floor(timeDiff / (1000 * 60 * 60 * 24)),
         hours: Math.floor((timeDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
@@ -63,18 +41,19 @@ const MeetupCard = ({ item, onPress }) => {
         status: "Timer Ongoing",
       };
     }
-  };
+  }, [eventTimes]);
 
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
+  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft);
 
   useEffect(() => {
+    setTimeLeft(calculateTimeLeft()); // Initialize timer immediately
+
     const timer = setInterval(() => {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [item.event_from_date, item.event_from_time, item.event_to_date, item.event_to_time]);
-
+  }, [calculateTimeLeft]);
   // return timeLeft;
 
 
@@ -103,18 +82,18 @@ const MeetupCard = ({ item, onPress }) => {
     <TouchableOpacity style={styles.card} onPress={() => onPress(item)}>
       <Image source={{ uri: item.event_event_image }} style={styles.headerImage} />
       <View style={{ padding: wp('3%'), backgroundColor: '#ffff' }}>
-        <Text style={styles.title}>{item.event_title}</Text>
+        <Text style={styles.title}>{item?.event_title}</Text>
         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           {/* <Text style={styles.date}>{formatDate(item.event_from_date)}</Text> */}
-          <Text style={styles.date}>{formatDate(item.event_from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.event_to_date)}</Text>
+          <Text style={styles.date}>{formatDate(item?.event_from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item?.event_to_date)}</Text>
 
-          {item.event_paid_or_free === 'Paid' ? <View>
+          {item?.event_paid_or_free === 'Paid' ? <View>
             <Text style={styles.pricetag} numberOfLines={1} ellipsizeMode="tail">₹{item.early_bird_price || 0}</Text>
           </View> : null}
         </View>
         <View style={styles.infoRow}>
           <MaterialIcons name="access-time" size={22} color="black" />
-          <Text style={styles.time}>{formatTime(item.event_from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.event_to_time)}</Text>
+          <Text style={styles.time}>{formatTime(item?.event_from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item?.event_to_time)}</Text>
         </View>
         <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.1'), borderRadius: wp('4'), width: wp("60"), marginVertical: wp('1.5') }]}>
           <FontAwesome name="map-marker" size={16} color="black" />
@@ -127,7 +106,7 @@ const MeetupCard = ({ item, onPress }) => {
             </View>
 
             <View>
-              {timeLeft.status === "Timer Ongoing" ? (
+              {timeLeft?.status === "Timer Ongoing" ? (
                 <>
                   <Text style={styles.text}>Starting In</Text>
                   <Text style={styles.text}>
@@ -135,12 +114,12 @@ const MeetupCard = ({ item, onPress }) => {
                   </Text>
                 </>
               ) : (
-                <Text style={[styles.text,{fontSize:wp('4')}]}>{timeLeft.status}</Text>
+                <Text style={[styles.text, { fontSize: wp('4') }]}>{timeLeft.status}</Text>
               )}
             </View>
 
           </View>
-          {item.event_mode_of_event == 'online' ? <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
+          {item?.event_mode_of_event == 'online' ? <View style={{ width: wp('35%'), flexDirection: 'row', backgroundColor: "#000", borderRadius: wp('3'), justifyContent: "space-evenly", alignItems: "center", paddingHorizontal: 0 }}>
             <View style={{ left: wp('5'), zIndex: 100 }}>
               <FontAwesome name="video-camera" size={24} color="#fff" />
             </View>
@@ -149,7 +128,7 @@ const MeetupCard = ({ item, onPress }) => {
               <CustomButton
                 title="Join"
                 align="right"
-                onPress={() => openMeeting(item.event_meeting_Link)}
+                onPress={() => openMeeting(item?.event_meeting_Link)}
                 style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('20%') }}
 
               />
@@ -164,7 +143,7 @@ const MeetupCard = ({ item, onPress }) => {
               <CustomButton
                 title="Direction"
                 align="right"
-                onPress={() => openGoogleMaps(item.event_google_map_link)}
+                onPress={() => openGoogleMaps(item?.event_google_map_link)}
                 style={{ margin: wp('0'), padding: wp('2.9'), backgroundColor: Colors.black, marginVertical: wp('0%'), width: wp('28%') }}
 
               />
@@ -176,91 +155,93 @@ const MeetupCard = ({ item, onPress }) => {
       </View>
     </TouchableOpacity>
   );
-};
+});
 
 const UpcomimgEventScreen = () => {
   const isFocused = useIsFocused();
   const [eventRegistration, setEventRegistration] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const pageSize = 10; // Fixed page size
   console.log('gggg', eventRegistration);
 
-  const getEventRegistration = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      // Get user ID from AsyncStorage
-      const userId = await AsyncStorage.getItem("User_id");
-
-      if (!userId) {
-        throw new Error("User ID not found");
-      }
-
-      // Make API request
-      const response = await api.get(`event-registration/user?id=${userId}`);
-
-      if (response.status === 200 && response.data?.result) {
-        setEventRegistration(response.data.data); // Store data in state
-        console.log('setEventRegistration', response.data.data);
-
-      } else {
-        showToast("error", response.data?.message || "No event registrations found");
-        throw new Error(response.data?.message || "No event registrations found");
-      }
-    } catch (error) {
-      console.error("Error fetching event registration:", error);
-
-      // Handle specific 400 status errors
-      if (error.response && error.response.status === 400) {
-        setError("No event registrations found.");
-        showToast("error", error.response.data?.message || "No event registrations found");
-      } else {
-        setError(error.message || "Something went wrong");
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-  // const getEventRegistration = async (currentPage = 1) => {
-  //   if (!hasMore && currentPage !== 1) return;
-
+  // const getEventRegistration = async () => {
   //   try {
   //     setLoading(true);
   //     setError(null);
 
   //     // Get user ID from AsyncStorage
   //     const userId = await AsyncStorage.getItem("User_id");
-  //     if (!userId) throw new Error("User ID not found");
 
-  //     // API request with pagination
-  //     const response = await api.get(`event-registration/user?id=${userId}&page=${currentPage}&pageSize=10`);
+  //     if (!userId) {
+  //       throw new Error("User ID not found");
+  //     }
+
+  //     // Make API request
+  //     const response = await api.get(`event-registration/user?id=${userId}`);
 
   //     if (response.status === 200 && response.data?.result) {
-  //       const newEvents = response.data.data || [];
-  //       const pagination = response.data.pagination;
+  //       setEventRegistration(response.data.data); // Store data in state
+  //       console.log('setEventRegistration', response.data.data);
 
-  //       setEventRegistration((prev) =>
-  //         currentPage === 1 ? newEvents : [...prev, ...newEvents]
-  //       );
-
-  //       setHasMore(pagination.currentPage < pagination.totalPages);
-  //       setPage(pagination.currentPage + 1);
-  // setLoading(false);
-  //       console.log("Fetched Events:", newEvents.map((item) => item.event_title));
   //     } else {
   //       showToast("error", response.data?.message || "No event registrations found");
-  //       setHasMore(false);
-  //       setLoading(false);
+  //       throw new Error(response.data?.message || "No event registrations found");
   //     }
   //   } catch (error) {
   //     console.error("Error fetching event registration:", error);
-  //     setError(error.message || "Something went wrong");
+
+  //     // Handle specific 400 status errors
+  //     if (error.response && error.response.status === 400) {
+  //       setError("No event registrations found.");
+  //       showToast("error", error.response.data?.message || "No event registrations found");
+  //     } else {
+  //       setError(error.message || "Something went wrong");
+  //     }
   //   } finally {
   //     setLoading(false);
   //   }
   // };
+  const getEventRegistration = async (page = 1) => {
+    if (page > totalPages) return; // ✅ Prevent extra API calls
 
+    try {
+      if (page === 1) setLoading(true); // ✅ Show full-screen loader only for first load
+      setIsFetchingMore(page !== 1); // ✅ Show bottom loader for pagination
+
+      const userId = await AsyncStorage.getItem("User_id");
+      if (!userId) throw new Error("User ID not found");
+
+      const response = await api.get(
+        `event-registration/user?id=${userId}&pageSize=${pageSize}&currentPage=${page}`
+      );
+
+      if (response.status === 200 && response.data?.result === true) {
+        setEventRegistration(prevData =>
+          page === 1 ? response.data.data : [...prevData, ...response.data.data]
+        );
+        setTotalPages(response.data.pagination.totalPages); // ✅ Store total pages
+        setCurrentPage(page); // ✅ Update current page
+      } else {
+        // Alert.alert('oooo')
+
+        throw new Error(response.data?.message || "No event registrations found");
+      }
+    } catch (error) {
+      console.error("Error fetching event registration:", error);
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
+  };
+  const loadMoreData = () => {
+    if (!isFetchingMore && currentPage < totalPages) {
+      getEventRegistration(currentPage + 1); // ✅ Load next page
+    }
+  };
   useEffect(() => {
     if (isFocused) {
       getEventRegistration();
@@ -270,18 +251,30 @@ const UpcomimgEventScreen = () => {
     console.log("Pressed item:", item);
   };
 
-
+  const renderItem = useCallback(({ item }) => <MeetupCard item={item} onPress={handlePress} />, []);
   return (
     <View style={styles.container}>
-      <FlatList
-        data={eventRegistration}
-        keyExtractor={(item) => item.registration_id}
-        renderItem={({ item }) => (
-          <MeetupCard item={item} onPress={handlePress} />
-        )}
-        showsVerticalScrollIndicator={false}
-      />
-      <Loader visible={loading} />
+      {loading ? (
+        <Loader visible={loading} /> // ✅ Full-screen loader for first load
+      ) : eventRegistration.length === 0 ? (
+        <View style={{ alignItems: "center", marginTop: 20 }}>
+          <Text style={{ fontSize: wp("5"), fontWeight: "bold", color: "gray" }}>
+            No registered events
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          data={eventRegistration}
+          keyExtractor={(item) => item.registration_id.toString()}
+          renderItem={renderItem}
+          showsVerticalScrollIndicator={false}
+          initialNumToRender={5} // ✅ Optimize rendering
+          removeClippedSubviews={true} // ✅ Memory optimization
+          onEndReached={loadMoreData} // ✅ Load more data when scrolling
+          onEndReachedThreshold={0.5} // ✅ Trigger load at halfway point
+          ListFooterComponent={isFetchingMore ? <ActivityIndicator size="large" color="black" /> : null} // ✅ Small bottom loader
+        />
+      )}
     </View>
   );
 };
@@ -291,7 +284,8 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     paddingVertical: wp("3%"),
-    backgroundColor: '#fff'
+    backgroundColor: '#fff',
+    justifyContent: "center"
   },
   card: {
     width: wp("93%"),
@@ -301,11 +295,9 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.1,
     // shadowRadius: 10,
     // shadowOffset: { width: 0, height: 5 },
-    elevation: 10,
+    elevation: 5,
     padding: wp('1'),
     alignItems: "center",
-
-
     marginTop: Platform.OS === 'ios' ? wp('10%') : wp("3%"),
     margin: wp("1%"),
   },
