@@ -351,7 +351,7 @@
 // })
 
 import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView, Platform } from 'react-native'
-import React, { memo, useEffect, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import ScreenHeader from '../../../ReusableComponents/ScreenHeader'
 import GradientContainer from '../../../ReusableComponents/GradientContainer'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -364,7 +364,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import api from "../../../utils/axiosInstance";
 import { showToast } from '../../../utils/toastService';
 import Loader from '../../../ReusableComponents/Loader';
-import { useIsFocused } from "@react-navigation/native";
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { formatTime } from '../../../utils/timeUtils';
 
@@ -488,7 +488,7 @@ const Home = ({ navigation }) => {
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
         </View>
-
+        <View style={{padding: wp("1.9%"),}}>
         {/* Content Section */}
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
 
@@ -518,7 +518,7 @@ const Home = ({ navigation }) => {
             />
           </View>
         </View>
-
+        </View>
       </TouchableOpacity>
     );
   };
@@ -529,23 +529,23 @@ const Home = ({ navigation }) => {
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
         </View>
-
+<View style={{padding: wp("1.9%"),}}>
         {/* Content Section */}
         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
 
-     
+
         {/* Date and Time */}
-        <View style={[styles.infoRow,{justifyContent:"space-between"}]}>
+        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
           <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
           {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
-             {/* Date and Time */}
-        <View style={styles.infoRow}>
-          <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
-          <MaterialIcons name="local-offer" size={16} color="black" />
-          <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
-            ₹ {item.initial_price || 0}
-          </Text>
-        </View>
+          {/* Date and Time */}
+          <View style={styles.infoRow}>
+            <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
+            <MaterialIcons name="local-offer" size={16} color="black" />
+            <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
+              ₹ {item.initial_price || 0}
+            </Text>
+          </View>
         </View>
         <View style={styles.infoRow}>
           <MaterialIcons name="access-time" size={16} color="black" />
@@ -567,6 +567,7 @@ const Home = ({ navigation }) => {
             />
           </View>
         </View>
+        </View>
       </TouchableOpacity>
     );
   };
@@ -583,7 +584,7 @@ const Home = ({ navigation }) => {
           <ScreenHeader headername={"EVENTS"} />
         </View>
         <View style={styles.bannerContainer}>
-          <CarouselComponent data={slider} renderItem={renderItem} height ={ hp("28%")} />
+          <CarouselComponent data={slider} renderItem={renderItem} height={hp("28%")} />
         </View>
         <FlatList
           data={events}
@@ -646,7 +647,7 @@ const Home = ({ navigation }) => {
   )
 }
 
-export default memo(Home)
+export default Home
 
 const styles = StyleSheet.create({
   maincontainer: {
@@ -668,7 +669,7 @@ const styles = StyleSheet.create({
     // height: wp("80%"),
     backgroundColor: '#fff',
     borderRadius: wp("2%"),
-    padding: wp("1.9%"),
+    // padding: wp("1.9%"),
     shadowColor: '#000',
     shadowOpacity: 0.1,
     shadowRadius: 10,
@@ -684,7 +685,7 @@ const styles = StyleSheet.create({
   },
   headerImage: {
     width: wp("94%"),
-    height: hp("17%"),
+    height: wp("39%"),
     resizeMode: 'contain',
     borderRadius: wp("2%"),
   },

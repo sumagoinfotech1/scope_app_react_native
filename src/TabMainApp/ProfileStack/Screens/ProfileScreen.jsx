@@ -15,6 +15,13 @@ import api from '../../../utils/axiosInstance';
 import Loader from '../../../ReusableComponents/Loader';
 import SweetAlert from 'react-native-sweet-alert';
 import { useIsFocused } from "@react-navigation/native";
+import CheckBox from "@react-native-community/checkbox";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import DeleteAccountModal from '../../../ReusableComponents/DeleteAccountModal';
+import LogModel from '../../../ReusableComponents/LogModel';
+
+
+
 const ProfileScreen = ({ navigation }) => {
     const isFocused = useIsFocused();
     const [rating, setRating] = useState(2);
@@ -24,7 +31,10 @@ const ProfileScreen = ({ navigation }) => {
     const [errorOccured, setErrorOccure] = useState(false);
     const [UserId, setUser] = useState('');
     const [profileData, setProfileData] = useState({});
-      const [error, setError] = useState(null);
+    const [error, setError] = useState(null);
+    const [deletemodalVisible, setDeleteModalVisible] = useState(false);
+    const [logoutmodalVisible, setlogoutModalVisible] = useState(false);
+
     // console.log('profileData', profileData);
 
     const [loading, setLoading] = useState(false); // Show loader while API fetches
@@ -53,7 +63,7 @@ const ProfileScreen = ({ navigation }) => {
             }
         };
         checkUserStatus();
-        if (isFocused) {}
+        if (isFocused) { }
     }, [isFocused]); // Removed `navigation` from dependencies
     const showDeleteAlert = () => {
         SweetAlert.showAlertWithOptions({
@@ -101,7 +111,7 @@ const ProfileScreen = ({ navigation }) => {
         }
     };
     const logoutUserApi = async () => {
-       
+
         try {
             const response = await api.post(`users/logout/${UserId}`); // Sending a POST request to logout
 
@@ -147,17 +157,17 @@ const ProfileScreen = ({ navigation }) => {
         try {
             setLoading(true);
             setErrorOccure(false);
-    
+
             console.log('Submitting Feedback:', { feedback: feedbackText, rating });
-    
+
             // API Request
             const response = await api.post('feedback/create', {
                 feedback: feedbackText,
                 rating: rating,
             });
-    
+
             console.log('Feedback Response:', response.data);
-    
+
             if (response.status === 200) {
                 showToast('success', 'Feedback Submitted', 'Thank you for your feedback!');
                 setModalVisible(false);
@@ -166,9 +176,9 @@ const ProfileScreen = ({ navigation }) => {
             }
         } catch (error) {
             console.error('Error in submitFeedback:', error);
-    
+
             let errorMsg = 'Something went wrong. Please try again.';
-    
+
             if (error.response) {
                 if (error.response.status === 400) {
                     errorMsg = error.response.data?.message || 'Feedback already submitted.';
@@ -182,26 +192,26 @@ const ProfileScreen = ({ navigation }) => {
                 errorMsg = error.message;
                 showToast('error', 'Error', errorMsg);
             }
-    
+
             setErrorOccure(true);
         } finally {
             setLoading(false);
         }
     };
-    
+
     const getUserData = async (userId) => {
         try {
             setLoading(true);
             setError(null);
-    
+
             // Make API request
             const response = await api.get(`users?id=${userId}`);
             console.log('User Data Response:', response.data.data);
-    
+
             if (response.status === 200 && response.data?.result) {
                 const userData = response.data.data;
                 setProfileData(userData); // Store data in state
-    
+
                 // Display profile data in a toast message
                 // showToast(
                 //     "success",
@@ -214,11 +224,11 @@ const ProfileScreen = ({ navigation }) => {
             }
         } catch (error) {
             console.error('Error fetching profile data:', error);
-    
+
             if (error.response) {
                 const { status, data } = error.response;
                 const errorMsg = data?.message || "An error occurred";
-    
+
                 if (status === 400) {
                     showToast("error", errorMsg);
                     setError(errorMsg);
@@ -234,8 +244,8 @@ const ProfileScreen = ({ navigation }) => {
             setLoading(false);
         }
     };
-    
-    
+
+
 
     return (
         <View style={styles.container}>
@@ -274,18 +284,18 @@ const ProfileScreen = ({ navigation }) => {
                     <Text style={styles.menuText}>Referral</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('UserSurvey',{profileData}) }}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('UserSurvey', { profileData }) }}>
                     <MaterialIcons name="question-answer" size={20} color="#000" />
                     <Text style={styles.menuText}>User Survey</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.menuItem} onPress={() => logout()}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => setlogoutModalVisible(true)}>
                     <FontAwesome5 name="sign-out-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Logout</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.menuItem} onPress={() => showDeleteAlert()}>
+                <TouchableOpacity style={styles.menuItem} onPress={() => setDeleteModalVisible(true)}>
                     <FontAwesome5 name="trash-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Delete Account</Text>
                     <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
@@ -293,11 +303,11 @@ const ProfileScreen = ({ navigation }) => {
             </View>
 
             <View style={styles.footer}>
-            <TouchableOpacity onPress={() => navigation.navigate('TermAndPolicy', { webUrl: 'https://www.youtube.com/' })}>
-                <Text style={styles.footerText}>Terms & Condition | V1.0.0 | </Text> 
+                <TouchableOpacity onPress={() => navigation.navigate('TermAndPolicy', { webUrl: 'https://www.youtube.com/' })}>
+                    <Text style={styles.footerText}>Terms & Condition | V1.0.0 | </Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={() => navigation.navigate('TermAndPolicy', { webUrl: 'https://web.sumagoinfotech.com/' })}>
-                <Text style={styles.footerText}>Privacy Policy</Text>
+                    <Text style={styles.footerText}>Privacy Policy</Text>
                 </TouchableOpacity>
             </View>
 
@@ -329,6 +339,17 @@ const ProfileScreen = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
             </Modal>
+            <DeleteAccountModal
+                visible={deletemodalVisible}
+                onClose={() => setDeleteModalVisible(false)}
+                onDelete={() => {
+                    setDeleteModalVisible(false);
+                    deleteAccountRequest()
+                }}
+            />
+            <View>
+            <LogModel isVisible={logoutmodalVisible} onClose={() => setlogoutModalVisible(false)} onConfirm={()=>logout()} />
+            </View>
             <Loader visible={loading} />
         </View>
     );

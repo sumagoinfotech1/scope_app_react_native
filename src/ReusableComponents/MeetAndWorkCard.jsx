@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerImage: {
-    width: wp("91%"),
-    height: hp("14%"),
+    width: wp("94%"),
+    height: wp("39%"),
     resizeMode: 'contain',
     borderRadius: wp("2%"),
   },

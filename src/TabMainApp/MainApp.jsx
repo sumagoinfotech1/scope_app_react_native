@@ -51,7 +51,7 @@ const MainApp = () => {
         tabBarInactiveTintColor: "#B0B0B0",
       })}
     >
-      <Tab.Screen name="Event" component={HomeStack} />
+      <Tab.Screen name="Event" component={HomeStack}     options={{ unmountOnBlur: true }}  />
       <Tab.Screen name="UpcomingEvent" component={UpcomingStack} />
       <Tab.Screen name="Notifications" component={NotificationStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />

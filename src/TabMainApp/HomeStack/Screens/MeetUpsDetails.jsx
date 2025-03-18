@@ -15,7 +15,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import TicketModal from "../../../ReusableComponents/TicketModal";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { formatTime } from "../../../utils/timeUtils"
-
+import FontAwesome from "react-native-vector-icons/FontAwesome";
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
@@ -210,9 +210,9 @@ const MeetUpsDetails = ({ navigation, route }) => {
             if (response.status === 200 && response.data?.result === true) {
                 showToast('success', 'Success', response.data?.message || 'Verification email sent successfully');
                 // registerForEvent()
-                Alert.alert("Email Send", response.data?.message)
+                // Alert.alert("Email Send", response.data?.message)
             } else {
-                Alert.alert("verify")
+                // Alert.alert("verify")
                 showToast('error', 'Error', response.data?.message || 'Failed to Verify');
                 throw new Error(response.data?.message || 'Failed to fetch events');
 
@@ -497,9 +497,19 @@ const MeetUpsDetails = ({ navigation, route }) => {
                         imageUrl={require('../../../assets/icons/share.png')}
                     />
 
-                    <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()} >
+                    {/* <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()} >
                         <Text style={styles.yesButtonText}>Invite</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
+                              <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()}>
+                                <View style={{ left: wp('2'), zIndex: 100 }}>
+                                  <FontAwesome name="share" size={16} color="#000" />
+                                </View>
+                    
+                                <View>
+                                  <Text style={styles.yesButtonText}>Invite</Text>
+                                </View>
+                    
+                              </TouchableOpacity>
 
                 </View>
 
@@ -554,8 +564,8 @@ const styles = StyleSheet.create({
         elevation: 10
     },
     image: {
-        width: "100%",
-        height: 150,
+        width: wp("94%"),
+        height: wp("39%"),
         borderRadius: 10,
         resizeMode: 'contain'
     },
@@ -604,19 +614,23 @@ const styles = StyleSheet.create({
     yesButton: {
         // flex: 1,
         backgroundColor: "#fff",
-        paddingVertical: hp("1%"),
+        paddingVertical: hp("0.8%"),
         borderRadius: wp("2%"),
         alignItems: "center",
         position: "absolute",
         right: wp('5'),
         bottom: wp('7'),
+        flexDirection:"row",
+        width:wp('18'),
+        justifyContent:"space-between",
+        paddingRight: wp('1.3')
     },
     yesButtonText: {
         fontSize: wp("4%"),
         fontWeight: "bold",
         color: "#000",
         // padding:wp('0.3'),
-        paddingHorizontal: wp('6')
+        // paddingHorizontal: wp('6')
     },
     infoRow: {
         flexDirection: 'row',

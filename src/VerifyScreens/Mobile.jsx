@@ -19,8 +19,10 @@ import api from "../utils/axiosInstance";
 const Mobile = ({ navigation }) => {
   const [step, setStep] = useState("mobile"); // Tracks the current step
   const [mobile, setMobile] = useState(""); // Store mobile number
-  const [otp, setOtp] = useState(["", "", "", ""]); // Store OTP
-  const inputRefs = [useRef(null), useRef(null), useRef(null), useRef(null)];
+  const length = 4;
+  const [otp, setOtp] = useState(new Array(length).fill("")); // Store OTP
+  const inputRefs = useRef([]);
+
   const [profileName, setProfileName] = useState("");
   const [promocode, setPromocode] = useState("");  // Store Profile name
   const [loading, setLoading] = useState(false); // Show loader while API fetches
@@ -38,24 +40,24 @@ const Mobile = ({ navigation }) => {
         const mobile = await AsyncStorage.getItem("mobile");
         const isLogin = await AsyncStorage.getItem("isLogin");
         console.log("isLogin:", isLogin); // Debugging
-  
+
         if (isLogin !== "true") {
           setStep("mobile");
           return;
         }
-  
+
         const storedProfileCompleted = await AsyncStorage.getItem("isProfileCompleted");
         const storedAnswerSubmitted = await AsyncStorage.getItem("isAnswerSubmitted");
-  
+
         console.log("Raw Profile Completed:", storedProfileCompleted);
         console.log("Raw Answer Submitted:", storedAnswerSubmitted);
-  
+
         const profileCompleted = storedProfileCompleted === "true";  // Convert to boolean
         const answerSubmitted = storedAnswerSubmitted === "true";  // Convert to boolean
-  
+
         console.log("Converted Profile Completed:", profileCompleted);
         console.log("Converted Answer Submitted:", answerSubmitted);
-  
+
         if (!profileCompleted) {
           setStep("profile");
           setMobile(mobile);
@@ -68,11 +70,11 @@ const Mobile = ({ navigation }) => {
         setLoading(false);
       }
     };
-  
+
     checkLoginStatus();
     getSlider()
   }, []);
-  
+
   const getSlider = async () => {
     try {
       setLoading(true);
@@ -182,28 +184,28 @@ const Mobile = ({ navigation }) => {
   const handleVerifyOtp = async () => {
     setErrorOccure(false);
     setError(""); // Clear previous errors
-  
+
     // Ensure OTP is an array of exactly 4 digits
     if (!Array.isArray(otp) || otp.length !== 4 || otp.some((digit) => digit.trim() === "")) {
       setErrorOccure(true);
       setError("Enter a valid 4-digit OTP");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       // API request to verify OTP
       const response = await api.post("auth/verify-otp", {
         mobile,
         otp: OTP // Convert array to string
       });
-  
+
       console.log("response otp verify:", response.data);
-  
+
       if (response.data.result === true) {
         const { accessToken, refreshToken, id, isProfileCompleted, mobile, is_answer_submitted } = response.data.data;
-  
+
         // Store tokens securely
         await AsyncStorage.setItem("accessToken", accessToken);
         await AsyncStorage.setItem("refreshToken", refreshToken);
@@ -212,16 +214,16 @@ const Mobile = ({ navigation }) => {
         await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
         await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(is_answer_submitted));
         await AsyncStorage.setItem("isLogin", JSON.stringify(true));
-  
+
         showToast("success", "OTP Verified Successfully");
-  
+
         // Determine next step based on profile completion and answer submission status
         if (!isProfileCompleted) {
           setStep("profile"); // Navigate to profile if it's not completed
         } else {
           navigation.replace(is_answer_submitted ? "MainApp" : "SkillsScreen");
         }
-  
+
         setOtp(["", "", "", ""]); // Reset OTP input after success
       } else {
         setErrorOccure(true);
@@ -230,22 +232,22 @@ const Mobile = ({ navigation }) => {
       }
     } catch (error) {
       console.error("Error verifying OTP:", error);
-  
+
       let errorMessage = "Error verifying OTP. Try again";
-  
+
       if (error.response) {
         errorMessage = error.response.data.message || "Invalid OTP, please try again";
       } else if (error.request) {
         errorMessage = "Network error, please check your internet connection";
       }
-  
+
       setErrorOccure(true);
       setError(errorMessage);
     } finally {
       setLoading(false);
     }
   };
-  
+
 
 
 
@@ -329,21 +331,28 @@ const Mobile = ({ navigation }) => {
 
 
   const handleChangeText = (text, index) => {
-    if (text.length > 1 || !/^\d?$/.test(text)) return; // Allow only a single digit (0-9)
+    if (!/^\d?$/.test(text)) return; // Only allow numbers
 
     let newOtp = [...otp];
     newOtp[index] = text;
     setOtp(newOtp);
 
-    // Move focus to the next input if text is entered
-    if (text && index < 3) {
-      inputRefs[index + 1].current.focus();
+    // Move to the next input if text is entered
+    if (text && index < length - 1) {
+      inputRefs.current[index + 1]?.focus();
     }
   };
 
   const handleKeyPress = (e, index) => {
-    if (e.nativeEvent.key === "Backspace" && index > 0 && !otp[index]) {
-      inputRefs[index - 1].current.focus();
+    if (e.nativeEvent.key === "Backspace") {
+      let newOtp = [...otp];
+
+      // Clear the current field and move focus back
+      if (!newOtp[index] && index > 0) {
+        inputRefs.current[index - 1]?.focus();
+      }
+      newOtp[index] = "";
+      setOtp(newOtp);
     }
   };
 
@@ -362,49 +371,49 @@ const Mobile = ({ navigation }) => {
       return;
     }
 
-  try {
-    console.log("Verifying Referral Code:", promocode);
+    try {
+      console.log("Verifying Referral Code:", promocode);
 
-    // Make API Request
-    const response = await api.post("auth/verify-referral-code", {
-      mobile,
-      referralCode: promocode
-    });
+      // Make API Request
+      const response = await api.post("auth/verify-referral-code", {
+        mobile,
+        referralCode: promocode
+      });
 
-    console.log("API Response:", response.data);
+      console.log("API Response:", response.data);
 
-    if (response.data?.result === true) {
-      const { referralCode, reward } = response.data?.data || {};
+      if (response.data?.result === true) {
+        const { referralCode, reward } = response.data?.data || {};
 
-      showToast("success", "Success", `Referral code verified successfully! You earned ${reward} points.`);
-      setVerifyCode(true);
-      setErrorOccure(false); // Clear previous errors if any
+        showToast("success", "Success", `Referral code verified successfully! You earned ${reward} points.`);
+        setVerifyCode(true);
+        setErrorOccure(false); // Clear previous errors if any
 
-      // // Store referral code and reward for further use
-      // setReferralCode(referralCode);
-      // setRewardPoints(reward);
-    } else {
+        // // Store referral code and reward for further use
+        // setReferralCode(referralCode);
+        // setRewardPoints(reward);
+      } else {
+        setVerifyCode(false);
+        setErrorOccure(true);
+        setError(response.data?.message || "Invalid referral code");
+        showToast("error", "Error", response.data?.message || "Invalid referral code");
+      }
+    } catch (error) {
+      let errorMsg = "Something went wrong. Please try again.";
+
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
       setVerifyCode(false);
       setErrorOccure(true);
-      setError(response.data?.message || "Invalid referral code");
-      showToast("error", "Error", response.data?.message || "Invalid referral code");
+      setError(errorMsg);
+      showToast("error", "Error", errorMsg);
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    let errorMsg = "Something went wrong. Please try again.";
-
-    if (error.response) {
-      errorMsg = error.response.data?.message || errorMsg;
-    } else if (error.message) {
-      errorMsg = error.message;
-    }
-
-    setVerifyCode(false);
-    setErrorOccure(true);
-    setError(errorMsg);
-    showToast("error", "Error", errorMsg);
-  } finally {
-    setLoading(false);
-  }
   };
 
   return (
@@ -433,8 +442,8 @@ const Mobile = ({ navigation }) => {
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
 
-            <CustomButton title="Proceed" align="right" onPress={handleSendOtp} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000',}}
+            <CustomButton title="Proceed" align="right" onPress={handleSendOtp}
+              style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor: '#000', }}
             />
           </View>
         )}
@@ -450,7 +459,7 @@ const Mobile = ({ navigation }) => {
               {otp.map((value, index) => (
                 <TextInput
                   key={index}
-                  ref={inputRefs[index]}
+                  ref={(el) => (inputRefs.current[index] = el)}
                   style={styles.inputOtp}
                   placeholder="-"
                   keyboardType="numeric"
@@ -458,21 +467,22 @@ const Mobile = ({ navigation }) => {
                   value={value}
                   onChangeText={(text) => handleChangeText(text, index)}
                   onKeyPress={(e) => handleKeyPress(e, index)}
+                  textAlign="center"
                 />
               ))}
-
             </View>
-            <TouchableOpacity disabled={isResendDisabled} onPress={() => { handleSendOtp() }}>
+            <TouchableOpacity disabled={isResendDisabled} onPress={() => { handleSendOtp() }} style={{ marginBottom: wp('2') }}>
               <Text style={{ fontWeight: "bold", fontSize: wp('3.5'), color: Colors.black }}>Resent OTP {isResendDisabled ? `In: 00:${timer}` : null}
               </Text>
             </TouchableOpacity>
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
-
-            <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000'}}
-            />
+            <View style={{ marginTop: wp('2'), alignSelf: "flex-end" }}>
+              <CustomButton title="Verify OTP" align="right" onPress={handleVerifyOtp}
+                style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor: '#000' }}
+              />
+            </View>
           </>
         )}
 
@@ -502,7 +512,7 @@ const Mobile = ({ navigation }) => {
               <CustomButton
                 title="Apply"
                 align="left"
-                style={{ paddingHorizontal: wp("4"), padding: wp("4.3%"),right:-wp('3'), backgroundColor:'#000'}}
+                style={{ paddingHorizontal: wp("4"), padding: wp("4.3%"), right: -wp('3'), backgroundColor: '#000' }}
                 textstyle={{ fontSize: wp("3.8%") }}
                 onPress={verifyReferralCode}
 
@@ -512,8 +522,8 @@ const Mobile = ({ navigation }) => {
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
             </View> : null}
-            <CustomButton title="Submit" align="right" onPress={handleCompleteProfile} 
-            style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor:'#000'}}
+            <CustomButton title="Submit" align="right" onPress={handleCompleteProfile}
+              style={{ paddingHorizontal: wp("4"), padding: wp("3.3%"), backgroundColor: '#000' }}
             />
           </>
         )}
@@ -590,7 +600,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 6,
     marginVertical: hp('1'),
-    color:'#000'
+    color: '#000'
   },
 
   otpContainer: { flexDirection: "row", justifyContent: "center", marginBottom: hp("2%") },
@@ -605,7 +615,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginHorizontal: wp("2%"),
     backgroundColor: Colors.white,
-     color:'#000'
+    color: '#000'
   },
 
   carouselImage: {
@@ -629,6 +639,7 @@ const styles = StyleSheet.create({
   errorcontainer: {
     alignItems: "center",
     justifyContent: 'center',
+    marginBottom: wp('2')
   },
   errorText: {
     color: 'red',
