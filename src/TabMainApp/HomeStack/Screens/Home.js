@@ -396,6 +396,8 @@ const Home = ({ navigation }) => {
         // console.log('data 13', response.data.data);
 
       } else {
+        // console.log('raviiBhai',response.data?.message);
+        
         showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
         throw new Error(response.data?.message || 'Failed to fetch events');
       }

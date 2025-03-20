@@ -1,7 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator, alert, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, Image, StyleSheet, Platform, ActivityIndicator, alert, Alert, KeyboardAvoidingView } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { ScrollView } from "react-native-gesture-handler";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
@@ -16,6 +16,7 @@ import Loader from "../ReusableComponents/Loader";
 import { API_URL } from '@env';
 import { showToast } from '../utils/toastService';
 import api from "../utils/axiosInstance";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 const Mobile = ({ navigation }) => {
   const [step, setStep] = useState("mobile"); // Tracks the current step
   const [mobile, setMobile] = useState(""); // Store mobile number
@@ -215,7 +216,7 @@ const Mobile = ({ navigation }) => {
         await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(is_answer_submitted));
         await AsyncStorage.setItem("isLogin", JSON.stringify(true));
 
-        showToast("success", "OTP Verified Successfully");
+        showToast("success", "OTP Verified Successfully", response.data.message);
 
         // Determine next step based on profile completion and answer submission status
         if (!isProfileCompleted) {
@@ -417,7 +418,9 @@ const Mobile = ({ navigation }) => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: Colors.background }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={{ flex: 1, backgroundColor: Colors.background }}>
       <View style={styles.container}>
         <HeaderName />
         <View style={styles.bannerContainer}>
@@ -428,7 +431,6 @@ const Mobile = ({ navigation }) => {
       <LinearGradient colors={["#FFFFFF", "#FFFFFF"]} style={styles.formContainer}>
         {step === "mobile" && (
           <View style={{ alignItems: 'center', width: wp('90%'), marginTop: hp('4') }}>
-
             <Text style={styles.label}>Enter your mobile number</Text>
             <TextInput
               style={styles.input}
@@ -437,6 +439,7 @@ const Mobile = ({ navigation }) => {
               value={mobile}
               onChangeText={setMobile}
               maxLength={10}
+              cursorColor="black" 
             />
             {errorOccure ? <View style={styles.errorcontainer}>
               <Text style={styles.errorText}>{error}</Text>
@@ -468,6 +471,7 @@ const Mobile = ({ navigation }) => {
                   onChangeText={(text) => handleChangeText(text, index)}
                   onKeyPress={(e) => handleKeyPress(e, index)}
                   textAlign="center"
+                  cursorColor="black" 
                 />
               ))}
             </View>
@@ -534,7 +538,7 @@ const Mobile = ({ navigation }) => {
         </View>
       )}
       <Loader visible={loading} />
-    </View>
+    </KeyboardAvoidingView>
 
   );
 };

@@ -20,7 +20,7 @@ const ReferalScreen = () => {
   // const [ticketmodalVisible, setTicketModalVisible] = useState(false);
   const copyToClipboard = () => {
     Clipboard.setString(referralCode);
-    showToast('info', 'Copied');
+    showToast('info', "",'Copied');
   };
   const [loading, setLoading] = useState(false);
   const [errorOccured, setErrorOccured] = useState(false);

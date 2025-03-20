@@ -225,6 +225,7 @@ import Mobile from './src/VerifyScreens/Mobile';
 import MainApp from './src/TabMainApp/MainApp';
 import SkillsScreen from './src/VerifyScreens/SkillsScreen';
 import Skills from './src/VerifyScreens/Skills';
+import { showToast,ToastProvider } from './src/utils/toastService';
 
 const Stack = createNativeStackNavigator();
 
@@ -412,7 +413,8 @@ const handleNotificationNavigation = (remoteMessage) => {
         <NavigationContainer ref={navigationRef}>
             <StatusBar hidden={true} />
             {!loading && <RootStack initialRoute={initialRoute} />}
-            <Toast />
+            {/* <Toast /> */}
+            <ToastProvider />
         </NavigationContainer>
     );
 };

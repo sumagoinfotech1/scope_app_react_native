@@ -65,22 +65,7 @@ const ProfileScreen = ({ navigation }) => {
         checkUserStatus();
         if (isFocused) { }
     }, [isFocused]); // Removed `navigation` from dependencies
-    const showDeleteAlert = () => {
-        SweetAlert.showAlertWithOptions({
-            title: "Are you sure?",
-            subTitle: "Once deleted, you will lose access to your account, and this action cannot be reversed.",
-            style: 'warning',
-            //   confirmButtonTitle: "Yes, Delete",
-            //   confirmButtonColor: "red",
-            //   otherButtonTitle: "No, Cancel",
-            //   otherButtonColor: "red",
-            cancellable: true,
-        }, (isConfirmed) => {
-            if (isConfirmed) {
-                deleteAccountRequest(); // Call your function to delete the account
-            }
-        });
-    };
+
     const deleteAccountRequest = async () => {
         try {
             const response = await api.post('deleteAccountRequestRoute/create'); // No data sent in the request
@@ -219,7 +204,7 @@ const ProfileScreen = ({ navigation }) => {
                 //     "Data Fetch"
                 // );
             } else {
-                showToast("error", "Failed to fetch profile data.");
+                showToast("error", " ","Failed to fetch profile data.");
                 setError("Failed to fetch profile data.");
             }
         } catch (error) {
@@ -229,15 +214,15 @@ const ProfileScreen = ({ navigation }) => {
                 const { status, data } = error.response;
                 const errorMsg = data?.message || "An error occurred";
 
-                if (status === 400) {
-                    showToast("error", errorMsg);
-                    setError(errorMsg);
-                } else {
-                    showToast("error", errorMsg);
-                    setError(errorMsg);
-                }
+                // if (status === 400) {
+                //     showToast("error", '',errorMsg);
+                //     setError(errorMsg);
+                // } else {
+                //     showToast("error",'', errorMsg);
+                //     setError(errorMsg);
+                // }
             } else {
-                showToast("error", "Network error. Please check your internet connection.");
+                showToast("error"," ", "Network error. Please check your internet connection.");
                 setError("Network error. Please check your internet connection.");
             }
         } finally {

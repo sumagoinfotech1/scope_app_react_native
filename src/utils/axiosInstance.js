@@ -250,7 +250,7 @@ const refreshAccessToken = async () => {
     await AsyncStorage.removeItem("accessToken");
     await AsyncStorage.removeItem("refreshToken");
 
-    showToast("error", "Session Expired", "Please log in again.");
+    showToast("error", "Session Expired", "Session Expired");
 
     if (navigationRef.isReady()) {
       navigationRef.navigate("Mobile");
@@ -296,7 +296,7 @@ api.interceptors.response.use(
         await AsyncStorage.removeItem("accessToken");
         await AsyncStorage.removeItem("refreshToken");
     
-        showToast("error", "Session Expired", "Please log in again.");
+        showToast("error", "Session Expired", "Session Expired");
     
         if (navigationRef.isReady()) {
           navigationRef.navigate("Mobile");
