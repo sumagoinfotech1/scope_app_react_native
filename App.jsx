@@ -244,12 +244,12 @@ const requestUserPermission = async () => {
         let enabled = authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
                       authStatus === messaging.AuthorizationStatus.PROVISIONAL;
         
-        // if (Platform.OS === 'android' && Platform.Version >= 33) {
-        //     const granted = await PermissionsAndroid.request(
-        //         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
-        //     );
-        //     enabled = granted === PermissionsAndroid.RESULTS.GRANTED;
-        // }
+        if (Platform.OS === 'android' && Platform.Version >= 33) {
+            const granted = await PermissionsAndroid.request(
+                PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+            );
+            enabled = granted === PermissionsAndroid.RESULTS.GRANTED;
+        }
         
         return enabled;
     } catch (error) {
@@ -389,10 +389,20 @@ const handleNotificationNavigation = (remoteMessage) => {
                     playSound: true,
                     soundName: "default",
                 });
+                subscribeToTopic()
             }
-        });
-        
+           
 
+        });
+         
+        const subscribeToTopic = async () => {
+            try {
+                await messaging().subscribeToTopic('all_users');
+                console.log('Subscribed to topic: all_users');
+            } catch (error) {
+                console.error('Error subscribing to topic:', error);
+            }
+        };
         const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
             console.log("App opened from notification:", remoteMessage);
         });

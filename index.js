@@ -46,52 +46,38 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
             playSound: true,
             soundName: "default",
         });
+        handleNotificationNavigation(remoteMessage);
+        subscribeToTopic()
     }
 
-    handleNotificationNavigation(remoteMessage);
+
 });
 
 
-
-// const handleNotificationNavigation = (remoteMessage) => {
-//     if (!remoteMessage?.data) return;
-
-//     const { eventId, eventType } = remoteMessage.data;
-    
-//     console.log('Received Notification:', remoteMessage.data);
-
-//     if (navigationRef.current) {
-//         if (eventType === 'Meetups') {
-//             console.log('Navigating to MeetUpsDetails:', eventId);
-//             navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
-
-//         } else if (eventType === 'Workshop') {
-//             console.log('Navigating to WorkshopDetails:', eventId);
-//             navigationRef.current.navigate('WorkshopDetails', { id: eventId });
-
-//         } else {
-//             console.log('Navigating to Home');
-//             navigationRef.current.navigate('Home'); // Default screen
-//         }
-//     } else {
-//         console.error('Navigation reference is not available');
-//     }
-// };
+const subscribeToTopic = async () => {
+    try {
+        await messaging().subscribeToTopic('all_users');
+        console.log('Subscribed to topic: all_users');
+    } catch (error) {
+        console.error('Error subscribing to topic:', error);
+    }
+};
 const handleNotificationNavigation = (remoteMessage) => {
     if (!remoteMessage?.data) return;
 
     const { eventId, eventType } = remoteMessage.data;
-    
+
     console.log('Received Notification:', remoteMessage.data);
 
     if (navigationRef.current) {
         if (eventType === 'Meetups') {
             console.log('Navigating to MeetUpsDetails:', eventId);
-            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
-
+            // navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+            navigationRef.current.navigate('Event', { screen: 'MeetUpsDetails', params: { id: eventId } });
+            
         } else if (eventType === 'Workshop') {
             console.log('Navigating to WorkshopDetails:', eventId);
-            navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
+            navigationRef.current.navigate('Event', { screen: 'MeetUpsDetails', params: { id: eventId } });
 
         } else {
             console.log('Navigating to Home');
