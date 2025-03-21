@@ -712,6 +712,7 @@ const styles = StyleSheet.create({
   },
   time: {
     marginLeft: wp("1%"),
+    color:'#000'
   },
   location: {
     marginLeft: wp("1%"),

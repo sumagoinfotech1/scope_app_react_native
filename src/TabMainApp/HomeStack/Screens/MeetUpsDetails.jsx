@@ -647,6 +647,7 @@ const styles = StyleSheet.create({
     time: {
         marginLeft: wp("1%"),
         fontSize: wp('3.5'),
+         color:'#000'
     },
 });
 

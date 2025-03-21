@@ -47,7 +47,7 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
             soundName: "default",
         });
         handleNotificationNavigation(remoteMessage);
-        subscribeToTopic()
+
     }
 
 
@@ -74,7 +74,7 @@ const handleNotificationNavigation = (remoteMessage) => {
             console.log('Navigating to MeetUpsDetails:', eventId);
             // navigationRef.current.navigate('MeetUpsDetails', { id: eventId });
             navigationRef.current.navigate('Event', { screen: 'MeetUpsDetails', params: { id: eventId } });
-            
+
         } else if (eventType === 'Workshop') {
             console.log('Navigating to WorkshopDetails:', eventId);
             navigationRef.current.navigate('Event', { screen: 'MeetUpsDetails', params: { id: eventId } });
@@ -87,4 +87,5 @@ const handleNotificationNavigation = (remoteMessage) => {
         console.error('Navigation reference is not available');
     }
 };
+subscribeToTopic()
 AppRegistry.registerComponent(appName, () => App);
