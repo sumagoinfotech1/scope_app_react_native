@@ -28,7 +28,25 @@ import { name as appName } from './app.json';
 import messaging from '@react-native-firebase/messaging';
 import PushNotification from 'react-native-push-notification';
 import { navigationRef } from './src/utils/axiosInstance';
+// Handle notifications in background/killed state
+// messaging().setBackgroundMessageHandler(async remoteMessage => {
+//     console.log("Background Notification Received:", remoteMessage);
 
+//     if (remoteMessage?.data) {
+//         PushNotification.localNotification({
+//             channelId: "custom-channel", // Custom channel created above
+//             title: remoteMessage.data?.notificationTitle || "New Notification",
+//             message: remoteMessage.data?.notificationMessage || "You have a new message",
+//             bigText: `🔔 Event: ${remoteMessage.data?.eventName || "No description"}\n📢 Type: ${remoteMessage.data?.eventTypeName || "Unknown"}`,
+//             playSound: true,
+//             soundName: "default",
+//             vibrate: true,
+//             priority: "high",
+//             ignoreInForeground: false, // Show even if the app is open
+//             data: JSON.stringify(remoteMessage.data),
+//         });
+//     }
+// });
 // 🔥 Subscribe to Firebase Topic
 const subscribeToTopic = async () => {
     try {
