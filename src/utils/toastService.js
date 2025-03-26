@@ -31,7 +31,7 @@ export const showToast = (type, message, description = '') => {
 
 const toastConfig = {
   success: ({ text1 }) => (
-    <View style={[styles.toastContainer, { backgroundColor: '#107c41' }]}>
+    <View style={[styles.toastContainer, { backgroundColor: '#49ba7c' }]}>
       <CheckCircle size={23} color="white" />
       <Text style={styles.toastText}>{text1}</Text>
       <TouchableOpacity onPress={Toast.hide}>
@@ -40,7 +40,7 @@ const toastConfig = {
     </View>
   ),
   error: ({ text1 }) => (
-    <View style={[styles.toastContainer, { backgroundColor: '#D32F2F' }]}>
+    <View style={[styles.toastContainer, { backgroundColor: '#db6565' }]}>
       <XCircle size={23} color="white" />
       <Text style={styles.toastText}>{text1}</Text>
       <TouchableOpacity onPress={Toast.hide}>
@@ -49,7 +49,7 @@ const toastConfig = {
     </View>
   ),
   info: ({ text1 }) => (
-    <View style={[styles.toastContainer, { backgroundColor: '#107c41' }]}>
+    <View style={[styles.toastContainer, { backgroundColor: '#49ba7c' }]}>
       <CheckCircle size={23} color="white" />
       <Text style={styles.toastText}>{text1}</Text>
       <TouchableOpacity onPress={Toast.hide}>

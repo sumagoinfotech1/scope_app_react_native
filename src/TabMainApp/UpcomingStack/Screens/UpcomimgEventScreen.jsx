@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
     // elevation: 1,
   },
   date: {
-    color: 'red',
+    color: '#c94f69',
     fontWeight: 'bold',
     marginRight: wp("2.5%"),
     fontSize: wp('5'),
@@ -364,7 +364,7 @@ const styles = StyleSheet.create({
   pricetag: {
     fontSize: wp('7%'),
     fontWeight: 'bold',
-    color: "red",
+    color: "#c94f69",
     // width: wp('25%'),
   },
   location: {

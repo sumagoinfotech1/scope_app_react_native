@@ -439,7 +439,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     <MainAppScreenHeader headername={heading} />
                 </View>
                 {/* Image Section */}
-                <View style={styles.card}>
+                <View style={[styles.card,{padding:0}]}>
                     <View style={styles.imageContainer}>
                         <Image source={{ uri: details.image }} style={styles.image} />
                     </View>
@@ -570,10 +570,11 @@ const styles = StyleSheet.create({
         resizeMode: 'contain'
     },
     textContainer: {
-        paddingVertical: wp("3%"),
+        padding: wp("4%"),
+        
     },
     advancedText: {
-        color: "#E63946",
+        color: "#c94f69",
         fontWeight: "bold",
         textTransform: "uppercase",
         fontSize: wp("4%"),
@@ -639,7 +640,7 @@ const styles = StyleSheet.create({
         elevation: 3,
     },
     date: {
-        color: 'red',
+        color: '#c94f69',
         fontWeight: 'bold',
         marginRight: wp("2%"),
         fontSize: wp('4'),

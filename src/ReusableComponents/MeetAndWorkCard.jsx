@@ -121,7 +121,7 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   date: {
-    color: 'red',
+    color: '#c94f69',
     fontWeight: 'bold',
     marginRight: wp("2.5%"),
     fontSize: wp('4'),
