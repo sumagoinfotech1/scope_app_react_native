@@ -315,28 +315,7 @@ const configurePushNotifications = () => {
         requestPermissions: true,
     });
 };
-// const handleNotificationNavigation = (data) => {
-//     if (!data) return;
 
-//     const { eventId, eventTypeName } = data;
-//     console.log("Handling Notification:", data);
-
-//     if (navigationRef.isReady()) {
-//         if (eventTypeName === "meetups") {
-//             console.log("Navigating to MeetUpsDetails:", eventId);
-//             navigationRef.current.navigate("MeetUpsDetails", { id: eventId });
-//         } else if (eventTypeName === "workshop") {
-//             console.log("Navigating to WorkshopDetails:", eventId);
-//             navigationRef.current.navigate("MeetUpsDetails", { id: eventId });
-//         } else {
-//             console.log("Navigating to Home");
-//             navigationRef.current.navigate("Home");
-//         }
-//     } else {
-//         console.error("Navigation reference is not available");
-//         setTimeout(() => handleNotificationNavigation(data), 500);
-//     }
-// };
 const waitForNavigationReady = () => {
     return new Promise((resolve) => {
         const checkNavigationReady = () => {
@@ -433,25 +412,31 @@ const App = () => {
         getFCMToken(); // Retrieve FCM Token
         configurePushNotifications(); // Configure local notifications
 
-        // 🔴 Handle Foreground Notifications
-        const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-            console.log("Foreground Notification:", remoteMessage);
+     // ✅ Handle Foreground Notifications (Suppress Firebase & Show Custom)
+    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+        console.log("Foreground Notification:", remoteMessage);
 
-            if (remoteMessage?.data) {
-                PushNotification.localNotification({
-                    channelId: "custom-channel",
-                    title: remoteMessage.data.notificationTitle || "New Notification",
-                    message: remoteMessage.data.notificationMessage || "You have a new message",
-                    bigText: remoteMessage.data.eventName || "No description available",
-                    playSound: true,
-                    soundName: "default",
-                    vibrate: true,
-                    priority: "high",
-                    ignoreInForeground: false,
-                    data: JSON.stringify(remoteMessage.data),
-                });
-            }
-        });
+        // 🔴 Prevent Firebase from showing its default notification
+        if (remoteMessage?.notification) {
+            console.log("🔴 Default Firebase Notification intercepted and suppressed.");
+        }
+
+        // ✅ Show only React Native Push Notification
+        if (remoteMessage?.data || remoteMessage?.notification) {
+            PushNotification.localNotification({
+                channelId: "custom-channel",
+                title: remoteMessage.data?.notificationTitle || remoteMessage.notification?.title || "New Notification",
+                message: remoteMessage.data?.notificationMessage || remoteMessage.notification?.body || "You have a new message",
+                bigText: remoteMessage.data?.eventName || "No description available",
+                playSound: true,
+                soundName: "default",
+                vibrate: true,
+                priority: "high",
+                ignoreInForeground: false,
+                data: JSON.stringify(remoteMessage.data),
+            });
+        }
+    });
 
         // 🟠 Handle Notification When App is in Background (Clicked)
         const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
@@ -463,19 +448,19 @@ const App = () => {
 
         // 🟡 Handle Background Notifications (Push received but not clicked)
         messaging().setBackgroundMessageHandler(async remoteMessage => {
-            console.log("Background Notification Received:", remoteMessage);
+            console.log("Background Notification app Received:", remoteMessage);
             
-            if (remoteMessage?.data) {
+            if (remoteMessage?.data || remoteMessage?.notification) {
                 PushNotification.localNotification({
                     channelId: "custom-channel",
-                    title: remoteMessage.data.notificationTitle || "New Notification",
-                    message: remoteMessage.data.notificationMessage || "You have a new message",
-                    bigText: remoteMessage.data.eventName || "No description available",
+                    title: remoteMessage.data?.notificationTitle || remoteMessage.notification?.title || "New Notification",
+                    message: remoteMessage.data?.notificationMessage || remoteMessage.notification?.body || "You have a new message",
+                    bigText: remoteMessage.data?.eventName || "No description available",
                     playSound: true,
                     soundName: "default",
                     vibrate: true,
                     priority: "high",
-                    ignoreInForeground: false, // Ensures notification is shown
+                    ignoreInForeground: false,
                     data: JSON.stringify(remoteMessage.data),
                 });
             }
@@ -487,7 +472,8 @@ const App = () => {
             .then(remoteMessage => {
                 if (remoteMessage?.data) {
                     console.log("App opened from killed state notification:", remoteMessage);
-                    handleNotificationNavigation(remoteMessage.data);
+                    
+                    // handleNotificationNavigation(remoteMessage.data);
                 }
             })
             .catch(error => console.error("Error getting initial notification:", error));
