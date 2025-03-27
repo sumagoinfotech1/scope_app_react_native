@@ -117,11 +117,7 @@ const Mobile = ({ navigation }) => {
     </View>
   );
 
-  const data = [
-    { id: 1, image: 'https://i.pinimg.com/736x/2d/0f/75/2d0f756dbb05462074db54ae96da5474.jpg' },
-    { id: 2, image: 'https://i.pinimg.com/736x/c8/a0/e8/c8a0e8eb808e4e217baa80e4e377a627.jpg' },
-    { id: 3, image: 'https://i.pinimg.com/736x/51/d5/48/51d548911242e61017adcdfbed429f59.jpg' },
-  ];
+
 
 
   useEffect(() => {
@@ -176,7 +172,7 @@ const Mobile = ({ navigation }) => {
       setError(error.response?.data?.message || "Error sending OTP");
 
       // Show error toast for API failure
-      showToast('error', 'Error', error.response?.data?.message || "Error sending OTP");
+      // showToast('error', 'Error', error.response?.data?.message || "Error sending OTP");
     }
 
     setLoading(false);
@@ -215,9 +211,10 @@ const Mobile = ({ navigation }) => {
         await AsyncStorage.setItem("isProfileCompleted", JSON.stringify(isProfileCompleted));
         await AsyncStorage.setItem("isAnswerSubmitted", JSON.stringify(is_answer_submitted));
         await AsyncStorage.setItem("isLogin", JSON.stringify(true));
-
+        
         showToast("success", "OTP Verified Successfully", response.data.message);
-
+       console.log('User_id',id);
+       
         // Determine next step based on profile completion and answer submission status
         if (!isProfileCompleted) {
           setStep("profile"); // Navigate to profile if it's not completed

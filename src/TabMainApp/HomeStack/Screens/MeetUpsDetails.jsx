@@ -16,19 +16,22 @@ import TicketModal from "../../../ReusableComponents/TicketModal";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { formatTime } from "../../../utils/timeUtils"
 import FontAwesome from "react-native-vector-icons/FontAwesome";
+import { useIsFocused } from "@react-navigation/native";
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
     const [ticketModal, setTicketModal] = useState(false);
     const [details, setEventsDetails] = useState([]);
+    const [isRegistered, setIsRegistered] = useState('');
     const [loading, setLoading] = useState(false);
     const [heading, setHeading] = useState();
     const [isconfiremmodal, setCinfirmModal] = useState(false);
     const [referralCode, setReferralCode] = useState("");
     const [errorOccured, setErrorOccured] = useState(false);
+    const isFocused = useIsFocused();
     // const [verificationmodal, setverificationmodal] = useState(false);
     const [userId, setUserId] = useState('')
-    console.log('referralCode', id);
+    console.log('isRegistered', isRegistered);
 
     const data = {
         image: require("../../../assets/icons/image.png"), // Replace with actual image path
@@ -43,6 +46,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
             "Continuously Evaluating And Adjusting System",
         ],
     };
+
 
 
     const getEventsDetails = async () => {
@@ -81,10 +85,66 @@ const MeetUpsDetails = ({ navigation, route }) => {
 
     // Fetch data on component mount
     useEffect(() => {
+
         getEventsDetails(); // Call event details after user ID is set
         fetchUserId();
         return () => { }
     }, []);
+
+    const getRegisteredEvents = async () => {
+        try {
+            setLoading(true);
+            console.log('Fetching registered events for user:', userId);
+
+            // API request
+            const response = await api.get(`event-registration/registered-event/user?id=${userId}`);
+
+            console.log('API Response:', response);
+
+            if (response.status === 200 && response.data?.result) {
+                const registeredEvents = response.data.data; // Extract event data
+
+                // Check if the eventId exists in the registered events list
+                const isRegistered = registeredEvents.some(event => event.event_id === id);
+
+                setIsRegistered(isRegistered); // Update state for UI
+                console.log(`Event ${id} is ${isRegistered ? 'already registered' : 'not registered'}`);
+            } else {
+                const errorMsg = response.data?.message || 'Failed to fetch events';
+                showToast('error', 'Error', errorMsg);
+                throw new Error(errorMsg);
+            }
+        } catch (error) {
+            console.error('Error fetching registered events:', error);
+
+            let errorMsg = 'Something went wrong. Please try again.';
+            if (error.response) {
+                console.error('Server Response:', error.response.data);
+                errorMsg = error.response.data?.message || errorMsg;
+            }
+
+            setError(errorMsg);
+        } finally {
+            console.log('Request completed.');
+            setLoading(false);
+        }
+    };
+
+
+    // Ensure userId is available before calling API
+    useEffect(() => {
+        if (userId) {
+            getRegisteredEvents();
+        } else {
+            console.log('User ID is missing, skipping API call.');
+        }
+    }, [userId]);
+
+
+
+
+
+
     const fetchUserId = async () => {
         try {
             const user_id = await AsyncStorage.getItem('User_id');
@@ -112,11 +172,11 @@ const MeetUpsDetails = ({ navigation, route }) => {
             // }
 
             // Fetch User Configuration
-            const response = await api.get(`/users/config?id=${userId}`);
+            const response = await api.get(`users/config?id=${userId}`);
 
             if (response.status === 200 && response.data?.result) {
                 const userConfig = response.data.data;
-                console.log('userConfig', userConfig);
+                console.log('userConfiggggnnn', userConfig);
 
                 if (userConfig.userisEmailVerified === false) {
                     setModalVisible(true);
@@ -439,7 +499,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     <MainAppScreenHeader headername={heading} />
                 </View>
                 {/* Image Section */}
-                <View style={[styles.card,{padding:0}]}>
+                <View style={[styles.card, { padding: 0 }]}>
                     <View style={styles.imageContainer}>
                         <Image source={{ uri: details.image }} style={styles.image} />
                     </View>
@@ -447,7 +507,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     {/* Text Section */}
                     <View style={styles.textContainer}>
                         <View style={[styles.infoRow, { justifyContent: 'space-between' }]}>
-                            <Text style={styles.advancedText}>ADVANCED</Text>
+                            {/* <Text style={styles.advancedText}>ADVANCED</Text> */}
 
                             {details.paid_or_free === 'Paid' ? <Text style={styles.date}>₹ {details.early_bird_price || 0}</Text> : null}
                         </View>
@@ -481,15 +541,19 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     {(details.summary || []).map((topic, index) => (
                         <Text key={index} style={styles.listItem}>✔ {topic}</Text>
                     ))}
-                    <View>
-                        <CustomButton
-                            title="Register"
-                            align="center"
-                            style={styles.registerButton}
-                            textstyle={styles.registerText}
-                            onPress={() => getUserConfig()}
-                        />
-                    </View>
+                    {isRegistered === true ?
+                        <View style={styles.registerButton}>
+                            <Text style={styles.registerText}>Event Already Registered</Text>
+                        </View> : <View>
+                            <CustomButton
+                                title="Register"
+                                align="center"
+                                style={styles.registerButton}
+                                textstyle={styles.registerText}
+                                onPress={() => getUserConfig()}
+                            />
+                        </View>}
+
                 </View>
                 <View style={{ alignItems: "flex-end", justifyContent: "flex-end" }}>
 
@@ -500,16 +564,16 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     {/* <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()} >
                         <Text style={styles.yesButtonText}>Invite</Text>
                     </TouchableOpacity> */}
-                              <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()}>
-                                <View style={{ left: wp('2'), zIndex: 100 }}>
-                                  <FontAwesome name="share" size={16} color="#000" />
-                                </View>
-                    
-                                <View>
-                                  <Text style={styles.yesButtonText}>Invite</Text>
-                                </View>
-                    
-                              </TouchableOpacity>
+                    <TouchableOpacity style={styles.yesButton} onPress={() => shareReferralLink()}>
+                        <View style={{ left: wp('2'), zIndex: 100 }}>
+                            <FontAwesome name="share" size={16} color="#000" />
+                        </View>
+
+                        <View>
+                            <Text style={styles.yesButtonText}>Invite</Text>
+                        </View>
+
+                    </TouchableOpacity>
 
                 </View>
 
@@ -571,7 +635,7 @@ const styles = StyleSheet.create({
     },
     textContainer: {
         padding: wp("4%"),
-        
+
     },
     advancedText: {
         color: "#c94f69",
@@ -611,6 +675,7 @@ const styles = StyleSheet.create({
         fontSize: wp("4.5%"),
         color: Colors.white,
         textAlign: "center",
+        fontWeight: 'bold'
     },
     yesButton: {
         // flex: 1,
@@ -621,9 +686,9 @@ const styles = StyleSheet.create({
         position: "absolute",
         right: wp('5'),
         bottom: wp('7'),
-        flexDirection:"row",
-        width:wp('18'),
-        justifyContent:"space-between",
+        flexDirection: "row",
+        width: wp('18'),
+        justifyContent: "space-between",
         paddingRight: wp('1.3')
     },
     yesButtonText: {
@@ -648,7 +713,7 @@ const styles = StyleSheet.create({
     time: {
         marginLeft: wp("1%"),
         fontSize: wp('3.5'),
-         color:'#000'
+        color: '#000'
     },
 });
 

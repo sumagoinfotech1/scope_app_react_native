@@ -1,356 +1,6 @@
-// import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView ,Platform} from 'react-native'
-// import React, { memo, useEffect, useState } from 'react'
-// import ScreenHeader from '../../../ReusableComponents/ScreenHeader'
-// import GradientContainer from '../../../ReusableComponents/GradientContainer'
-// import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
-// import CarouselComponent from '../../../ReusableComponents/CarouselComponent';
-// import Colors from '../../../ReusableComponents/Colors';
-// import MaterialIcons from "react-native-vector-icons/MaterialIcons";
-// import FontAwesome from "react-native-vector-icons/FontAwesome";
-// import CustomButton from '../../../ReusableComponents/CustomButton';
-// import AsyncStorage from "@react-native-async-storage/async-storage";
-// import api from "../../../utils/axiosInstance";
-// import { showToast } from '../../../utils/toastService';
-// const data = [
-//   { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
-//   { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
-//   { id: 3, title: 'Item 3', image: 'https://i.pinimg.com/736x/1f/d1/6c/1fd16c0483c99a1e70b58c6a4698488d.jpg' },
-// ];
-
-// const meetupData = [
-//   { id: '1', title: 'Visual Elements Of User Interface Design', date: '04 Feb 25', time: '02:40 PM', location: 'Govind Nagar Nashik', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-//   { id: '2', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/50/35/57/503557d678025e87d3c017dd6a9fba14.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-//   { id: '3', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/f7/8c/ef/f78cef0dd20b57db43cc6c93cc4e7303.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-//   { id: '4', title: 'Advanced UX Strategies', date: '10 Mar 25', time: '03:00 PM', location: 'Downtown Mumbai', image: 'https://i.pinimg.com/736x/a5/77/4c/a5774cfed2b9a6bbc14ffea6148b7fb9.jpg', price: '600', offerprice: '300', joinmembers: "400" },
-// ];
-
-// const Home = ({navigation}) => {
-//   const [events, setEvents] = useState([]);
-//   const [loading, setLoading] = useState(false);
-// const [error, setError] = useState(null);
-
-// // console.log('eventsss',events);
-
-// const getEvents = async () => {
-//   try {
-//     setLoading(true);
-//     // console.log('Fetching Events...');
-
-//     // Make API Request
-//     const response = await api.get('event/get_events_grouped_by_eventtype');
-
-//     if (response.status === 200 && response.data?.result) {
-//       setEvents(response.data.data); // Store data in state
-//       console.log('data 13',response.data.data.map((item)=>item.name));
-
-//     } else {
-//       showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
-//       throw new Error(response.data?.message || 'Failed to fetch events');
-//     }
-//   } catch (error) {
-//     console.error('Error in getEvents:', error);
-
-//     let errorMsg = 'Something went wrong. Please try again.';
-//     if (error.response) {
-//       errorMsg = error.response.data?.message || errorMsg;
-//     } else if (error.message) {
-//       errorMsg = error.message;
-//     }
-
-//     setError(errorMsg);
-//   } finally {
-//     setLoading(false);
-//   }
-// };
-
-// // Fetch data on component mount
-// useEffect(() => {
-//   getEvents();
-// }, []);
 
 
-
-
-
-// const renderItem = ({ item }) => (
-//     <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-//       <Image source={{ uri: item.image }} style={{ width: wp("95%"), height: hp("20%"), borderRadius: 20, backgroundColor: "black", resizeMode: "cover", borderWidth: 2, borderColor: Colors.white }} />
-//     </View>
-//   );
-
-// const gotoMeetup=()=>{
-//   navigation.navigate('MeetUpsScreen')
-// }
-// const gotoWorkShop=()=>{
-//   navigation.navigate('WorkShopScreen')
-// }
-//   const MeetupCard = ({ item }) => {
-//     return (
-//       <View style={styles.card}>
-//         {/* Header Section */}
-//         <View style={styles.header}>
-//           <Image source={{ uri: item.image }} style={styles.headerImage} />
-//         </View>
-
-//         {/* Content Section */}
-//         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
-
-//         {/* Date and Time */}
-//         <View style={styles.infoRow}>
-//           <Text style={styles.date}>{item.date}</Text>
-//           <MaterialIcons name="access-time" size={16} color="black" />
-//           <Text style={styles.time}>{item.time}</Text>
-//         </View>
-
-//         {/* Location */}
-//         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-//           <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4') ,width: wp("45"),}]}>
-//             <FontAwesome name="map-marker" size={16} color="black" />
-//             <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
-//           </View>
-//           <View style={{ alignItems: "flex-end" }}>
-//             <CustomButton
-//               title="Register"
-//               align="right"
-//               // onPress={handleSendOtp}
-//               style={{ padding: wp('1.4'), backgroundColor: Colors.black, borderRadius: wp('1') }}
-//               textstyle={{  fontSize: wp("3.9%") }}
-//             />
-//           </View>
-//         </View>
-
-//       </View>
-//     );
-//   };
-//   const WorkShopCard = ({ item }) => {
-//     return (
-//       <View style={styles.card}>
-//         {/* Header Section */}
-//         <View style={styles.header}>
-//           <Image source={{ uri: item.image }} style={styles.headerImage} />
-//         </View>
-
-//         {/* Content Section */}
-//         <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
-
-//         {/* Date and Time */}
-//         <View style={styles.infoRow}>
-//           <Text style={styles.date}>{item.offerprice} Rs</Text>
-//           <MaterialIcons name="local-offer" size={16} color="black" />
-//           <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
-//             {item.price} Rs
-//           </Text>
-//         </View>
-
-//         {/* Location */}
-//         <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-//           <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4') ,width: wp("45"),}]}>
-//             <FontAwesome name="user" size={22} color="#8C8C8C" />
-//             <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail"><Text style={{ fontWeight: "bold", fontSize: wp('3.6') }}>{item.joinmembers}</Text> Members Joined</Text>
-//           </View>
-//           <View style={{ alignItems: "flex-end" }}>
-//             <CustomButton
-//               title="Register"
-//               align="right"
-//               // onPress={fetchCategories}
-//               style={{ padding: wp('1.4'), backgroundColor: Colors.black, borderRadius: wp('1') }}
-//               textstyle={{ fontSize: wp("3.9%") }}
-//             />
-//           </View>
-//         </View>
-
-//       </View>
-//     );
-//   };
-
-//   return (
-//     <GradientContainer style={styles.maincontainer}>
-//       <ScrollView>
-//       <View style={{position:'static',}}>
-//         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('RewardsScreen')}>
-//             <Image source={require('../../../assets/icons/Maskgroup.png')} style={styles.icon} />
-//         </TouchableOpacity>
-//         </View>
-//       <View style={{ marginTop: Platform.OS === 'ios' ? hp("7%") : hp("2%"), marginBottom:hp("2%")}}>
-//         <ScreenHeader headername={"EVENTS"} />
-//         </View>
-//         <View style={styles.bannerContainer}>
-//           <CarouselComponent data={data} renderItem={renderItem} />
-//         </View>
-
-//         <View style={{ marginBottom: hp('2') }}>
-//           <ScreenHeader headername={"MEET UPS"} />
-//         </View>
-//         <View style={{ overflow: 'hidden' }}>
-//           <FlatList
-//             data={meetupData}
-//             horizontal
-//             keyExtractor={(item) => item.id}
-//             renderItem={({ item }) => <MeetupCard item={item} />}
-//             removeClippedSubviews={true}
-//           />
-//           <CustomButton
-//             title="See More"
-//             align="right"
-//             onPress={()=>gotoMeetup()}
-//             style={{ marginRight: wp('2') }}
-
-//           />
-//         </View>
-//         <View style={{ margin: hp('2') }}>
-//           <ScreenHeader headername={"WORKSHOP"} />
-//         </View>
-//         <View style={{ overflow: 'hidden' }}>
-//           <FlatList
-//             data={meetupData}
-//             horizontal
-//             keyExtractor={(item) => item.id}
-//             renderItem={({ item }) => <WorkShopCard item={item} />}
-//             removeClippedSubviews={true}
-//           />
-//           <CustomButton
-//             title="See More"
-//             align="right"
-//             onPress={()=>gotoWorkShop()}
-//             style={{ marginRight: wp('2') }}
-
-//           />
-//         </View>
-//         <View style={{ margin: hp('2') }}>
-//           <ScreenHeader headername={"EARN REWARDS"} />
-//         </View>
-//         <View style={styles.ImageCard}>
-//           <Image
-//             // source={{ uri: "https://i.pinimg.com/736x/06/16/32/061632d4efe20eb88834e335ccbee1e9.jpg" }}
-//             source={require('../../../assets/icons/Banner.png')}
-//             style={styles.CardImage}
-//             resizeMode="contain" // You can change to "contain" or "stretch" if needed
-//           />
-//         </View>
-
-//       </ScrollView>
-//     </GradientContainer>
-//   )
-// }
-
-// export default memo(Home)
-
-// const styles = StyleSheet.create({
-//   maincontainer: {
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center'
-//   },
-//   bannerContainer: {
-//     // flex:1,
-//     alignItems: "center",
-//     justifyContent: 'center',
-//     marginBottom: hp("1%"),
-//     width: wp("100%"),
-
-//   },
-
-//   card: {
-//     width: wp("70%"),
-//     backgroundColor: '#fff',
-//     borderRadius: wp("2%"),
-//     padding: wp("1.5%"),
-//     shadowColor: '#000',
-//     shadowOpacity: 0.1,
-//     shadowRadius: 10,
-//     shadowOffset: { width: 0, height: 5 },
-//     elevation: 6,
-//     // alignItems: 'center',
-//     marginBottom: wp("2%"),
-//     margin: wp("1%"),
-//   },
-//   header: {
-//     alignItems: 'center',
-//   },
-//   headerImage: {
-//     width: wp("67%"),
-//     height: hp("14%"),
-//     resizeMode: 'cover',
-//     borderRadius: wp("2%"),
-//   },
-
-//   title: {
-//     fontSize: 16,
-//     fontWeight: 'bold',
-//     marginTop: 10,
-//     textAlign: 'left',
-//     color: Colors.black
-//   },
-//   infoRow: {
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     marginVertical: wp("1%"),
-//     elevation: 3
-//   },
-//   date: {
-//     color: 'red',
-//     fontWeight: 'bold',
-//     marginRight: wp("2.5%"),
-//   },
-//   time: {
-//     marginLeft: wp("1%"),
-//   },
-//   location: {
-//     marginLeft: wp("1%"),
-//     color: Colors.black,
-//     fontSize: wp("3.5%"),
-//     padding: wp("1%"),
-//     width: wp("40")
-
-//   },
-
-//   ImageCard: {
-//     alignItems: "center",
-//     justifyContent: "center",
-//     // elevation: 18,
-//     borderRadius: wp("3%"),
-//     alignSelf: "center",
-//     marginBottom: wp("3.9%")
-//   },
-//   CardImage: {
-//     width: wp("96%"),
-//     height: hp("38%"),
-//     borderRadius: wp("3%"),
-
-
-
-//   },
-//   button: {
-//     position: 'absolute',
-//     // bottom: wp('5%'),
-//     // right: wp('5%'),
-//     backgroundColor: '#E7E7E7',
-//     width: wp('14%'),
-//     height: wp('12%'),
-//     // borderRadius: wp('7%'),
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     shadowColor: '#000',
-//     shadowOpacity: 0.2,
-//     shadowRadius: 5,
-//     elevation: 5,
-//     alignSelf:"flex-end",
-//     marginVertical:wp('3'),
-//     borderTopLeftRadius:wp('7%'),
-//     borderBottomLeftRadius:wp('7%'),
-//     paddingHorizontal:wp('8'),
-
-// },
-// icon: {
-//     width: wp('7%'),
-//     height: wp('7%'),
-//     tintColor: '#000',
-//     resizeMode:'cover'
-// },
-
-// })
-
-import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView, Platform } from 'react-native'
+import { StyleSheet, Text, View, Image, FlatList, TouchableOpacity, ScrollView, Platform, Alert } from 'react-native'
 import React, { memo, useCallback, useEffect, useState } from 'react'
 import ScreenHeader from '../../../ReusableComponents/ScreenHeader'
 import GradientContainer from '../../../ReusableComponents/GradientContainer'
@@ -368,11 +18,6 @@ import { useFocusEffect, useIsFocused } from "@react-navigation/native";
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
 import { formatTime } from '../../../utils/timeUtils';
 
-const data = [
-  { id: 1, title: 'Item 1', image: 'https://i.pinimg.com/736x/3d/c2/eb/3dc2eb4ec5899da8b73b07aac0f7c700.jpg' },
-  { id: 2, title: 'Item 2', image: 'https://i.pinimg.com/736x/02/d9/78/02d9787575ca3e942ba0223e6e6eaaaf.jpg' },
-  { id: 3, title: 'Item 3', image: 'https://i.pinimg.com/736x/1f/d1/6c/1fd16c0483c99a1e70b58c6a4698488d.jpg' },
-];
 
 
 const Home = ({ navigation }) => {
@@ -381,6 +26,7 @@ const Home = ({ navigation }) => {
   const [error, setError] = useState(null);
   const isFocused = useIsFocused();
   const [slider, setSlider] = useState([]);
+  const [registeredEvents, setRegisteredEvents] = useState(new Set()); // Store registered event IDs
   // console.log('api',events[0].events);
 
   const getEvents = async () => {
@@ -397,7 +43,7 @@ const Home = ({ navigation }) => {
 
       } else {
         // console.log('raviiBhai',response.data?.message);
-        
+
         showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
         throw new Error(response.data?.message || 'Failed to fetch events');
       }
@@ -447,6 +93,45 @@ const Home = ({ navigation }) => {
       setLoading(false);
     }
   };
+  // ✅ Fetch Registered Events
+  const fetchRegisteredEvents = async () => {
+    try {
+      setLoading(true);
+      const userId = await AsyncStorage.getItem('User_id');
+
+      if (!userId) {
+        showToast('error', 'Error', 'User ID not found.');
+        throw new Error('User ID not found');
+      }
+
+      console.log('Fetching registered events for user:', userId);
+      const response = await api.get(`event-registration/registered-event/user?id=${userId}`);
+
+      if (response.status === 200 && response.data?.result) {
+        const registeredSet = new Set(response.data.data.map(event => event.event_id)); // Store event IDs in Set
+        setRegisteredEvents(registeredSet);
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch events');
+      }
+    } catch (error) {
+      console.error('Error fetching registered events:', error);
+      setError(error.message || 'Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ✅ Check if Event is Registered
+  const checkIfRegistered = (eventId) => {
+    return registeredEvents.has(eventId);
+  };
+
+  // Ensure userId is available before calling API
+  useEffect(() => {
+
+    fetchRegisteredEvents();
+
+  }, []);
   // Fetch data on component mount
 
   useEffect(() => {
@@ -455,8 +140,68 @@ const Home = ({ navigation }) => {
       getSlider()
     }
   }, [isFocused]);
+  useEffect(() => {
+    checkAccessToken()
+  }, []);
 
+  const checkAccessToken = async () => {
+    try {
+      const oldFMCToken = await AsyncStorage.getItem('oldFMCToken');
+      const FMCToken = await AsyncStorage.getItem('FMCToken');
+      console.log('new', FMCToken);
+      console.log('old', oldFMCToken);
 
+      if (oldFMCToken === FMCToken) {
+        console.log('old and new same');
+
+        return
+      } else {
+        createDeviceToken(FMCToken)
+
+        await AsyncStorage.setItem('oldFMCToken', FMCToken);
+      }
+    } catch (error) {
+      console.error('Error retrieving or saving access token:', error);
+    }
+  };
+
+  const createDeviceToken = async (token) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Creating Device Token:', token);
+
+      // API Request
+      const response = await api.post('device-token/create', {
+        token
+      });
+
+      console.log('Device Token Response:', response.data);
+
+      if (response.data?.result === true) {
+        // showToast("success", "Device Token Registered", "Your device has been successfully registered.");
+        return response.data;
+      } else {
+        showToast("error", "Failed to register device", response.data?.message || "Unable to register device token.");
+        throw new Error(response.data?.message || "Unable to register device token.");
+      }
+    } catch (error) {
+      console.error('Error in createDeviceToken:', error);
+
+      let errorMsg = "Something went wrong. Please try again.";
+      if (error.response) {
+        errorMsg = error.response.data?.message || errorMsg;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+
+      showToast("error", "Error", errorMsg);
+      setError(errorMsg);
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   const renderItem = ({ item }) => (
@@ -483,92 +228,109 @@ const Home = ({ navigation }) => {
 
     return `${day}-${month}-${year}`;
   };
-  const MeetupCard = ({ item }) => {
+  const MeetupCard = ({ item, isRegistered }) => {
+    console.log('isRegistered', isRegistered);
+
     return (
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
         </View>
-        <View style={{padding: wp("1.9%"),}}>
-        {/* Content Section */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
+        <View style={{ padding: wp("1.9%"), }}>
+          {/* Content Section */}
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
 
-        {/* Date and Time */}
-        <View style={styles.infoRow}>
-          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
-          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
-        </View>
-        <View style={styles.infoRow}>
-          <MaterialIcons name="access-time" size={16} color="black" />
-          <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
-        </View>
-        {/* Location */}
-        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
-            <FontAwesome name="map-marker" size={16} color="black" />
-            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
+          {/* Date and Time */}
+          <View style={styles.infoRow}>
+            <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+            {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
           </View>
-          <View style={{ alignItems: "flex-end" }}>
-            <CustomButton
-              title="Register"
-              align="right"
-              onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
-              textstyle={{ fontSize: wp("3.9%") }}
-
-            />
+          <View style={styles.infoRow}>
+            <MaterialIcons name="access-time" size={16} color="black" />
+            <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
           </View>
-        </View>
+          {/* Location */}
+          <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+            <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
+              <FontAwesome name="map-marker" size={16} color="black" />
+              <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail">{item.location}</Text>
+            </View>
+            <View style={{ alignItems: "flex-end" }}>
+            {isRegistered === true ?  <View style={{ padding: wp('2.5'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('40') }}>
+                <Text style={{
+                  color: '#fff',
+                  fontSize: wp("3.9%%"),
+                  fontWeight: 'bold',
+                }}> Already Registered</Text>
+              </View> : <CustomButton
+                title="Register"
+                align="right"
+                onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
+                style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
+                textstyle={{ fontSize: wp("3.9%") }}
+              />}
+            </View>
+          </View>
         </View>
       </TouchableOpacity>
     );
   };
-  const WorkShopCard = ({ item }) => {
+  const WorkShopCard = ({ item, isRegistered }) => {
+    // console.log('workisRegistered',isRegistered);
+
     return (
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
         </View>
-<View style={{padding: wp("1.9%"),}}>
-        {/* Content Section */}
-        <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
+        <View style={{ padding: wp("1.9%"), }}>
+          {/* Content Section */}
+          <Text style={styles.title} numberOfLines={1} ellipsizeMode="tail">{item.title}</Text>
 
 
-        {/* Date and Time */}
-        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
-          {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
           {/* Date and Time */}
+          <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+            <Text style={styles.date}>{formatDate(item.from_date)} <Text style={{ color: '#000' }}>To</Text> {formatDate(item.to_date)}</Text>
+            {/* <Text style={styles.date}>{formatDate(item.to_date)}</Text> */}
+            {/* Date and Time */}
+            <View style={styles.infoRow}>
+              <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
+              <MaterialIcons name="local-offer" size={16} color="black" />
+              <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
+                ₹ {item.initial_price || 0}
+              </Text>
+            </View>
+          </View>
           <View style={styles.infoRow}>
-            <Text style={styles.date}>₹ {item.early_bird_price || 0}</Text>
-            <MaterialIcons name="local-offer" size={16} color="black" />
-            <Text style={[styles.time, { textDecorationLine: 'line-through', fontWeight: 'bold' }]}>
-              ₹ {item.initial_price || 0}
-            </Text>
+            <MaterialIcons name="access-time" size={16} color="black" />
+            <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
           </View>
-        </View>
-        <View style={styles.infoRow}>
-          <MaterialIcons name="access-time" size={16} color="black" />
-          <Text style={styles.time}>{formatTime(item.from_time)} <Text style={{ color: '#000' }}>To</Text> {formatTime(item.to_time)}</Text>
-        </View>
-        {/* Location */}
-        <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
-          <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
-            <FontAwesome name="user" size={22} color="#8C8C8C" />
-            <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail"><Text style={{ fontWeight: "bold", fontSize: wp('3.6') }}>{item.max_attendees}</Text> Members Joined</Text>
+          {/* Location */}
+          <View style={[styles.infoRow, { justifyContent: "space-between" }]}>
+            <View style={[styles.infoRow, { backgroundColor: "#E2E2E2", padding: wp('1.3'), borderRadius: wp('4'), width: wp("45"), }]}>
+              <FontAwesome name="user" size={22} color="#8C8C8C" />
+              <Text style={styles.location} numberOfLines={1} ellipsizeMode="tail"><Text style={{ fontWeight: "bold", fontSize: wp('3.6') }}>{item.max_attendees}</Text> Members Joined</Text>
+            </View>
+
+            <View style={{ alignItems: "flex-end" }}>
+              {isRegistered === true ?  <View style={{ padding: wp('2.5'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('40') }}>
+                <Text style={{
+                  color: '#fff',
+                  fontSize: wp("3.9%%"),
+                  fontWeight: 'bold',
+                }}> Already Registered</Text>
+              </View> : <CustomButton
+                title="Register"
+                align="right"
+                onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
+                style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
+                textstyle={{ fontSize: wp("3.9%") }}
+              />}
+             
+            </View>
           </View>
-          <View style={{ alignItems: "flex-end" }}>
-            <CustomButton
-              title="Register"
-              align="right"
-              onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}
-              style={{ padding: wp('3'), backgroundColor: Colors.black, borderRadius: wp('3.5'), width: wp('30') }}
-              textstyle={{ fontSize: wp("3.9%") }}
-            />
-          </View>
-        </View>
         </View>
       </TouchableOpacity>
     );
@@ -602,13 +364,13 @@ const Home = ({ navigation }) => {
                 renderItem={({ item }) => (
                   <View style={{ marginLeft: wp('1') }}>
                     {item.paid_or_free === 'Paid' ? (
-                      <WorkShopCard item={item} />
+                      <WorkShopCard item={item} isRegistered={checkIfRegistered(item.id)} />
                     ) : (
-                      <MeetupCard item={item} />
+                      <MeetupCard item={item} isRegistered={checkIfRegistered(item.id)} />
                     )}
                   </View>
                 )}
-                showsHorizontalScrollIndicator={false} // Hide scrollbar for cleaner UI
+                showsHorizontalScrollIndicator={false}
                 removeClippedSubviews={true}
               />
               {/* "See More" button appears once per item */}
@@ -712,7 +474,7 @@ const styles = StyleSheet.create({
   },
   time: {
     marginLeft: wp("1%"),
-    color:'#000'
+    color: '#000'
   },
   location: {
     marginLeft: wp("1%"),

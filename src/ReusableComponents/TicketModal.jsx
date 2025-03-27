@@ -9,9 +9,9 @@ import { useNavigation } from "@react-navigation/native";
 import Colors from "./Colors";
 const { width } = Dimensions.get("window");
 
-const TicketModal = ({ visible, onClose ,item,setTicketModal}) => {
+const TicketModal = ({ visible, onClose, item, setTicketModal }) => {
   const [showFirstComponent, setShowFirstComponent] = useState(true);
-  
+
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -33,13 +33,13 @@ const TicketModal = ({ visible, onClose ,item,setTicketModal}) => {
             // width: "100%",
 
           }}>
-            <Image source={{uri:item.image}} style={styles.imageSection} />
+            <Image source={{ uri: item.image }} style={styles.imageSection} />
 
           </View>
 
           {/* Cutout Effect */}
           <View style={styles.cutoutWrapper}>
-            <View style={styles.cutoutLeft} /><Text style={{ fontSize: wp('8'), fontWeight: 'bold', color: '#ccc' }}> - - - - - - - - - - - - - - - </Text>
+            <View style={styles.cutoutLeft} /><Text style={{ fontSize: wp('8'), fontWeight: 'bold', color: '#ccc' }}>- - - - - - - - - - - - - - - - </Text>
             {/* <View style={styles.separator} /> */}
             <View style={styles.cutoutRight} />
           </View>
@@ -50,23 +50,23 @@ const TicketModal = ({ visible, onClose ,item,setTicketModal}) => {
             <Text style={styles.subtitle}>Successfully Done</Text>
 
             {/* Gift Icon */}
-            
-            {showFirstComponent?
-          <FastImage source={require("../assets/gif/Love.gif")} style={styles.giftIcon} />: <View style={{margin:wp('5'),alignItems:"center"}}>
-          <Text style={{ fontSize: wp('5'), color: '#000', fontWeight: 'bold' }}>On Visual Elements</Text>
-          <View style={{ flexDirection: 'row', }}>
-            <Text style={{ fontSize: wp('3.4'), color: 'red', fontWeight: 'bold', marginRight: wp('4') }}>{item.to_date}</Text>
-            <Text style={{ fontSize: wp('3.4'), color: '#000', }}>{item.from_time}</Text>
-          </View>
-          <CustomButton
-            title="Explore More"
-            align="center"
-            style={{ padding: wp('2.5'), backgroundColor: Colors.black, marginHorizontal: wp('7'), marginVertical: wp('2'), width:wp('35')}}
-            textstyle={{ fontSize: wp("4%") }}
-            onPress={() => {onClose,navigation.navigate('Home')}}
-          />
-        </View>}
-         
+
+            {showFirstComponent ?
+              <FastImage source={require("../assets/gif/Love.gif")} style={styles.giftIcon} /> : <View style={{ margin: wp('5'), alignItems: "center" }}>
+                <Text style={{ fontSize: wp('5'), color: '#000', fontWeight: 'bold' }}>On Visual Elements</Text>
+                <View style={{ flexDirection: 'row', }}>
+                  <Text style={{ fontSize: wp('3.4'), color: 'red', fontWeight: 'bold', marginRight: wp('4') }}>{item.to_date}</Text>
+                  <Text style={{ fontSize: wp('3.4'), color: '#000', }}>{item.from_time}</Text>
+                </View>
+                <CustomButton
+                  title="Explore More"
+                  align="center"
+                  style={{ padding: wp('2.5'), backgroundColor: Colors.black, marginHorizontal: wp('7'), marginVertical: wp('2'), width: wp('35') }}
+                  textstyle={{ fontSize: wp("4%") }}
+                  onPress={() => { onClose, navigation.navigate('Home') }}
+                />
+              </View>}
+
           </View>
           {/* Close Button */}
           <TouchableOpacity style={styles.closeButton} onPress={onClose}>

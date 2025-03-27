@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
 
 import CustomButton from './CustomButton'; // Assuming you have a CustomButton component for reuse
@@ -7,8 +7,13 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import Colors from './Colors';
 import { formatTime } from '../utils/timeUtils';
+import { showToast } from '../utils/toastService';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import api from '../utils/axiosInstance';
 
-const MeetAndWorkCard = ({ item, onpress }) => {
+const MeetAndWorkCard = ({ item, onpress,navigation }) => {
+  const [loading, setLoading] = useState(false);
+  const [isRegistered, setIsRegistered] = useState('');
   const formatDate = (dateString) => {
     const months = [
       "Jan", "Feb", "March", "April", "May", "June",
@@ -22,8 +27,59 @@ const MeetAndWorkCard = ({ item, onpress }) => {
 
     return `${day}-${month}-${year}`;
   };
-  console.log('itemitem', item);
+  console.log('itemitem', item.id);
+  const getRegisteredEvents = async () => {
+    try {
+      setLoading(true);
+      const userId = await AsyncStorage.getItem('User_id');
 
+      if (!userId) {
+        showToast('error', 'Error', 'User ID not found.');
+        throw new Error('User ID not found');
+      }
+      console.log('Fetching registered events for user:', userId);
+
+      // API request
+      const response = await api.get(`event-registration/registered-event/user?id=${userId}`);
+
+      console.log('API Response:', response);
+
+      if (response.status === 200 && response.data?.result) {
+        const registeredEvents = response.data.data; // Extract event data
+
+        // Check if the eventId exists in the registered events list
+        const isRegistered = registeredEvents.some(event => event.event_id === item.id);
+
+        setIsRegistered(isRegistered); // Update state for UI
+        console.log(`Eventr ${item.id} is ${isRegistered ? 'already registered' : 'not registered'}`);
+      } else {
+        const errorMsg = response.data?.message || 'Failed to fetch events';
+        showToast('error', 'Error', errorMsg);
+        throw new Error(errorMsg);
+      }
+    } catch (error) {
+      console.error('Error fetching registered events:', error);
+
+      let errorMsg = 'Something went wrong. Please try again.';
+      if (error.response) {
+        console.error('Server Response:', error.response.data);
+        errorMsg = error.response.data?.message || errorMsg;
+      }
+
+      setError(errorMsg);
+    } finally {
+      console.log('Request completed.');
+      setLoading(false);
+    }
+  };
+
+
+  // Ensure userId is available before calling API
+  useEffect(() => {
+
+    getRegisteredEvents();
+
+  }, []);
   return (
     <View style={styles.card}>
       <TouchableOpacity onPress={onpress}>
@@ -71,14 +127,16 @@ const MeetAndWorkCard = ({ item, onpress }) => {
 
         </View>
       </TouchableOpacity>
-
-      <CustomButton
+      {isRegistered === true ?  <View style={styles.registerButton}>
+                              <Text style={styles.registerText}>Event Already Registered</Text>
+                          </View>  : <CustomButton
         title="Register"
         align="center"
-        // onPress={handleSendOtp} // You can pass actions here
+        onPress={onpress}
         style={styles.registerButton}
         textstyle={styles.registerText}
-      />
+      />}
+
     </View>
   );
 };
@@ -151,16 +209,21 @@ const styles = StyleSheet.create({
     padding: wp('2'),
     backgroundColor: Colors.black,
     borderRadius: wp('3.5'),
-    width: wp('87%')
+    width: wp('87%'),
+    alignSelf:'center'
   },
   registerText: {
     fontSize: wp("4.5%"),
+  
+    color: Colors.white,
+    textAlign: "center",
+    fontWeight:'bold'
 
   },
   pricetag: {
     fontSize: wp('7'),
     fontWeight: 'bold',
-    color: "red"
+    color: "#c94f69"
   }
 });
 
