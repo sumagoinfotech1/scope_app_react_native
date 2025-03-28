@@ -17,18 +17,23 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import { formatTime } from "../../../utils/timeUtils"
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { useIsFocused } from "@react-navigation/native";
+import VerifyLinkModal from "../../../ReusableComponents/VerifyLinkModal";
+
 const MeetUpsDetails = ({ navigation, route }) => {
     const { id } = route.params || {};
     const [modalVisible, setModalVisible] = useState(false);
+    const [isVerifyModal, setVerifyModalVisible] = useState(false);
     const [ticketModal, setTicketModal] = useState(false);
     const [details, setEventsDetails] = useState([]);
     const [isRegistered, setIsRegistered] = useState('');
+    const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
     const [heading, setHeading] = useState();
     const [isconfiremmodal, setCinfirmModal] = useState(false);
     const [referralCode, setReferralCode] = useState("");
-    const [errorOccured, setErrorOccured] = useState(false);
+    const [errorOccured, setErrorOccured] = useState(true);
     const isFocused = useIsFocused();
+     const [error, setError] = useState(null);
     // const [verificationmodal, setverificationmodal] = useState(false);
     const [userId, setUserId] = useState('')
     console.log('isRegistered', isRegistered);
@@ -50,7 +55,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
 
 
     const getEventsDetails = async () => {
-
+        setErrorOccured(false)
         try {
             setLoading(true);
             // console.log('Fetching Events...');
@@ -77,7 +82,6 @@ const MeetUpsDetails = ({ navigation, route }) => {
                 errorMsg = error.message;
             }
 
-            setError(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -123,7 +127,6 @@ const MeetUpsDetails = ({ navigation, route }) => {
                 errorMsg = error.response.data?.message || errorMsg;
             }
 
-            setError(errorMsg);
         } finally {
             console.log('Request completed.');
             setLoading(false);
@@ -177,15 +180,36 @@ const MeetUpsDetails = ({ navigation, route }) => {
             if (response.status === 200 && response.data?.result) {
                 const userConfig = response.data.data;
                 console.log('userConfiggggnnn', userConfig);
+                setEmail(userConfig.email)
 
-                if (userConfig.userisEmailVerified === false) {
-                    setModalVisible(true);
 
-                } else {
 
-                    setCinfirmModal(true)
+
+                if (userConfig.userEmailExist && !userConfig.userisEmailVerified) {
+                    // If email exists but is not verified, send the verification link
+                    console.log("Email exists but is not verified. Sending verification link...");
+                    getVerifyEmail();
+                } else if (!userConfig.userEmailExist && !userConfig.userisEmailVerified) {
+                    // If email does not exist and is not verified, prompt user to enter their email
+                    console.log("Email does not exist. Prompting user to enter email...");
+                    setModalVisible(true);setErrorOccured(false)
+                } else if (userConfig.userEmailExist && userConfig.userisEmailVerified) {
+                    // If email exists and is verified, show confirmation modal
+                    setCinfirmModal(true);
                 }
 
+
+
+
+
+
+                // if (userConfig.userisEmailVerified === false ) {
+                //     setModalVisible(true);
+
+                // } else {
+
+                //     setCinfirmModal(true)
+                // }
                 return userConfig; // Return user config for further use
             } else {
                 showToast('error', 'Error', response.data?.message || 'Failed to fetch user config');
@@ -201,24 +225,27 @@ const MeetUpsDetails = ({ navigation, route }) => {
                 errorMsg = error.message;
             }
 
-            setError(errorMsg);
         } finally {
             setLoading(false);
         }
     };
     const updateUser = async (email) => {
+        setErrorOccured(false)
         console.log('email', email);
-
+        setEmail(email)
+         // Validate email format
+         if (!email || !email.includes('@')) {
+            // showToast('error', 'Error', 'Invalid email address.');
+            setErrorOccured(true)
+            setError('Invalid email address.');
+            return;
+        }
         try {
             setLoading(true);
 
 
 
-            // Validate email format
-            if (!email || !email.includes('@')) {
-                showToast('error', 'Error', 'Invalid email address.');
-                return;
-            }
+           
 
             // API request with proper headers
             const response = await api.put(
@@ -259,68 +286,71 @@ const MeetUpsDetails = ({ navigation, route }) => {
         }
     };
 
-    const getVerifyEmail = async () => {
-        try {
-            setLoading(true);
-            // console.log('Fetching Events...');
-
-            // Make API Request
-            const response = await api.post(`auth/email/send-verification`);
-
-            if (response.status === 200 && response.data?.result === true) {
-                showToast('success', 'Success', response.data?.message || 'Verification email sent successfully');
-                // registerForEvent()
-                // Alert.alert("Email Send", response.data?.message)
-            } else {
-                // Alert.alert("verify")
-                showToast('error', 'Error', response.data?.message || 'Failed to Verify');
-                throw new Error(response.data?.message || 'Failed to fetch events');
-
-            }
-        } catch (error) {
-            console.error('Error in getEvents:', error);
-
-            let errorMsg = 'Something went wrong. Please try again.';
-            if (error.response) {
-                errorMsg = error.response.data?.message || errorMsg;
-            } else if (error.message) {
-                errorMsg = error.message;
-            }
-
-            setError(errorMsg);
-        } finally {
-            setLoading(false);
-        }
-    };
-    // const registerForEvent = async () => {
+    // const getVerifyEmail = async () => {
     //     try {
     //         setLoading(true);
+    //         // console.log('Fetching Events...');
 
-    //         // API request to register for the event
-    //         const response = await api.post('event-registration/register', {
-    //             userId: userId,
-    //             eventId: id,
-    //         });
-    //         console.log("responseee".response);
+    //         // Make API Request
+    //         const response = await api.post(`auth/email/send-verification`);
 
-    //         if (response.data?.result === true) {
-    //             showToast('success', 'Success', response.data?.message);
-    //             setCinfirmModal(false);
-    //             setTicketModal(true)
+    //         if (response.status === 200 && response.data?.result === true) {
+    //             showToast('success', 'Success', response.data?.message || 'Verification email sent successfully');
+    //             // registerForEvent()
+    //             // Alert.alert("Email Send", response.data?.message)
     //         } else {
-    //             if (response.data?.message === "Email not verified") {
-    //                 setModalVisible(true); // Show email verification modal
-    //             } else {
-    //                 showToast('error', 'Error', response.data?.message);
-    //             }
+    //             // Alert.alert("verify")
+    //             showToast('error', 'Error', response.data?.message || 'Failed to Verify');
+    //             throw new Error(response.data?.message || 'Failed to fetch events');
+
     //         }
     //     } catch (error) {
-    //         showToast('error', 'Error', 'Something went wrong. Please try again.');
-    //         console.error('Error registering for event:', error);
+    //         console.error('Error in verify email:', error);
+
+    //         let errorMsg = 'Something went wrong. Please try again.';
+    //         if (error.response) {
+    //             errorMsg = error.response.data?.message || errorMsg;
+    //         } else if (error.message) {
+    //             errorMsg = error.message;
+    //         }
+
+    //         setError(errorMsg);
     //     } finally {
     //         setLoading(false);
     //     }
     // };
+
+    const getVerifyEmail = async () => {
+        try {
+            setLoading(true);
+
+            // Make API Request
+            const response = await api.post('auth/email/send-verification');
+
+            if (response?.status === 200 && response?.data?.result) {
+                showToast('success', 'Success', response?.data?.message || 'Verification email sent successfully');
+                setVerifyModalVisible(true)
+
+            } else {
+                showToast('error', 'Error', response?.data?.message || 'Failed to verify');
+            }
+        } catch (error) {
+            console.error('Error in verifying email:', error);
+
+            let errorMsg = 'Something went wrong. Please try again.';
+
+            if (error?.response?.data?.message) {
+                errorMsg = error.response.data.message;
+            } else if (error?.message) {
+                errorMsg = error.message;
+            }
+
+            showToast('error', 'Error', errorMsg); // Show toast on error
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const registerForEvent = async () => {
         try {
             setLoading(true);
@@ -387,7 +417,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
         fetchUserIdAndCreateReferral();
     }, []);
     const handleCreateReferral = async (userId) => {
-        setErrorOccured(false);
+        
         setLoading(true);
 
         try {
@@ -400,7 +430,6 @@ const MeetUpsDetails = ({ navigation, route }) => {
                 setReferralCode(response.data.data.referral_code)
             } else {
                 setErrorOccured(true);
-                setError(response.data.message || "Failed to create referral");
                 showToast('error', 'Referral Failed', response.data.message || "Failed to create referral");
             }
         } catch (error) {
@@ -413,11 +442,9 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     fetchUserReferral(userId)
 
                 } else {
-                    setError(error.response.data?.message || "Error creating referral");
                     showToast('error', 'Error', error.response.data?.message || "Error creating referral");
                 }
             } else {
-                setError("Network error. Please check your connection.");
                 showToast('error', 'Network Error', "Please check your internet connection.");
             }
         }
@@ -499,7 +526,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     <MainAppScreenHeader headername={heading} />
                 </View>
                 {/* Image Section */}
-                <View style={[styles.card, { padding: 0 }]}>
+                <View style={[styles.card]}>
                     <View style={styles.imageContainer}>
                         <Image source={{ uri: details.image }} style={styles.image} />
                     </View>
@@ -584,6 +611,8 @@ const MeetUpsDetails = ({ navigation, route }) => {
                         updateUser(item)
 
                     }}
+                    error={error}
+                    errorOccure={errorOccured}
                 />
 
 
@@ -598,6 +627,11 @@ const MeetUpsDetails = ({ navigation, route }) => {
                     onClose={() => setTicketModal(false)}
                     item={details}
 
+                />
+                <VerifyLinkModal
+                    isVisible={isVerifyModal}
+                    onClose={() => setVerifyModalVisible(false)}
+                    email={email}
                 />
             </ScrollView>
             <Loader visible={loading} />
@@ -625,16 +659,20 @@ const styles = StyleSheet.create({
     },
     imageContainer: {
         alignItems: "center",
-        elevation: 10
+        elevation: 10,
+        backgroundColor: "#fff",
+        borderRadius: 10,
+
     },
     image: {
-        width: wp("94%"),
-        height: wp("39%"),
+        width: wp("84%"),
+        height: wp("45%"),
         borderRadius: 10,
-        resizeMode: 'contain'
+        resizeMode: 'cover',
+        elevation: 10,
     },
     textContainer: {
-        padding: wp("4%"),
+        // padding: wp("4%"),
 
     },
     advancedText: {

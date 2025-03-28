@@ -51,7 +51,7 @@ const getFCMToken = async () => {
         const token = await messaging().getToken();
         console.log('FCM Tokenn:', token);
         // await AsyncStorage.removeItem("oldFMCToken");
-        await AsyncStorage.setItem("FMCToken",token);
+        await AsyncStorage.setItem("FMCToken", token);
     } catch (error) {
         console.error('Failed to get FCM token:', error);
     }
@@ -103,18 +103,33 @@ const waitForNavigationReady = () => {
 const handleNotificationNavigation = async (data) => {
     if (!data) return;
 
-    const { eventId, eventTypeName } = data;
+    const { eventId, notificationType } = data;
     console.log("Handling Notification:", data);
 
     await waitForNavigationReady(); // ✅ Wait until navigation is ready
 
-    if (eventTypeName === "meetups") {
+    if (notificationType === "event_created") {
         console.log("Navigating to MeetUpsDetails:", eventId);
-        navigationRef.current.navigate("MeetUpsDetails", { id: eventId });
-    } else if (eventTypeName === "workshop") {
-        console.log("Navigating to WorkshopDetails:", eventId);
-        navigationRef.current.navigate("MeetUpsDetails", { id: eventId });
-    } else {
+        // navigationRef.current.navigate("MeetUpsDetails", { id: eventId });
+        navigationRef.current.navigate('Event', {
+            screen: "MeetUpsDetails",
+            params: { id: eventId }
+        });
+    }
+    else if (notificationType === "event_reminder") {
+        console.log("Navigating to UpcomimgEventScreen:", eventId);
+        navigationRef.current.navigate('UpcomingEvent', { screen: 'UpcomimgEventScreen' });
+    }
+    else if (notificationType === "event_cancelled") {
+        console.log("Navigating to event cancelled:", eventId);
+        navigationRef.current.navigate('UpcomingEvent', { screen: 'UpcomimgEventScreen' });
+    }
+    else if (notificationType === "reward_earned") {
+        console.log("Navigating to event cancelled:", eventId);
+        // navigationRef.current.navigate("RewardsScreen");
+        navigationRef.current.navigate('Event', { screen: 'RewardsScreen' });
+    }
+    else {
         console.log("Navigating to Home");
         navigationRef.current.navigate("Event");
     }
@@ -183,31 +198,31 @@ const App = () => {
         getFCMToken(); // Retrieve FCM Token
         configurePushNotifications(); // Configure local notifications
 
-     // ✅ Handle Foreground Notifications (Suppress Firebase & Show Custom)
-    const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
-        console.log("Foreground Notification:", remoteMessage);
+        // ✅ Handle Foreground Notifications (Suppress Firebase & Show Custom)
+        const unsubscribeForeground = messaging().onMessage(async remoteMessage => {
+            console.log("Foreground Notification:", remoteMessage);
 
-        // 🔴 Prevent Firebase from showing its default notification
-        if (remoteMessage?.notification) {
-            console.log("🔴 Default Firebase Notification intercepted and suppressed.");
-        }
+            // 🔴 Prevent Firebase from showing its default notification
+            if (remoteMessage?.notification) {
+                console.log("🔴 Default Firebase Notification intercepted and suppressed.");
+            }
 
-        // ✅ Show only React Native Push Notification
-        if (remoteMessage?.data || remoteMessage?.notification) {
-            PushNotification.localNotification({
-                channelId: "custom-channel",
-                title: remoteMessage.data?.notificationTitle || remoteMessage.notification?.title || "New Notification",
-                message: remoteMessage.data?.notificationMessage || remoteMessage.notification?.body || "You have a new message",
-                bigText: remoteMessage.data?.eventName || "No description available",
-                playSound: true,
-                soundName: "default",
-                vibrate: true,
-                priority: "high",
-                ignoreInForeground: false,
-                data: JSON.stringify(remoteMessage.data),
-            });
-        }
-    });
+            // ✅ Show only React Native Push Notification
+            if (remoteMessage?.data || remoteMessage?.notification) {
+                PushNotification.localNotification({
+                    channelId: "custom-channel",
+                    title: remoteMessage.data?.notificationTitle || remoteMessage.notification?.title || "New Notification",
+                    message: remoteMessage.data?.notificationMessage || remoteMessage.notification?.body || "You have a new message",
+                    bigText: remoteMessage.data?.eventName || "No description available",
+                    playSound: true,
+                    soundName: "default",
+                    vibrate: true,
+                    priority: "high",
+                    ignoreInForeground: false,
+                    data: JSON.stringify(remoteMessage.data),
+                });
+            }
+        });
 
         // 🟠 Handle Notification When App is in Background (Clicked)
         const unsubscribeNotificationOpened = messaging().onNotificationOpenedApp(remoteMessage => {
@@ -220,7 +235,7 @@ const App = () => {
         // 🟡 Handle Background Notifications (Push received but not clicked)
         messaging().setBackgroundMessageHandler(async remoteMessage => {
             console.log("Background Notification app Received:", remoteMessage);
-            
+
             if (remoteMessage?.data || remoteMessage?.notification) {
                 PushNotification.localNotification({
                     channelId: "custom-channel",
@@ -242,7 +257,7 @@ const App = () => {
             .then(remoteMessage => {
                 if (remoteMessage?.data) {
                     console.log("App opened from killed state notification:", remoteMessage);
-                    
+
                     // handleNotificationNavigation(remoteMessage.data);
                 }
             })
@@ -257,7 +272,7 @@ const App = () => {
         <NavigationContainer ref={navigationRef}>
             <StatusBar hidden={true} />
             {!loading && <RootStack initialRoute={initialRoute} />}
-            
+
             <ToastProvider />
         </NavigationContainer>
     );

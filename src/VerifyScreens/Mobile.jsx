@@ -141,7 +141,7 @@ const Mobile = ({ navigation }) => {
       setError("Enter a valid 10-digit mobile number");
 
       // Show error toast for invalid mobile number
-      showToast('error', 'Invalid Mobile', 'Enter a valid 10-digit mobile number');
+      // showToast('error', 'Invalid Mobile', 'Enter a valid 10-digit mobile number');
       return;
     }
 
@@ -452,7 +452,7 @@ const Mobile = ({ navigation }) => {
           <>
             <Text style={styles.label}>OTP Verification</Text>
 
-            <Text style={styles.extraText}>A 4 Digit CODE HAS BEEN SENT TO {"\n"}{mobile}
+            <Text style={styles.extraText}>A 4 DIGIT CODE HAS BEEN SENT TO {"\n"}{mobile}
               <FontAwesome name="edit-2" size={18} color={"black"} onPress={() => { setStep("mobile"), setOtp(["", "", "", ""]), setErrorOccure(false) }} />
             </Text>
             <View style={styles.otpContainer}>

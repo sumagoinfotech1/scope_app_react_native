@@ -12,6 +12,7 @@ import Loader from '../../../ReusableComponents/Loader';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useIsFocused } from "@react-navigation/native";
 import { formatTime } from '../../../utils/timeUtils';
+import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader';
 
 
 
@@ -172,43 +173,7 @@ const UpcomimgEventScreen = () => {
   const pageSize = 10; // Fixed page size
   console.log('gggg', eventRegistration);
 
-  // const getEventRegistration = async () => {
-  //   try {
-  //     setLoading(true);
-  //     setError(null);
 
-  //     // Get user ID from AsyncStorage
-  //     const userId = await AsyncStorage.getItem("User_id");
-
-  //     if (!userId) {
-  //       throw new Error("User ID not found");
-  //     }
-
-  //     // Make API request
-  //     const response = await api.get(`event-registration/user?id=${userId}`);
-
-  //     if (response.status === 200 && response.data?.result) {
-  //       setEventRegistration(response.data.data); // Store data in state
-  //       console.log('setEventRegistration', response.data.data);
-
-  //     } else {
-  //       showToast("error", response.data?.message || "No event registrations found");
-  //       throw new Error(response.data?.message || "No event registrations found");
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching event registration:", error);
-
-  //     // Handle specific 400 status errors
-  //     if (error.response && error.response.status === 400) {
-  //       setError("No event registrations found.");
-  //       showToast("error", error.response.data?.message || "No event registrations found");
-  //     } else {
-  //       setError(error.message || "Something went wrong");
-  //     }
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
   const getEventRegistration = async (page = 1) => {
     if (page > totalPages) return; // ✅ Prevent extra API calls
 
@@ -258,6 +223,9 @@ const UpcomimgEventScreen = () => {
   const renderItem = useCallback(({ item }) => <MeetupCard item={item} onPress={handlePress} />, []);
   return (
     <View style={styles.container}>
+        <View style={{ marginTop: hp('3') }}>
+                    <MainAppScreenHeader headername={"UPCOMING EVENTS"} color='#000' />
+                </View>
       {loading ? (
         <Loader visible={loading} /> // ✅ Full-screen loader for first load
       ) : eventRegistration.length === 0 ? (
@@ -288,7 +256,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     // paddingVertical: wp("3%"),
-    backgroundColor: '#D9D9D9',
+    backgroundColor: '#ffff',
     justifyContent: "center"
   },
   card: {

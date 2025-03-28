@@ -127,17 +127,18 @@ const Home = ({ navigation }) => {
   };
 
   // Ensure userId is available before calling API
-  useEffect(() => {
+  // useEffect(() => {
 
-    fetchRegisteredEvents();
+  //   fetchRegisteredEvents();
 
-  }, []);
+  // }, []);
   // Fetch data on component mount
 
   useEffect(() => {
     if (isFocused) {
       getEvents();
       getSlider()
+      fetchRegisteredEvents();
     }
   }, [isFocused]);
   useEffect(() => {
@@ -229,7 +230,7 @@ const Home = ({ navigation }) => {
     return `${day}-${month}-${year}`;
   };
   const MeetupCard = ({ item, isRegistered }) => {
-    console.log('isRegistered', isRegistered);
+    // console.log('isRegistered', isRegistered);
 
     return (
       <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('MeetUpsDetails', { id: (item.id) })}>

@@ -32,17 +32,17 @@ import { navigationRef } from './src/utils/axiosInstance';
 messaging().setBackgroundMessageHandler(async remoteMessage => {
     console.log("Background Notification index Received:", remoteMessage);
 
-    if (remoteMessage?.data || remoteMessage?.notification) {
+    if (remoteMessage?.data) {
         PushNotification.localNotification({
-            channelId: "custom-channel", // Custom channel created above
-            title: remoteMessage.data?.notificationTitle || "New Notification",
-            message: remoteMessage.data?.notificationMessage || "You have a new message",
-            bigText: `🔔 Event: ${remoteMessage.data?.eventName || "No description"}\n📢 Type: ${remoteMessage.data?.eventTypeName || "Unknown"}`,
+            channelId: "custom-channel",
+            title: remoteMessage.data.notificationTitle || "New Notification",
+            message: remoteMessage.data.notificationMessage || "You have a new message",
+            bigText: `🔔 Event: ${remoteMessage.data.eventName || "No description"}\n📢 Type: ${remoteMessage.data.eventTypeName || "Unknown"}`,
             playSound: true,
             soundName: "default",
             vibrate: true,
             priority: "high",
-            ignoreInForeground: false, // Show even if the app is open
+            ignoreInForeground: false, 
             data: JSON.stringify(remoteMessage.data),
         });
     }
