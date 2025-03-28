@@ -4,6 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput, Alert } from 'react-native';
 import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
@@ -249,41 +250,41 @@ const ProfileScreen = ({ navigation }) => {
                 <TouchableOpacity style={styles.menuItem} onPress={() => navigation.navigate('ProfileEdit', { profileData })}>
                     <FontAwesome5 name="user" size={20} color="#000" />
                     <Text style={styles.menuText}>Profile Details</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('FAQScreen') }}>
                     <FontAwesome5 name="question-circle" size={20} color="#000" />
                     <Text style={styles.menuText}>FAQ</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => setModalVisible(true)}>
                     <FontAwesome5 name="comment-dots" size={20} color="#000" />
                     <Text style={styles.menuText}>Feedback</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('ReferalScreen') }}>
                     <FontAwesome5 name="user-friends" size={20} color="#000" />
                     <Text style={styles.menuText}>Referral</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => { navigation.navigate('UserSurvey', { profileData }) }}>
                     <MaterialIcons name="question-answer" size={20} color="#000" />
                     <Text style={styles.menuText}>User Survey</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.menuItem} onPress={() => setlogoutModalVisible(true)}>
                     <FontAwesome5 name="sign-out-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Logout</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.menuItem} onPress={() => setDeleteModalVisible(true)}>
                     <FontAwesome5 name="trash-alt" size={20} color="red" />
                     <Text style={[styles.menuText, { color: 'red' }]}>Delete Account</Text>
-                    <FontAwesome5 name="chevron-right" size={15} color="#aaa" />
+                    <Ionicons name="arrow-forward" size={20} color="#aaa" />
                 </TouchableOpacity>
             </View>
 
@@ -310,9 +311,10 @@ const ProfileScreen = ({ navigation }) => {
                         style={styles.feedbackInput}
                         placeholder="Share your feedback"
                         multiline
+                        textAlignVertical="top" 
                         onChangeText={(value) => setfeedbackText(value)}
                     />
-                    <Text style={styles.ratingText}>Rate Us {rating}</Text>
+                    <Text style={styles.ratingText}>Rate Us</Text>
                     <StarRating rating={rating} onChange={setRating} starSize={32} />
 
                     <TouchableOpacity style={styles.saveButton} onPress={() => submitFeedback()}>
@@ -387,8 +389,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#fff',
-        padding: hp('1.5%'),
-        borderRadius: 10,
+        padding: hp('1.7%'),
+        borderRadius: wp('3.7%'),
         marginBottom: hp('1.5%'),
         elevation: 10,
         shadowColor: '#000',
@@ -439,6 +441,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         minHeight: hp('10%'),
         marginBottom: hp('2%'),
+      
     },
     ratingText: {
         fontSize: wp('4%'),

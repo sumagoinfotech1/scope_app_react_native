@@ -139,11 +139,10 @@ const Home = ({ navigation }) => {
       getEvents();
       getSlider()
       fetchRegisteredEvents();
+      checkAccessToken()
     }
   }, [isFocused]);
-  useEffect(() => {
-    checkAccessToken()
-  }, []);
+
 
   const checkAccessToken = async () => {
     try {
@@ -154,11 +153,11 @@ const Home = ({ navigation }) => {
 
       if (oldFMCToken === FMCToken) {
         console.log('old and new same');
-
+// Alert.alert('same fmc token')
         return
       } else {
         createDeviceToken(FMCToken)
-
+        // Alert.alert('api call')
         await AsyncStorage.setItem('oldFMCToken', FMCToken);
       }
     } catch (error) {

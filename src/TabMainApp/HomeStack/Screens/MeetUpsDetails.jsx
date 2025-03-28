@@ -271,7 +271,7 @@ const MeetUpsDetails = ({ navigation, route }) => {
             if (error.response) {
                 setModalVisible(false);
                 console.error('Server Response:', error.response.data);
-                showToast('error', 'Error', error.response.data?.message || 'Failed to update user.');
+                showToast('success', '', error.response.data?.message || 'Failed to update user.');
             } else if (error.request) {
                 console.error('No response from server:', error.request);
                 showToast('error', 'Error', 'No response from server.');

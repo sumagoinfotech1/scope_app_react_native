@@ -15,7 +15,7 @@ const Tab = createBottomTabNavigator();
 const getTabIcon = (routeName, focused) => {
   const icons = {
     Event: focused ? "calendar-star" : "calendar-star",
-    UpcomingEvent: focused ? "calendar-clock" : "calendar-clock-outline",
+    Upcoming: focused ? "calendar-clock" : "calendar-clock-outline",
     Notifications: focused ? "bell" : "bell-outline",
     Profile: focused ? "account-circle" : "account-circle-outline",
   };
@@ -52,7 +52,7 @@ const MainApp = () => {
       })}
     >
       <Tab.Screen name="Event" component={HomeStack}     options={{ unmountOnBlur: true }}  />
-      <Tab.Screen name="UpcomingEvent" component={UpcomingStack} />
+      <Tab.Screen name="Upcoming" component={UpcomingStack} />
       <Tab.Screen name="Notifications" component={NotificationStack} />
       <Tab.Screen name="Profile" component={ProfileStack} />
     </Tab.Navigator>

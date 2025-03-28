@@ -40,7 +40,7 @@ const Skills = ({ navigation, route }) => {
 
 
     const mainApp = async () => {
-        if (selectedItems.length < 1) {
+        if (selectedItems.length < 3) {
             return showToast('error', 'Error', 'Select at least 1 items');
         }
 

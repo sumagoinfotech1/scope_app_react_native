@@ -29,35 +29,30 @@ const FAQScreen = () => {
 
     const getFaq = async () => {
         try {
-          setLoading(true);
-          // console.log('Fetching Events...');
+            setLoading(true);
     
-          // Make API Request
-          const response = await api.get('faq/all');
+            // API Request
+            const response = await api.get('faq/all');
     
-          if (response.status === 200 && response.data?.result) {
-            setEvents(response.data.data); // Store data in state
-            console.log('dataRavi', response.data.data.map((item) => item.name));
+            if (response.status === 200 && response.data?.result) {
+                const fetchedData = response.data.data;
+                setEvents(fetchedData); 
     
-          } else {
-            showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
-            throw new Error(response.data?.message || 'Failed to fetch events');
-          }
+                // ✅ Set first item expanded by default
+                if (fetchedData.length > 0) {
+                    setExpandedId(fetchedData[0].id);
+                }
+            } else {
+                showToast('error', 'Error', response.data?.message || 'Failed to fetch events');
+                throw new Error(response.data?.message || 'Failed to fetch events');
+            }
         } catch (error) {
-          console.error('Error in getEvents:', error);
-    
-          let errorMsg = 'Something went wrong. Please try again.';
-          if (error.response) {
-            errorMsg = error.response.data?.message || errorMsg;
-          } else if (error.message) {
-            errorMsg = error.message;
-          }
-    
-          setError(errorMsg);
+            console.error('Error in getFaq:', error);
         } finally {
-          setLoading(false);
+            setLoading(false);
         }
-      };
+    };
+    
     
       // Fetch data on component mount
     

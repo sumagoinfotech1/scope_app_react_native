@@ -96,6 +96,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+    marginTop: hp("1%"),
   },
   noButton: {
     flex: 1,
@@ -131,7 +132,7 @@ const styles = StyleSheet.create({
   errorcontainer: {
     alignItems: "center",
     justifyContent: 'center',
-    marginBottom: wp('3'),
+    // marginBottom: wp('1'),
     // alignSelf:"center"
   },
   errorText: {

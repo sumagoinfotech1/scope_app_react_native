@@ -94,7 +94,8 @@ import React, { useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, Image,ImageBackground,Platform} from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from "react-native-responsive-screen";
 import MainAppScreenHeader from '../../../ReusableComponents/MainAppScreenHeader';
-
+import { useFocusEffect, useIsFocused } from "@react-navigation/native";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const initialNotifications = [
     { id: '1', title: 'New Event Added 🚀', message: 'A New Workshop On React Native is Now Live! Register Before Seats Fill Up!', isNew: true, isRead: false, icon: require('../../../assets/icons/i3.png') },
     { id: '2', title: 'Upcoming Event Reminder 🎟️', message: 'Your JavaScript Workshop Starts In 1 Hour. Get Ready!', isNew: false, isRead: false, icon: require('../../../assets/icons/i3.png') },
@@ -105,7 +106,17 @@ const initialNotifications = [
 
 const NotificationScreen = () => {
     const [notifications, setNotifications] = useState(initialNotifications);
-
+    const [loading, setLoading] = useState(false);
+    const [isFetchingMore, setIsFetchingMore] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(null);
+    const [heading, setHeading] = useState([]);
+  const isFocused = useIsFocused();
+//    useEffect(() => {
+//       if (isFocused) {
+//         getNotifications()
+//       }
+//     }, [isFocused]);
     const handlePress = (id) => {
         setNotifications((prev) =>
             prev.map((item) =>
@@ -113,6 +124,58 @@ const NotificationScreen = () => {
             )
         );
     };
+//     const getNotifications = async (page = 1) => {
+//         if (isFetchingMore || (totalPages !== null && page > totalPages)) return; // Prevent duplicate calls
+    
+//         try {
+//             setIsFetchingMore(true);
+//             if (page === 1) setLoading(true); // Show full-screen loader for first page
+    
+//             const user_id = await AsyncStorage.getItem('User_id');
+    
+//             if (!user_id) {
+//                 showToast('error', 'Error', 'User ID not found.');
+//                 throw new Error('User ID not found');
+//             }
+    
+//             // API Request
+//             const response = await api.get(`notification/user`, {
+//                 params: {
+//                     id: user_id, // ✅ Dynamically using retrieved user_id
+//                     pageSize: 4, 
+//                     currentPage: page,
+//                 },
+//             });
+    
+//             if (response.status === 200 && response.data?.result) {
+//                 const newData = response.data.data;
+//                 const totalItems = response.data.pagination?.totalItems || 0;
+//                 const calculatedTotalPages = Math.ceil(totalItems / 4);
+    
+//                 setNotifications((prevData) => (page === 1 ? newData : [...prevData, ...newData]));
+//                 setCurrentPage(page);
+//                 setTotalPages(calculatedTotalPages);
+    
+//                 console.log(`Fetched Page ${page} / ${calculatedTotalPages}`, newData);
+//             } else {
+//                 showToast("error", "Error", response.data?.message || "Failed to fetch notifications");
+//                 console.warn(response.data?.message || "Failed to fetch notifications");
+//             }
+//         } catch (error) {
+//             console.warn("Error fetching notifications:", error.message);
+//         } finally {
+//             setLoading(false);
+//             setIsFetchingMore(false);
+//         }
+//     };
+//    // Load more data when user scrolls to the bottom
+//    const loadMoreMeetups = () => {
+//     if (!isFetchingMore && currentPage < totalPages) {
+//         setIsFetchingMore(true);
+//         getMeetups(currentPage + 1);
+//     }
+// };
+
 
     const renderItem = ({ item }) => (
         <TouchableOpacity

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, Pressable } from 'react-native';
 
 import CustomButton from './CustomButton'; // Assuming you have a CustomButton component for reuse
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
@@ -11,7 +11,7 @@ import { showToast } from '../utils/toastService';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../utils/axiosInstance';
 
-const MeetAndWorkCard = ({ item, onpress,navigation }) => {
+const MeetAndWorkCard = ({ item, onpress, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [isRegistered, setIsRegistered] = useState('');
   const formatDate = (dateString) => {
@@ -25,7 +25,7 @@ const MeetAndWorkCard = ({ item, onpress,navigation }) => {
     const month = months[date.getMonth()];
     const year = String(date.getFullYear()).slice(-2);
 
-    return `${day}-${month}-${year}`;
+    return `${day} ${month} ${year}`;
   };
   console.log('itemitem', item.id);
   const getRegisteredEvents = async () => {
@@ -82,7 +82,7 @@ const MeetAndWorkCard = ({ item, onpress,navigation }) => {
   }, []);
   return (
     <View style={styles.card}>
-      <TouchableOpacity onPress={onpress}>
+      <Pressable onPress={onpress}>
         {/* Header Section */}
         <View style={styles.header}>
           <Image source={{ uri: item.image }} style={styles.headerImage} />
@@ -126,10 +126,10 @@ const MeetAndWorkCard = ({ item, onpress,navigation }) => {
 
 
         </View>
-      </TouchableOpacity>
-      {isRegistered === true ?  <View style={styles.registerButton}>
-                              <Text style={styles.registerText}>Event Already Registered</Text>
-                          </View>  : <CustomButton
+      </Pressable>
+      {isRegistered === true ? <View style={styles.registerButton}>
+        <Text style={styles.registerText}>Event Already Registered</Text>
+      </View> : <CustomButton
         title="Register"
         align="center"
         onPress={onpress}
@@ -155,15 +155,25 @@ const styles = StyleSheet.create({
     marginTop: wp("3%"),
     // marginBottom: wp("15%"),
     margin: wp("1%"),
+    alignItems:'center',
+    padding:wp('4')
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
+    elevation: 10,
+    // backgroundColor: "red",
+    borderRadius: 10,
+    width: wp("84%"),
+    // height: wp("45%"),
+    // marginTop: wp("3%"),
   },
   headerImage: {
-    width: wp("94%"),
-    height: wp("39%"),
-    resizeMode: 'contain',
-    borderRadius: wp("2%"),
+    width: wp("84%"),
+    height: wp("45%"),
+    borderRadius: 10,
+    resizeMode: 'cover',
+    elevation: 10,
+    backgroundColor: "#fff",
   },
   title: {
     fontSize: wp('5'),
@@ -210,14 +220,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.black,
     borderRadius: wp('3.5'),
     width: wp('87%'),
-    alignSelf:'center'
+    alignSelf: 'center'
   },
   registerText: {
     fontSize: wp("4.5%"),
-  
+
     color: Colors.white,
     textAlign: "center",
-    fontWeight:'bold'
+    fontWeight: 'bold'
 
   },
   pricetag: {

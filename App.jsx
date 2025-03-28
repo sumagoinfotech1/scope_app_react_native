@@ -118,11 +118,11 @@ const handleNotificationNavigation = async (data) => {
     }
     else if (notificationType === "event_reminder") {
         console.log("Navigating to UpcomimgEventScreen:", eventId);
-        navigationRef.current.navigate('UpcomingEvent', { screen: 'UpcomimgEventScreen' });
+        navigationRef.current.navigate('Upcoming', { screen: 'UpcomimgEventScreen' });
     }
     else if (notificationType === "event_cancelled") {
         console.log("Navigating to event cancelled:", eventId);
-        navigationRef.current.navigate('UpcomingEvent', { screen: 'UpcomimgEventScreen' });
+        navigationRef.current.navigate('Upcoming', { screen: 'UpcomimgEventScreen' });
     }
     else if (notificationType === "reward_earned") {
         console.log("Navigating to event cancelled:", eventId);

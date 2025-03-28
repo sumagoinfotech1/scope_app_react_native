@@ -227,9 +227,24 @@ const styles = StyleSheet.create({
 
   descriptionContainer: { marginTop: hp('3%'), paddingHorizontal: wp('5%'), width: '90%' },
 
-  bulletPoint: { flexDirection: 'row', alignItems: 'center', marginBottom: hp('1%') },
-
-  descriptionText: { fontSize: wp('4%'), color: 'black', marginLeft: wp('2%') },
+  bulletPoint: {
+    flexDirection: 'row',
+    alignItems: 'flex-start', // Keeps bullet aligned with the first line
+    marginBottom: hp('1%'),
+  },
+  icon: {
+    borderWidth: 4,
+    borderRadius: 20,
+    borderColor: Colors.background,
+    padding: 4,
+    marginTop: 2, // Adjust bullet alignment slightly
+  },
+  descriptionText: {
+    fontSize: wp('4%'),
+    color: 'black',
+    marginLeft: wp('2%'),
+    flexShrink: 1, // Ensures text wraps properly without pushing the bullet down
+  },
 
   referralBox: { flexDirection: 'row', alignItems: 'center', backgroundColor: 'white', borderRadius: 10, paddingHorizontal: wp('5%'), width: '85%', height: hp('6%'), marginTop: hp('3%'), elevation: 5 },
 
@@ -240,14 +255,14 @@ const styles = StyleSheet.create({
   referButton: { backgroundColor: 'black', paddingVertical: hp('1.5%'), paddingHorizontal: wp('10%'), borderRadius: 10, marginTop: hp('3%') },
 
   referButtonText: { color: 'white', fontSize: wp('4.5%'), fontWeight: 'bold' },
-  icon: {
-    fontWeight: "bold",
-    fontSize: wp('3'),
-    borderWidth: 4,
-    borderRadius: 20,
-    borderColor: Colors.background,
-    padding: 4
-  },
+  // icon: {
+  //   fontWeight: "bold",
+  //   fontSize: wp('3'),
+  //   borderWidth: 4,
+  //   borderRadius: 20,
+  //   borderColor: Colors.background,
+  //   padding: 4
+  // },
   yesButton: {
     backgroundColor: "#000",
     paddingVertical: hp("0.8%"),
